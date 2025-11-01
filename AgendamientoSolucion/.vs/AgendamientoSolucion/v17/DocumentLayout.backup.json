@@ -1,0 +1,897 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\scriptbd\\bd.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\scriptbd\\bd.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\usuariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\usuariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\notificacioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\notificacioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\metricasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\metricasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\imetricasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\imetricasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\informeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\informeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\iinformeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\iinformeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\informe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\informe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\models\\smtpsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\models\\smtpsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\emailtemplateservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\emailtemplateservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\iemailtemplateservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\iemailtemplateservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\utils\\emailvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\utils\\emailvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\correoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\correoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\tutoria.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\tutoria.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\retroalimentacion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\retroalimentacion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\horario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\horario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\notificacion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\notificacion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\usuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\usuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\dbcontexts\\agendamientodbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\dbcontexts\\agendamientodbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\agendamiento.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\agendamiento.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\horariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\horariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\horarioservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\horarioservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\iauthenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\iauthenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\horariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\horariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\agendamiento.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\agendamiento.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\usuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\usuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\excelservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\excelservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\tutoriaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\tutoriaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\notificacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\notificacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\ihorarioservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\ihorarioservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\interfaces\\ihorariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\interfaces\\ihorariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.entidades\\entities\\rol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8495BD0A-A031-44B6-808F-8ECB73FF331B}|AgendamientoGestion.Entidades\\AgendamientoGestion.Entidades.csproj|solutionrelative:agendamientogestion.entidades\\entities\\rol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\agendamientogestion.persistencia.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\agendamientogestion.persistencia.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\agendamientogestion.logica.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\agendamientogestion.logica.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\usuariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\usuariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\tutoriarepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\tutoriarepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\retroalimentacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\retroalimentacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\notificacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\notificacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\informerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\informerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\services\\retroalimentacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\services\\retroalimentacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\interfaces\\iusuariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\interfaces\\iusuariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\interfaces\\inotificacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\interfaces\\inotificacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\interfaces\\itutoriarepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\interfaces\\itutoriarepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\interfaces\\iinformerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\interfaces\\iinformerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\interfaces\\iretroalimentacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\interfaces\\iretroalimentacionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\iretroalimentacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\iretroalimentacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\iusuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\iusuarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\itutoriaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\itutoriaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.logica\\interfaces\\inotificacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7E44AA4-EF21-4A95-863F-8C1BD7D7FCD8}|AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj|solutionrelative:agendamientogestion.logica\\interfaces\\inotificacionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamientogestion.persistencia\\scriptbd\\bd.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame",
+      "RelativeMoniker": "D:0:0:{826B8249-CCE3-44F0-AB58-CEA0E3C12001}|AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj|solutionrelative:agendamientogestion.persistencia\\scriptbd\\bd.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 11,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "HorarioRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\HorarioRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\HorarioRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\HorarioRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\HorarioRepository.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAcwAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T22:11:10.922Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "AgendamientoDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\DbContexts\\AgendamientoDbContext.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\DbContexts\\AgendamientoDbContext.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\DbContexts\\AgendamientoDbContext.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\DbContexts\\AgendamientoDbContext.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAA0wB8AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T22:39:35.471Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Usuario.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Usuario.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Usuario.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Usuario.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Usuario.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:42:36.758Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Informe.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Informe.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Informe.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Informe.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Informe.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:51:28.364Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IInformeService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IInformeService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IInformeService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IInformeService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IInformeService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:02:49.022Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "InformeService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\InformeService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\InformeService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\InformeService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\InformeService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T22:59:29.967Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MetricasService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\MetricasService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\MetricasService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\MetricasService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\MetricasService.cs",
+              "ViewState": "AgIAAGQAAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T23:31:06.511Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NotificacionController.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\NotificacionController.cs",
+              "RelativeDocumentMoniker": "Agendamiento\\Controllers\\NotificacionController.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\NotificacionController.cs",
+              "RelativeToolTip": "Agendamiento\\Controllers\\NotificacionController.cs",
+              "ViewState": "AgIAAHAAAAAAAAAAAAAqwIsAAABXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T01:51:19.007Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Program.cs",
+              "RelativeDocumentMoniker": "Agendamiento\\Program.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Program.cs",
+              "RelativeToolTip": "Agendamiento\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:23:11.508Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BD.sql ",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\ScriptBD\\BD.sql",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\ScriptBD\\BD.sql",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\ScriptBD\\BD.sql",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\ScriptBD\\BD.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-10-31T02:01:04.866Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UsuarioController.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\UsuarioController.cs",
+              "RelativeDocumentMoniker": "Agendamiento\\Controllers\\UsuarioController.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\UsuarioController.cs",
+              "RelativeToolTip": "Agendamiento\\Controllers\\UsuarioController.cs",
+              "ViewState": "AgIAAHgAAAAAAAAAAAAAAJMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-01T00:13:38.899Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "HorarioServices.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\HorarioServices.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\HorarioServices.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\HorarioServices.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\HorarioServices.cs",
+              "ViewState": "AgIAALwAAAAAAAAAAAAuwAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T22:12:48.879Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\appsettings.json",
+              "RelativeDocumentMoniker": "Agendamiento\\appsettings.json",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\appsettings.json",
+              "RelativeToolTip": "Agendamiento\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-24T22:35:17.324Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IMetricasService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IMetricasService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IMetricasService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IMetricasService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IMetricasService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-31T23:39:07.65Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Retroalimentacion.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Retroalimentacion.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Retroalimentacion.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Retroalimentacion.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Retroalimentacion.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:51:16.699Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "EmailValidator.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Utils\\EmailValidator.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Utils\\EmailValidator.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Utils\\EmailValidator.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Utils\\EmailValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-31T22:00:07.02Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "IEmailTemplateService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IEmailTemplateService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IEmailTemplateService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IEmailTemplateService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IEmailTemplateService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-31T22:00:16.628Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "SmtpSettings.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Models\\SmtpSettings.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Models\\SmtpSettings.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Models\\SmtpSettings.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Models\\SmtpSettings.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-31T22:06:32.59Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "EmailTemplateService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\EmailTemplateService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\EmailTemplateService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\EmailTemplateService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\EmailTemplateService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T01:25:54.178Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Notificacion.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Notificacion.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Notificacion.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Notificacion.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Notificacion.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:51:49.669Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "Horario.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Horario.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Horario.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Horario.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Horario.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T22:08:18.219Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "CorreoService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\CorreoService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\CorreoService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\CorreoService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\CorreoService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T01:21:15.972Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Tutoria.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Tutoria.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Tutoria.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Tutoria.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Tutoria.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:43:01.589Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "AuthenticationService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\AuthenticationService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\AuthenticationService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\AuthenticationService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\AuthenticationService.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAA8AAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T23:29:59.44Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Agendamiento.http",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Agendamiento.http",
+              "RelativeDocumentMoniker": "Agendamiento\\Agendamiento.http",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Agendamiento.http",
+              "RelativeToolTip": "Agendamiento\\Agendamiento.http",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2025-10-24T22:34:58.576Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "IAuthenticationService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IAuthenticationService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IAuthenticationService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IAuthenticationService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IAuthenticationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T02:04:39.188Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "Agendamiento.csproj",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Agendamiento.csproj",
+              "RelativeDocumentMoniker": "Agendamiento\\Agendamiento.csproj",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Agendamiento.csproj",
+              "RelativeToolTip": "Agendamiento\\Agendamiento.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-26T01:36:03.759Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "HorarioController.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\HorarioController.cs",
+              "RelativeDocumentMoniker": "Agendamiento\\Controllers\\HorarioController.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\HorarioController.cs",
+              "RelativeToolTip": "Agendamiento\\Controllers\\HorarioController.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAhwCsAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T23:15:33.352Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "ExcelService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\ExcelService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\ExcelService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\ExcelService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\ExcelService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T01:26:24.099Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Agendamiento\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Agendamiento\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T23:15:29.528Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "UsuarioService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\UsuarioService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\UsuarioService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\UsuarioService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\UsuarioService.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAqwAkAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T22:57:52.429Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "TutoriaService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\TutoriaService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\TutoriaService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\TutoriaService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\TutoriaService.cs",
+              "ViewState": "AgIAAIYAAAAAAAAAAAAYwAkAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T22:58:35.631Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "NotificacionService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\NotificacionService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\NotificacionService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\NotificacionService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\NotificacionService.cs",
+              "ViewState": "AgIAAAoBAAAAAAAAAAAAwAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T22:59:14.897Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "IHorarioRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IHorarioRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\Interfaces\\IHorarioRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IHorarioRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\Interfaces\\IHorarioRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T22:11:47.869Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "IHorarioServices.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IHorarioServices.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IHorarioServices.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IHorarioServices.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IHorarioServices.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T22:12:21.472Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "AgendamientoGestion.Persistencia.csproj",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\AgendamientoGestion.Persistencia.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-25T01:21:59.059Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "UsuarioRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\UsuarioRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\UsuarioRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\UsuarioRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\UsuarioRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA6wAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:17:19.171Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "Rol.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Rol.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Entidades\\Entities\\Rol.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Entidades\\Entities\\Rol.cs",
+              "RelativeToolTip": "AgendamientoGestion.Entidades\\Entities\\Rol.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T18:43:28.035Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAAP0UAAAAAAAAAAAswBEVAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-10-25T07:12:25.434Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "AgendamientoGestion.Logica.csproj",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\AgendamientoGestion.Logica.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-25T20:59:37.258Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "TutoriaRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\TutoriaRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\TutoriaRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\TutoriaRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\TutoriaRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA6wAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:17:43.041Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "RetroalimentacionRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\RetroalimentacionRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\RetroalimentacionRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\RetroalimentacionRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\RetroalimentacionRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA6wAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:18:17.592Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "NotificacionRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\NotificacionRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\NotificacionRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\NotificacionRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\NotificacionRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA6wAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:18:49.248Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "InformeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\InformeRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\InformeRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\InformeRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\InformeRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAqwAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:19:16.808Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "RetroalimentacionService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\RetroalimentacionService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Services\\RetroalimentacionService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Services\\RetroalimentacionService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\RetroalimentacionService.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAABhwA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T22:59:02.034Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "IUsuarioRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IUsuarioRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\Interfaces\\IUsuarioRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IUsuarioRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\Interfaces\\IUsuarioRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:14:11.434Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "INotificacionRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\INotificacionRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\Interfaces\\INotificacionRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\INotificacionRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\Interfaces\\INotificacionRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:16:10.215Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 48,
+              "Title": "IInformeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IInformeRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\Interfaces\\IInformeRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IInformeRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\Interfaces\\IInformeRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:16:36.161Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 49,
+              "Title": "IRetroalimentacionRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IRetroalimentacionRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\Interfaces\\IRetroalimentacionRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\IRetroalimentacionRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\Interfaces\\IRetroalimentacionRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:15:36.778Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 47,
+              "Title": "ITutoriaRepository.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\ITutoriaRepository.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Persistencia\\Interfaces\\ITutoriaRepository.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Persistencia\\Interfaces\\ITutoriaRepository.cs",
+              "RelativeToolTip": "AgendamientoGestion.Persistencia\\Interfaces\\ITutoriaRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:15:10.408Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 50,
+              "Title": "IRetroalimentacionService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IRetroalimentacionService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IRetroalimentacionService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IRetroalimentacionService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IRetroalimentacionService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:01:42.849Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 52,
+              "Title": "ITutoriaService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\ITutoriaService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\ITutoriaService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\ITutoriaService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\ITutoriaService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:01:20.617Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 51,
+              "Title": "IUsuarioService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IUsuarioService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\IUsuarioService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\IUsuarioService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\IUsuarioService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:01:00.812Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 53,
+              "Title": "INotificacionService.cs",
+              "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\INotificacionService.cs",
+              "RelativeDocumentMoniker": "AgendamientoGestion.Logica\\Interfaces\\INotificacionService.cs",
+              "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\AgendamientoGestion.Logica\\Interfaces\\INotificacionService.cs",
+              "RelativeToolTip": "AgendamientoGestion.Logica\\Interfaces\\INotificacionService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T23:02:17.297Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

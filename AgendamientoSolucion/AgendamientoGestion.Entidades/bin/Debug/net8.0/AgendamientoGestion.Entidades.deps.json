@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "AgendamientoGestion.Entidades/1.0.0": {
+        "runtime": {
+          "AgendamientoGestion.Entidades.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AgendamientoGestion.Entidades/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

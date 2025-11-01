@@ -1,0 +1,17 @@
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\bin\Debug\net8.0\AgendamientoGestion.Persistencia.deps.json
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\bin\Debug\net8.0\AgendamientoGestion.Persistencia.runtimeconfig.json
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\bin\Debug\net8.0\AgendamientoGestion.Persistencia.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\bin\Debug\net8.0\AgendamientoGestion.Persistencia.pdb
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\bin\Debug\net8.0\AgendamientoGestion.Entidades.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\bin\Debug\net8.0\AgendamientoGestion.Entidades.pdb
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.csproj.AssemblyReference.cache
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.AssemblyInfoInputs.cache
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.AssemblyInfo.cs
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.csproj.CoreCompileInputs.cache
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\Agendami.54B75CA5.Up2Date
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\refint\AgendamientoGestion.Persistencia.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.pdb
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.genruntimeconfig.cache
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\ref\AgendamientoGestion.Persistencia.dll

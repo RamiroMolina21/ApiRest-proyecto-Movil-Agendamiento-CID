@@ -1,0 +1,11 @@
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\bin\Debug\net8.0\AgendamientoGestion.Entidades.deps.json
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\bin\Debug\net8.0\AgendamientoGestion.Entidades.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\bin\Debug\net8.0\AgendamientoGestion.Entidades.pdb
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.AssemblyInfoInputs.cache
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.AssemblyInfo.cs
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.csproj.CoreCompileInputs.cache
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\refint\AgendamientoGestion.Entidades.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.pdb
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\ref\AgendamientoGestion.Entidades.dll
