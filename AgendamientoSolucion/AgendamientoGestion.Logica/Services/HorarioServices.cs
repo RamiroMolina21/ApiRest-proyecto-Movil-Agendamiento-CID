@@ -2,13 +2,10 @@
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
-using AgendamientoGestion.Logica.Utils;
 using AgendamientoGestion.Persistencia.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AgendamientoGestion.Logica.Services;
@@ -17,62 +14,20 @@ public class HorarioServices : IHorarioServices
 {
     private readonly IHorarioRepository _horarioRepository;
     private readonly IUsuarioRepository _usuarioRepository;
-    private readonly IRolRepository _rolRepository;
 
-    public HorarioServices(IHorarioRepository horarioRepository, IUsuarioRepository usuarioRepository, IRolRepository rolRepository)
+    public HorarioServices(IHorarioRepository horarioRepository, IUsuarioRepository usuarioRepository)
     {
         _horarioRepository = horarioRepository;
         _usuarioRepository = usuarioRepository;
-        _rolRepository = rolRepository;
     }
 
     public async Task<HorarioResponseDto> CreateHorarioAsync(HorarioCreateDto horarioDto)
     {
-        // Validar formato de correo
-        EmailValidator.ValidateEmail(horarioDto.DocenteCorreo, "Correo del docente");
-
-        // Buscar docente por nombre, apellidos y correo
-        var docente = await _usuarioRepository.GetByNombreApellidosCorreoAsync(
-            horarioDto.DocenteNombre, 
-            horarioDto.DocenteApellidos, 
-            horarioDto.DocenteCorreo);
-
-        // Si no existe, buscar por correo para verificar si hay inconsistencia
-        if (docente == null)
+        // Buscar usuario por ID
+        var usuario = await _usuarioRepository.GetByIdAsync(horarioDto.UsuarioId);
+        if (usuario == null)
         {
-            var docentePorCorreo = await _usuarioRepository.GetByEmailAsync(horarioDto.DocenteCorreo);
-            if (docentePorCorreo != null)
-            {
-                throw new ValidationException("Ya existe un usuario con este correo pero con datos diferentes");
-            }
-
-            // Buscar rol docente
-            var rolDocente = await _rolRepository.GetByTipoAsync("Docente");
-            if (rolDocente == null)
-            {
-                throw new NotFoundException("El rol 'Docente' no existe en el sistema");
-            }
-
-            // Crear nuevo docente
-            docente = new Usuario
-            {
-                nombres = horarioDto.DocenteNombre,
-                apellidos = horarioDto.DocenteApellidos,
-                correo = horarioDto.DocenteCorreo,
-                contrasenaHash = BCrypt.Net.BCrypt.HashPassword("Temporal123!"), // Contraseña temporal
-                fechaRegistro = DateTime.Now,
-                Rol_idRol = rolDocente.idRol
-            };
-
-            docente = await _usuarioRepository.CreateAsync(docente);
-        }
-        else
-        {
-            // Verificar que el usuario tenga rol de docente
-            if (docente.Rol == null || docente.Rol.tipoRol.ToLower() != "docente")
-            {
-                throw new ValidationException("El usuario especificado no tiene rol de docente");
-            }
+            throw new NotFoundException("Usuario no encontrado");
         }
 
         // Crear horario
@@ -85,7 +40,7 @@ public class HorarioServices : IHorarioServices
             cupos = horarioDto.Cupos,
             espacio = horarioDto.Espacio,
             estado = horarioDto.Estado,
-            Usuario_idUsuario = docente.idUsuario
+            Usuario_idUsuario = usuario.idUsuario
         };
 
         var horarioCreado = await _horarioRepository.CreateAsync(horario);
@@ -100,9 +55,9 @@ public class HorarioServices : IHorarioServices
             Cupos = horarioCreado.cupos,
             Espacio = horarioCreado.espacio,
             Estado = horarioCreado.estado,
-            UsuarioNombre = docente.nombres,
-            UsuarioApellidos = docente.apellidos,
-            UsuarioCorreo = docente.correo
+            UsuarioNombre = usuario.nombres,
+            UsuarioApellidos = usuario.apellidos,
+            UsuarioCorreo = usuario.correo
         };
     }
 
@@ -166,51 +121,11 @@ public class HorarioServices : IHorarioServices
             throw new NotFoundException("Horario no encontrado");
         }
 
-        // Validar formato de correo
-        EmailValidator.ValidateEmail(horarioDto.DocenteCorreo, "Correo del docente");
-
-        // Buscar docente por nombre, apellidos y correo
-        var docente = await _usuarioRepository.GetByNombreApellidosCorreoAsync(
-            horarioDto.DocenteNombre, 
-            horarioDto.DocenteApellidos, 
-            horarioDto.DocenteCorreo);
-
-        // Si no existe, buscar por correo para verificar si hay inconsistencia
-        if (docente == null)
+        // Buscar usuario por ID
+        var usuario = await _usuarioRepository.GetByIdAsync(horarioDto.UsuarioId);
+        if (usuario == null)
         {
-            var docentePorCorreo = await _usuarioRepository.GetByEmailAsync(horarioDto.DocenteCorreo);
-            if (docentePorCorreo != null)
-            {
-                throw new ValidationException("Ya existe un usuario con este correo pero con datos diferentes");
-            }
-
-            // Buscar rol docente
-            var rolDocente = await _rolRepository.GetByTipoAsync("Docente");
-            if (rolDocente == null)
-            {
-                throw new NotFoundException("El rol 'Docente' no existe en el sistema");
-            }
-
-            // Crear nuevo docente
-            docente = new Usuario
-            {
-                nombres = horarioDto.DocenteNombre,
-                apellidos = horarioDto.DocenteApellidos,
-                correo = horarioDto.DocenteCorreo,
-                contrasenaHash = BCrypt.Net.BCrypt.HashPassword("Temporal123!"), // Contraseña temporal
-                fechaRegistro = DateTime.Now,
-                Rol_idRol = rolDocente.idRol
-            };
-
-            docente = await _usuarioRepository.CreateAsync(docente);
-        }
-        else
-        {
-            // Verificar que el usuario tenga rol de docente
-            if (docente.Rol == null || docente.Rol.tipoRol.ToLower() != "docente")
-            {
-                throw new ValidationException("El usuario especificado no tiene rol de docente");
-            }
+            throw new NotFoundException("Usuario no encontrado");
         }
 
         // Actualizar datos
@@ -221,7 +136,7 @@ public class HorarioServices : IHorarioServices
         horario.cupos = horarioDto.Cupos;
         horario.espacio = horarioDto.Espacio;
         horario.estado = horarioDto.Estado;
-        horario.Usuario_idUsuario = docente.idUsuario;
+        horario.Usuario_idUsuario = usuario.idUsuario;
 
         await _horarioRepository.UpdateAsync(horario);
 
@@ -235,9 +150,9 @@ public class HorarioServices : IHorarioServices
             Cupos = horario.cupos,
             Espacio = horario.espacio,
             Estado = horario.estado,
-            UsuarioNombre = docente.nombres,
-            UsuarioApellidos = docente.apellidos,
-            UsuarioCorreo = docente.correo
+            UsuarioNombre = usuario.nombres,
+            UsuarioApellidos = usuario.apellidos,
+            UsuarioCorreo = usuario.correo
         };
     }
 

@@ -1027,15 +1027,13 @@
       "HorarioCreateDto": {
         "required": [
           "cupos",
-          "docenteApellidos",
-          "docenteCorreo",
-          "docenteNombre",
           "espacio",
           "estado",
           "fechaFin",
           "fechaInicio",
           "horaFin",
-          "horaInicio"
+          "horaInicio",
+          "usuarioId"
         ],
         "type": "object",
         "properties": {
@@ -1070,21 +1068,9 @@
             "minLength": 0,
             "type": "string"
           },
-          "docenteNombre": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "docenteApellidos": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "docenteCorreo": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string",
-            "format": "email"
+          "usuarioId": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1148,9 +1134,7 @@
           "modalidad",
           "nivel",
           "tema",
-          "tutorApellidos",
-          "tutorCorreo",
-          "tutorNombre"
+          "usuarioId"
         ],
         "type": "object",
         "properties": {
@@ -1183,21 +1167,9 @@
             "type": "string",
             "format": "date-time"
           },
-          "tutorNombre": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "tutorApellidos": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "tutorCorreo": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string",
-            "format": "email"
+          "usuarioId": {
+            "type": "integer",
+            "format": "int32"
           },
           "horarioId": {
             "type": "integer",

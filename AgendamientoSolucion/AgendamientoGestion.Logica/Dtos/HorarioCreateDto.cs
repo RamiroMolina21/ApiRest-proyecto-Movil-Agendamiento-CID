@@ -33,17 +33,7 @@ namespace AgendamientoGestion.Logica.Dtos
         [StringLength(60, ErrorMessage = "El estado no puede exceder 60 caracteres")]
         public string Estado { get; set; }
 
-        [Required(ErrorMessage = "El nombre del docente es obligatorio")]
-        [StringLength(60, ErrorMessage = "El nombre no puede exceder 60 caracteres")]
-        public string DocenteNombre { get; set; }
-
-        [Required(ErrorMessage = "Los apellidos del docente son obligatorios")]
-        [StringLength(60, ErrorMessage = "Los apellidos no pueden exceder 60 caracteres")]
-        public string DocenteApellidos { get; set; }
-
-        [Required(ErrorMessage = "El correo del docente es obligatorio")]
-        [StringLength(60, ErrorMessage = "El correo no puede exceder 60 caracteres")]
-        [EmailAddress(ErrorMessage = "El formato del correo no es válido")]
-        public string DocenteCorreo { get; set; }
+        [Required(ErrorMessage = "El ID del usuario es obligatorio")]
+        public int UsuarioId { get; set; }
     }
 }

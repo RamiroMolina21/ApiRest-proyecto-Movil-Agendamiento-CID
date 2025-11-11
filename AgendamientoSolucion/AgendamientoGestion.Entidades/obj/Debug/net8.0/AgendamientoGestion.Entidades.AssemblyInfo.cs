@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgendamientoGestion.Entidades")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db45eb270a44304cbac9645b626f232f4001dc95")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgendamientoGestion.Entidades")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgendamientoGestion.Entidades")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

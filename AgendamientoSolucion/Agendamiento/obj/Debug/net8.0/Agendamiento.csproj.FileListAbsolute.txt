@@ -176,3 +176,4 @@ C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\Agendami.676A7057.Up2Date
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\Agendamiento.genruntimeconfig.cache
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\ref\Agendamiento.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\Agendamiento.sourcelink.json

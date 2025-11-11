@@ -17,3 +17,4 @@ C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoG
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Logica\bin\Debug\net8.0\AgendamientoGestion.Persistencia.pdb
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Logica\bin\Debug\net8.0\AgendamientoGestion.Entidades.pdb
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Logica\obj\Debug\net8.0\Agendami.365551F5.Up2Date
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Logica\obj\Debug\net8.0\AgendamientoGestion.Logica.sourcelink.json

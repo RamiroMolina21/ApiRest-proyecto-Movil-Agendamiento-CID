@@ -34,48 +34,11 @@ public class TutoriaService : ITutoriaService
 
     public async Task<TutoriaResponseDto> CreateTutoriaAsync(TutoriaCreateDto tutoriaDto)
     {
-        // Validar formato de correo
-        EmailValidator.ValidateEmail(tutoriaDto.TutorCorreo, "Correo del tutor");
-
-        // Buscar tutor por nombre, apellidos y correo
-        var tutor = await _usuarioRepository.GetByNombreApellidosCorreoAsync(
-            tutoriaDto.TutorNombre, 
-            tutoriaDto.TutorApellidos, 
-            tutoriaDto.TutorCorreo);
-
-        // Si no existe, buscar por correo para verificar si hay inconsistencia
+        // Buscar tutor por ID
+        var tutor = await _usuarioRepository.GetByIdAsync(tutoriaDto.UsuarioId);
         if (tutor == null)
         {
-            var tutorPorCorreo = await _usuarioRepository.GetByEmailAsync(tutoriaDto.TutorCorreo);
-            if (tutorPorCorreo != null)
-            {
-                throw new ValidationException("Ya existe un usuario con este correo pero con datos diferentes");
-            }
-
-            // Buscar rol tutor (podría ser "Tutor" o "Docente", asumimos que existe un rol para tutores)
-            var rolTutor = await _rolRepository.GetByTipoAsync("Tutor");
-            if (rolTutor == null)
-            {
-                // Si no existe rol Tutor, usar Docente
-                rolTutor = await _rolRepository.GetByTipoAsync("Docente");
-                if (rolTutor == null)
-                {
-                    throw new NotFoundException("No existe un rol adecuado para tutores en el sistema");
-                }
-            }
-
-            // Crear nuevo tutor
-            tutor = new Usuario
-            {
-                nombres = tutoriaDto.TutorNombre,
-                apellidos = tutoriaDto.TutorApellidos,
-                correo = tutoriaDto.TutorCorreo,
-                contrasenaHash = BCrypt.Net.BCrypt.HashPassword("Temporal123!"), // Contraseña temporal
-                fechaRegistro = DateTime.Now,
-                Rol_idRol = rolTutor.idRol
-            };
-
-            tutor = await _usuarioRepository.CreateAsync(tutor);
+            throw new NotFoundException("Usuario no encontrado");
         }
 
         // Verificar que el horario existe
@@ -237,47 +200,11 @@ public class TutoriaService : ITutoriaService
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        // Validar formato de correo
-        EmailValidator.ValidateEmail(tutoriaDto.TutorCorreo, "Correo del tutor");
-
-        // Buscar tutor por nombre, apellidos y correo
-        var tutor = await _usuarioRepository.GetByNombreApellidosCorreoAsync(
-            tutoriaDto.TutorNombre, 
-            tutoriaDto.TutorApellidos, 
-            tutoriaDto.TutorCorreo);
-
-        // Si no existe, buscar por correo para verificar si hay inconsistencia
+        // Buscar tutor por ID
+        var tutor = await _usuarioRepository.GetByIdAsync(tutoriaDto.UsuarioId);
         if (tutor == null)
         {
-            var tutorPorCorreo = await _usuarioRepository.GetByEmailAsync(tutoriaDto.TutorCorreo);
-            if (tutorPorCorreo != null)
-            {
-                throw new ValidationException("Ya existe un usuario con este correo pero con datos diferentes");
-            }
-
-            // Buscar rol tutor
-            var rolTutor = await _rolRepository.GetByTipoAsync("Tutor");
-            if (rolTutor == null)
-            {
-                rolTutor = await _rolRepository.GetByTipoAsync("Docente");
-                if (rolTutor == null)
-                {
-                    throw new NotFoundException("No existe un rol adecuado para tutores en el sistema");
-                }
-            }
-
-            // Crear nuevo tutor
-            tutor = new Usuario
-            {
-                nombres = tutoriaDto.TutorNombre,
-                apellidos = tutoriaDto.TutorApellidos,
-                correo = tutoriaDto.TutorCorreo,
-                contrasenaHash = BCrypt.Net.BCrypt.HashPassword("Temporal123!"),
-                fechaRegistro = DateTime.Now,
-                Rol_idRol = rolTutor.idRol
-            };
-
-            tutor = await _usuarioRepository.CreateAsync(tutor);
+            throw new NotFoundException("Usuario no encontrado");
         }
 
         // Verificar que el horario existe
