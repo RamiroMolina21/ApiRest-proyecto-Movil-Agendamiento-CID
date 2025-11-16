@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgendamientoGestion.Persistencia")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db45eb270a44304cbac9645b626f232f4001dc95")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+690b76c0b8e9a7550dd620ffa5854ffbc2768139")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgendamientoGestion.Persistencia")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgendamientoGestion.Persistencia")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

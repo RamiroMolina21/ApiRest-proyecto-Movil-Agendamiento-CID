@@ -33,6 +33,7 @@ public class HorarioServices : IHorarioServices
         // Crear horario
         var horario = new Horario
         {
+            titulo = horarioDto.Titulo,
             fechaInicio = horarioDto.FechaInicio,
             fechaFin = horarioDto.FechaFin,
             horaInicio = horarioDto.HoraInicio,
@@ -48,6 +49,7 @@ public class HorarioServices : IHorarioServices
         return new HorarioResponseDto
         {
             IdHorario = horarioCreado.idHorario,
+            Titulo = horarioCreado.titulo,
             FechaInicio = horarioCreado.fechaInicio,
             FechaFin = horarioCreado.fechaFin,
             HoraInicio = horarioCreado.horaInicio,
@@ -74,6 +76,7 @@ public class HorarioServices : IHorarioServices
         return new HorarioResponseDto
         {
             IdHorario = horario.idHorario,
+            Titulo = horario.titulo,
             FechaInicio = horario.fechaInicio,
             FechaFin = horario.fechaFin,
             HoraInicio = horario.horaInicio,
@@ -98,6 +101,7 @@ public class HorarioServices : IHorarioServices
             horariosDto.Add(new HorarioResponseDto
             {
                 IdHorario = horario.idHorario,
+                Titulo = horario.titulo,
                 FechaInicio = horario.fechaInicio,
                 FechaFin = horario.fechaFin,
                 HoraInicio = horario.horaInicio,
@@ -129,6 +133,7 @@ public class HorarioServices : IHorarioServices
         }
 
         // Actualizar datos
+        horario.titulo = horarioDto.Titulo;
         horario.fechaInicio = horarioDto.FechaInicio;
         horario.fechaFin = horarioDto.FechaFin;
         horario.horaInicio = horarioDto.HoraInicio;
@@ -143,6 +148,7 @@ public class HorarioServices : IHorarioServices
         return new HorarioResponseDto
         {
             IdHorario = horario.idHorario,
+            Titulo = horario.titulo,
             FechaInicio = horario.fechaInicio,
             FechaFin = horario.fechaFin,
             HoraInicio = horario.horaInicio,
@@ -178,6 +184,7 @@ public class HorarioServices : IHorarioServices
             horariosDto.Add(new HorarioResponseDto
             {
                 IdHorario = horario.idHorario,
+                Titulo = horario.titulo,
                 FechaInicio = horario.fechaInicio,
                 FechaFin = horario.fechaFin,
                 HoraInicio = horario.horaInicio,
@@ -204,6 +211,7 @@ public class HorarioServices : IHorarioServices
             horariosDto.Add(new HorarioResponseDto
             {
                 IdHorario = horario.idHorario,
+                Titulo = horario.titulo,
                 FechaInicio = horario.fechaInicio,
                 FechaFin = horario.fechaFin,
                 HoraInicio = horario.horaInicio,

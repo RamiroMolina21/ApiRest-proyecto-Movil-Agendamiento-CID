@@ -231,5 +231,23 @@ namespace Agendamiento.Controllers
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
+
+        [HttpGet("{id}/estudiantes")]
+        public async Task<IActionResult> GetEstudiantesByTutoria(int id)
+        {
+            try
+            {
+                var estudiantes = await _tutoriaService.GetEstudiantesByTutoriaAsync(id);
+                return Ok(estudiantes);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor" });
+            }
+        }
     }
 }

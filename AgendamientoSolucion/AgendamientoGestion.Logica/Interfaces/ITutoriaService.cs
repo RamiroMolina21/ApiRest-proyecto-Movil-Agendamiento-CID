@@ -17,4 +17,5 @@ public interface ITutoriaService {
     Task<List<TutoriaResponseDto>> GetCalendarioPorDocenteAsync(string nombre, string apellidos, string correo);
     Task<List<TutoriaResponseDto>> GetCalendarioPorEstudianteAsync(string nombre, string apellidos, string correo);
     Task<List<TutoriaResponseDto>> GetCalendarioPorIdiomaNivelAsync(string idioma, string nivel);
+    Task<List<UsuarioResponseDto>> GetEstudiantesByTutoriaAsync(int tutoriaId);
 }

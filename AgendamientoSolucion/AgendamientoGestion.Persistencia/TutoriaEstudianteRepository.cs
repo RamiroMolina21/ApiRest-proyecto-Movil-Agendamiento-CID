@@ -47,6 +47,7 @@ public class TutoriaEstudianteRepository : ITutoriaEstudianteRepository
         return await _context.TutoriaEstudiantes
             .Include(te => te.Tutoria)
             .Include(te => te.Usuario)
+                .ThenInclude(u => u.Rol)
             .Where(te => te.Tutoria_idTutoria == tutoriaId)
             .ToListAsync();
     }

@@ -9,3 +9,4 @@ C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoG
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\refint\AgendamientoGestion.Entidades.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.pdb
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\ref\AgendamientoGestion.Entidades.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Entidades\obj\Debug\net8.0\AgendamientoGestion.Entidades.sourcelink.json

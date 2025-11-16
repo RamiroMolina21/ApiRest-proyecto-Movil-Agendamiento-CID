@@ -732,6 +732,27 @@
             "description": "OK"
           }
         }
+      },
+      "get": {
+        "tags": [
+          "Tutoria"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/Tutoria/calendario/docente": {
@@ -984,42 +1005,17 @@
     "schemas": {
       "AgregarEstudiantesTutoriaDto": {
         "required": [
-          "estudiantes"
+          "estudianteIds"
         ],
         "type": "object",
         "properties": {
-          "estudiantes": {
+          "estudianteIds": {
+            "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EstudianteTutoriaDto"
+              "type": "integer",
+              "format": "int32"
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "EstudianteTutoriaDto": {
-        "required": [
-          "apellidos",
-          "correo",
-          "nombre"
-        ],
-        "type": "object",
-        "properties": {
-          "nombre": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "apellidos": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "correo": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string",
-            "format": "email"
           }
         },
         "additionalProperties": false
@@ -1033,10 +1029,16 @@
           "fechaInicio",
           "horaFin",
           "horaInicio",
+          "titulo",
           "usuarioId"
         ],
         "type": "object",
         "properties": {
+          "titulo": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
           "fechaInicio": {
             "type": "string",
             "format": "date-time"

@@ -110,37 +110,26 @@ public class TutoriaService : ITutoriaService
         var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
         var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
 
-        // Obtener estudiantes asignados a la tutoría
+        // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
         var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(id);
         var estudiantes = new List<UsuarioResponseDto>();
 
         foreach (var te in tutoriaEstudiantes)
         {
-            var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
-            if (estudiante != null)
+            // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
+            if (te.Usuario != null)
             {
                 estudiantes.Add(new UsuarioResponseDto
                 {
-                    IdUsuario = estudiante.idUsuario,
-                    Nombres = estudiante.nombres,
-                    Apellidos = estudiante.apellidos,
-                    Correo = estudiante.correo,
-                    FechaRegistro = estudiante.fechaRegistro,
-                    TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
+                    IdUsuario = te.Usuario.idUsuario,
+                    Nombres = te.Usuario.nombres,
+                    Apellidos = te.Usuario.apellidos,
+                    Correo = te.Usuario.correo,
+                    FechaRegistro = te.Usuario.fechaRegistro,
+                    TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
                 });
             }
         }
-
-        // Información del profesor/tutor
-        var profesorDto = tutor != null ? new UsuarioResponseDto
-        {
-            IdUsuario = tutor.idUsuario,
-            Nombres = tutor.nombres,
-            Apellidos = tutor.apellidos,
-            Correo = tutor.correo,
-            FechaRegistro = tutor.fechaRegistro,
-            TipoRol = tutor.Rol?.tipoRol ?? "Sin rol"
-        } : null;
 
         return new TutoriaResponseDto
         {
@@ -157,7 +146,6 @@ public class TutoriaService : ITutoriaService
             HorarioEspacio = horario?.espacio ?? "N/A",
             HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
             HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-            Profesor = profesorDto,
             Estudiantes = estudiantes
         };
     }
@@ -172,6 +160,27 @@ public class TutoriaService : ITutoriaService
             var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
             var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
             
+            // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
+            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
+            var estudiantes = new List<UsuarioResponseDto>();
+
+            foreach (var te in tutoriaEstudiantes)
+            {
+                // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
+                if (te.Usuario != null)
+                {
+                    estudiantes.Add(new UsuarioResponseDto
+                    {
+                        IdUsuario = te.Usuario.idUsuario,
+                        Nombres = te.Usuario.nombres,
+                        Apellidos = te.Usuario.apellidos,
+                        Correo = te.Usuario.correo,
+                        FechaRegistro = te.Usuario.fechaRegistro,
+                        TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
+                    });
+                }
+            }
+            
             tutoriasDto.Add(new TutoriaResponseDto
             {
                 IdTutoria = tutoria.idTutoria,
@@ -183,9 +192,11 @@ public class TutoriaService : ITutoriaService
                 FechaTutoria = tutoria.fechaHora,
                 UsuarioNombre = usuario?.nombres ?? "N/A",
                 UsuarioApellidos = usuario?.apellidos ?? "N/A",
+                UsuarioCorreo = usuario?.correo ?? "N/A",
                 HorarioEspacio = horario?.espacio ?? "N/A",
                 HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue
+                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
+                Estudiantes = estudiantes
             });
         }
 
@@ -287,64 +298,51 @@ public class TutoriaService : ITutoriaService
 
     public async Task<bool> AgregarEstudiantesATutoriaAsync(int tutoriaId, AgregarEstudiantesTutoriaDto estudiantesDto)
     {
-        // Verificar que la tutoría existe
+        // Verificar que la tutoría existe y obtener información completa
         var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
         if (tutoria == null)
         {
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        // Buscar rol estudiante
-        var rolEstudiante = await _rolRepository.GetByTipoAsync("Estudiante");
-        if (rolEstudiante == null)
+        // Obtener información del horario para construir el DTO de respuesta
+        var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
+        var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+
+        // Crear el DTO de tutoría una sola vez para reutilizar en las notificaciones
+        var tutoriaDto = new TutoriaResponseDto
         {
-            throw new NotFoundException("El rol 'Estudiante' no existe en el sistema");
-        }
+            IdTutoria = tutoria.idTutoria,
+            Idioma = tutoria.idioma,
+            Nivel = tutoria.nivel,
+            Tema = tutoria.tema,
+            Modalidad = tutoria.modalidad,
+            Estado = tutoria.estado,
+            FechaTutoria = tutoria.fechaHora,
+            UsuarioNombre = tutor?.nombres ?? "N/A",
+            UsuarioApellidos = tutor?.apellidos ?? "N/A",
+            UsuarioCorreo = tutor?.correo ?? "N/A",
+            HorarioEspacio = horario?.espacio ?? "N/A",
+            HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
+            HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue
+        };
 
         var estudiantesAgregados = new List<Usuario>();
 
-        // Procesar cada estudiante
-        foreach (var estudianteDto in estudiantesDto.Estudiantes)
+        // Procesar cada ID de estudiante
+        foreach (var estudianteId in estudiantesDto.EstudianteIds)
         {
-            // Validar formato de correo
-            EmailValidator.ValidateEmail(estudianteDto.Correo, "Correo del estudiante");
-
-            // Buscar estudiante por nombre, apellidos y correo
-            var estudiante = await _usuarioRepository.GetByNombreApellidosCorreoAsync(
-                estudianteDto.Nombre,
-                estudianteDto.Apellidos,
-                estudianteDto.Correo);
-
-            // Si no existe, crear nuevo estudiante
+            // Buscar estudiante por ID
+            var estudiante = await _usuarioRepository.GetByIdAsync(estudianteId);
             if (estudiante == null)
             {
-                var estudiantePorCorreo = await _usuarioRepository.GetByEmailAsync(estudianteDto.Correo);
-                if (estudiantePorCorreo != null)
-                {
-                    throw new ValidationException($"Ya existe un usuario con el correo {estudianteDto.Correo} pero con datos diferentes");
-                }
-
-                estudiante = new Usuario
-                {
-                    nombres = estudianteDto.Nombre,
-                    apellidos = estudianteDto.Apellidos,
-                    correo = estudianteDto.Correo,
-                    contrasenaHash = BCrypt.Net.BCrypt.HashPassword("Temporal123!"), // Contraseña temporal
-                    fechaRegistro = DateTime.Now,
-                    Rol_idRol = rolEstudiante.idRol
-                };
-
-                estudiante = await _usuarioRepository.CreateAsync(estudiante);
+                throw new NotFoundException($"Estudiante con ID {estudianteId} no encontrado");
             }
-            else
+
+            // Verificar que sea estudiante
+            if (estudiante.Rol == null || estudiante.Rol.tipoRol.ToLower() != "estudiante")
             {
-                // Verificar que el usuario tenga rol de estudiante
-                if (estudiante.Rol == null || estudiante.Rol.tipoRol.ToLower() != "estudiante")
-                {
-                    // Si no es estudiante, actualizar el rol
-                    estudiante.Rol_idRol = rolEstudiante.idRol;
-                    await _usuarioRepository.UpdateAsync(estudiante);
-                }
+                throw new ValidationException($"El usuario con ID {estudianteId} no tiene el rol de Estudiante");
             }
 
             // Verificar que el estudiante no esté ya asignado a esta tutoría
@@ -364,31 +362,22 @@ public class TutoriaService : ITutoriaService
                 // Enviar notificación por email al estudiante
                 try
                 {
-                    var tutoriaDto = new TutoriaResponseDto
-                    {
-                        IdTutoria = tutoria.idTutoria,
-                        Idioma = tutoria.idioma,
-                        Nivel = tutoria.nivel,
-                        Tema = tutoria.tema,
-                        Modalidad = tutoria.modalidad,
-                        Estado = tutoria.estado,
-                        FechaTutoria = tutoria.fechaHora
-                    };
-
                     var estudianteResponseDto = new UsuarioResponseDto
                     {
                         IdUsuario = estudiante.idUsuario,
                         Nombres = estudiante.nombres,
                         Apellidos = estudiante.apellidos,
-                        Correo = estudiante.correo
+                        Correo = estudiante.correo,
+                        FechaRegistro = estudiante.fechaRegistro,
+                        TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
                     };
 
-                    // Enviar notificación de asignación
+                    // Enviar notificación de asignación usando el DTO ya construido
                     await _notificacionService.EnviarNotificacionEstudianteTutoriaAsync(tutoriaDto, estudianteResponseDto, "asignacion");
                 }
                 catch (Exception ex)
                 {
-                    // Log del error pero continuar
+                    // Log del error pero continuar con los demás estudiantes
                     Console.WriteLine($"Error enviando notificación a estudiante {estudiante.correo}: {ex.Message}");
                 }
             }
@@ -446,17 +435,6 @@ public class TutoriaService : ITutoriaService
                 }
             }
 
-            // Información del profesor/tutor
-            var profesorDto = new UsuarioResponseDto
-            {
-                IdUsuario = docente.idUsuario,
-                Nombres = docente.nombres,
-                Apellidos = docente.apellidos,
-                Correo = docente.correo,
-                FechaRegistro = docente.fechaRegistro,
-                TipoRol = docente.Rol?.tipoRol ?? "Sin rol"
-            };
-
             tutoriasDto.Add(new TutoriaResponseDto
             {
                 IdTutoria = tutoria.idTutoria,
@@ -472,7 +450,6 @@ public class TutoriaService : ITutoriaService
                 HorarioEspacio = horario?.espacio ?? "N/A",
                 HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
                 HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Profesor = profesorDto,
                 Estudiantes = estudiantes
             });
         }
@@ -527,17 +504,6 @@ public class TutoriaService : ITutoriaService
                 }
             }
 
-            // Información del profesor/tutor
-            var profesorDto = tutor != null ? new UsuarioResponseDto
-            {
-                IdUsuario = tutor.idUsuario,
-                Nombres = tutor.nombres,
-                Apellidos = tutor.apellidos,
-                Correo = tutor.correo,
-                FechaRegistro = tutor.fechaRegistro,
-                TipoRol = tutor.Rol?.tipoRol ?? "Sin rol"
-            } : null;
-
             tutoriasDto.Add(new TutoriaResponseDto
             {
                 IdTutoria = tutoria.idTutoria,
@@ -553,7 +519,6 @@ public class TutoriaService : ITutoriaService
                 HorarioEspacio = horario?.espacio ?? "N/A",
                 HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
                 HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Profesor = profesorDto,
                 Estudiantes = estudiantes
             });
         }
@@ -593,17 +558,6 @@ public class TutoriaService : ITutoriaService
                 }
             }
 
-            // Información del profesor/tutor
-            var profesorDto = tutor != null ? new UsuarioResponseDto
-            {
-                IdUsuario = tutor.idUsuario,
-                Nombres = tutor.nombres,
-                Apellidos = tutor.apellidos,
-                Correo = tutor.correo,
-                FechaRegistro = tutor.fechaRegistro,
-                TipoRol = tutor.Rol?.tipoRol ?? "Sin rol"
-            } : null;
-
             tutoriasDto.Add(new TutoriaResponseDto
             {
                 IdTutoria = tutoria.idTutoria,
@@ -619,11 +573,43 @@ public class TutoriaService : ITutoriaService
                 HorarioEspacio = horario?.espacio ?? "N/A",
                 HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
                 HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Profesor = profesorDto,
                 Estudiantes = estudiantes
             });
         }
 
         return tutoriasDto;
+    }
+
+    public async Task<List<UsuarioResponseDto>> GetEstudiantesByTutoriaAsync(int tutoriaId)
+    {
+        // Verificar que la tutoría existe
+        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
+        if (tutoria == null)
+        {
+            throw new NotFoundException("Tutoría no encontrada");
+        }
+
+        // Obtener estudiantes asignados a la tutoría
+        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
+        var estudiantes = new List<UsuarioResponseDto>();
+
+        foreach (var te in tutoriaEstudiantes)
+        {
+            var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
+            if (estudiante != null)
+            {
+                estudiantes.Add(new UsuarioResponseDto
+                {
+                    IdUsuario = estudiante.idUsuario,
+                    Nombres = estudiante.nombres,
+                    Apellidos = estudiante.apellidos,
+                    Correo = estudiante.correo,
+                    FechaRegistro = estudiante.fechaRegistro,
+                    TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
+                });
+            }
+        }
+
+        return estudiantes;
     }
 }

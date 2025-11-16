@@ -15,3 +15,4 @@ C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoG
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.pdb
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.genruntimeconfig.cache
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\ref\AgendamientoGestion.Persistencia.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\AgendamientoGestion.Persistencia\obj\Debug\net8.0\AgendamientoGestion.Persistencia.sourcelink.json

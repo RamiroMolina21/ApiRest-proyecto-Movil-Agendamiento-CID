@@ -21,7 +21,6 @@ namespace AgendamientoGestion.Logica.Dtos
         public string HorarioEspacio { get; set; }
         public DateTime HorarioHoraInicio { get; set; }
         public DateTime HorarioHoraFin { get; set; }
-        public UsuarioResponseDto Profesor { get; set; }
         public List<UsuarioResponseDto> Estudiantes { get; set; }
     }
 }

@@ -469,6 +469,22 @@
   },
   {
     "ContainingType": "Agendamiento.Controllers.TutoriaController",
+    "Method": "GetEstudiantesByTutoria",
+    "RelativePath": "api/Tutoria/{id}/estudiantes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.TutoriaController",
     "Method": "GetCalendarioPorDocente",
     "RelativePath": "api/Tutoria/calendario/docente",
     "HttpMethod": "GET",

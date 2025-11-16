@@ -1,9 +1,7 @@
-
-
-CREATE DATABASE proyectoagendamientov3;
+CREATE DATABASE proyectoagendamientov4;
 GO
 
-USE proyectoagendamientov3;
+USE proyectoagendamientov4;
 GO
 
 -- =========================================
@@ -52,10 +50,11 @@ CREATE TABLE Notificacion (
 GO
 
 -- =========================================
--- TABLA Horario
+-- TABLA Horario (MODIFICADA - AGREGADO TITULO)
 -- =========================================
 CREATE TABLE Horario (
     idHorario INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
     fechaInicio DATE NOT NULL,
     fechaFin DATE NOT NULL,
     horaInicio DATETIME NOT NULL,
@@ -165,8 +164,6 @@ CREATE TABLE TutoriaEstudiante (
 );
 GO    
 
-
-
 -- =========================================
 -- INSERTS (SIN ID MANUAL)
 -- =========================================
@@ -182,54 +179,54 @@ GO
 
 -- === Tabla Usuario ===
 INSERT INTO Usuario (nombres, apellidos, correo, contrasenaHash, fechaRegistro, Rol_idRol) VALUES
-('Carlos', 'P�rez', 'carlos.perez@example.com', 'hash12345', GETDATE(), 2),
-('Mar�a', 'G�mez', 'maria.gomez@example.com', 'hash54321', GETDATE(), 2),
-('Luis', 'Rodr�guez', 'luis.rodriguez@example.com', 'hash11111', GETDATE(), 3),
-('Ana', 'Mart�nez', 'ana.martinez@example.com', 'hash22222', GETDATE(), 3),
-('Jorge', 'L�pez', 'jorge.lopez@example.com', 'hash33333', GETDATE(), 4);
+('Carlos', 'Pérez', 'carlos.perez@example.com', 'hash12345', GETDATE(), 2),
+('María', 'Gómez', 'maria.gomez@example.com', 'hash54321', GETDATE(), 2),
+('Luis', 'Rodríguez', 'luis.rodriguez@example.com', 'hash11111', GETDATE(), 3),
+('Ana', 'Martínez', 'ana.martinez@example.com', 'hash22222', GETDATE(), 3),
+('Jorge', 'López', 'jorge.lopez@example.com', 'hash33333', GETDATE(), 4);
 GO
 
 -- === Tabla Notificacion ===
 INSERT INTO Notificacion (fecha, asunto, descripcion, Usuario_idUsuario) VALUES
-(GETDATE(), 'Nueva tutor�a', 'Tienes una nueva tutor�a programada.', 2),
-(GETDATE(), 'Cambio de horario', 'Tu tutor�a ha cambiado de horario.', 3),
-(GETDATE(), 'Retroalimentaci�n disponible', 'Tu retroalimentaci�n est� lista.', 3),
-(GETDATE(), 'Nueva notificaci�n', 'Revisa tus mensajes.', 1),
-(GETDATE(), 'Recordatorio', 'No olvides asistir a la tutor�a de ma�ana.', 4);
+(GETDATE(), 'Nueva tutoría', 'Tienes una nueva tutoría programada.', 2),
+(GETDATE(), 'Cambio de horario', 'Tu tutoría ha cambiado de horario.', 3),
+(GETDATE(), 'Retroalimentación disponible', 'Tu retroalimentación está lista.', 3),
+(GETDATE(), 'Nueva notificación', 'Revisa tus mensajes.', 1),
+(GETDATE(), 'Recordatorio', 'No olvides asistir a la tutoría de mañana.', 4);
 GO
 
--- === Tabla Horario ===
-INSERT INTO Horario (fechaInicio, fechaFin, horaInicio, horaFin, cupos, espacio, estado, Usuario_idUsuario) VALUES
-('2025-10-20', '2025-10-20', '2025-10-20 08:00:00', '2025-10-20 09:00:00', '10', 'Sala A', 'Disponible', 2),
-('2025-10-21', '2025-10-21', '2025-10-21 09:00:00', '2025-10-21 10:00:00', '8', 'Sala B', 'Ocupado', 2),
-('2025-10-22', '2025-10-22', '2025-10-22 10:00:00', '2025-10-22 11:00:00', '12', 'Sala C', 'Disponible', 2),
-('2025-10-23', '2025-10-23', '2025-10-23 11:00:00', '2025-10-23 12:00:00', '6', 'Sala D', 'Disponible', 2),
-('2025-10-24', '2025-10-24', '2025-10-24 12:00:00', '2025-10-24 13:00:00', '5', 'Sala E', 'Cancelado', 2);
+-- === Tabla Horario (MODIFICADA - AGREGADO TITULO) ===
+INSERT INTO Horario (titulo, fechaInicio, fechaFin, horaInicio, horaFin, cupos, espacio, estado, Usuario_idUsuario) VALUES
+('Tutoría Inglés Básico', '2025-10-20', '2025-10-20', '2025-10-20 08:00:00', '2025-10-20 09:00:00', '10', 'Sala A', 'Disponible', 2),
+('Tutoría Francés Intermedio', '2025-10-21', '2025-10-21', '2025-10-21 09:00:00', '2025-10-21 10:00:00', '8', 'Sala B', 'Ocupado', 2),
+('Tutoría Alemán Avanzado', '2025-10-22', '2025-10-22', '2025-10-22 10:00:00', '2025-10-22 11:00:00', '12', 'Sala C', 'Disponible', 2),
+('Tutoría Italiano Básico', '2025-10-23', '2025-10-23', '2025-10-23 11:00:00', '2025-10-23 12:00:00', '6', 'Sala D', 'Disponible', 2),
+('Tutoría Portugués Intermedio', '2025-10-24', '2025-10-24', '2025-10-24 12:00:00', '2025-10-24 13:00:00', '5', 'Sala E', 'Cancelado', 2);
 GO
 
 -- === Tabla Tutoria ===
 INSERT INTO Tutoria (idioma, nivel, tema, modalidad, estado, fechaHora, Usuario_idUsuario, Horario_idHorario) VALUES
-('Ingl�s', 'B�sico', 'Saludos y presentaciones', 'Virtual', 'Programada', '2025-10-20 08:00:00', 3, 1),
-('Franc�s', 'Intermedio', 'Conversaci�n', 'Presencial', 'Completada', '2025-10-21 09:00:00', 3, 2),
-('Alem�n', 'Avanzado', 'Gram�tica', 'Virtual', 'Cancelada', '2025-10-22 10:00:00', 4, 3),
-('Italiano', 'B�sico', 'Pronunciaci�n', 'Presencial', 'Programada', '2025-10-23 11:00:00', 4, 4),
-('Portugu�s', 'Intermedio', 'Conversaci�n informal', 'Virtual', 'Programada', '2025-10-24 12:00:00', 3, 5);
+('Inglés', 'Básico', 'Saludos y presentaciones', 'Virtual', 'Programada', '2025-10-20 08:00:00', 3, 1),
+('Francés', 'Intermedio', 'Conversación', 'Presencial', 'Completada', '2025-10-21 09:00:00', 3, 2),
+('Alemán', 'Avanzado', 'Gramática', 'Virtual', 'Cancelada', '2025-10-22 10:00:00', 4, 3),
+('Italiano', 'Básico', 'Pronunciación', 'Presencial', 'Programada', '2025-10-23 11:00:00', 4, 4),
+('Portugués', 'Intermedio', 'Conversación informal', 'Virtual', 'Programada', '2025-10-24 12:00:00', 3, 5);
 GO
 
 -- === Tabla Informe ===
 INSERT INTO Informe (descripcion, fechaGeneracion, Tutoria_idTutoria, Usuario_idUsuario) VALUES
-('Informe de asistencia tutor�a ingl�s', GETDATE(), 1, 2),
-('Resumen tutor�a franc�s', GETDATE(), 2, 2),
-('Evaluaci�n tutor�a alem�n', GETDATE(), 3, 2),
-('Reporte tutor�a italiano', GETDATE(), 4, 2),
-('Informe tutor�a portugu�s', GETDATE(), 5, 2);
+('Informe de asistencia tutoría inglés', GETDATE(), 1, 2),
+('Resumen tutoría francés', GETDATE(), 2, 2),
+('Evaluación tutoría alemán', GETDATE(), 3, 2),
+('Reporte tutoría italiano', GETDATE(), 4, 2),
+('Informe tutoría portugués', GETDATE(), 5, 2);
 GO
 
 -- === Tabla Retroalimentacion ===
 INSERT INTO Retroalimentacion (comentario, calificacion, fecha, Tutoria_idTutoria, Usuario_idUsuario) VALUES
 ('Excelente clase, muy clara.', 4.80, GETDATE(), 1, 3),
 ('Buen manejo del tema.', 4.50, GETDATE(), 2, 3),
-('Podr�a mejorar la pronunciaci�n.', 3.80, GETDATE(), 3, 4),
-('Muy buena tutor�a.', 4.90, GETDATE(), 4, 4),
+('Podría mejorar la pronunciación.', 3.80, GETDATE(), 3, 4),
+('Muy buena tutoría.', 4.90, GETDATE(), 4, 4),
 ('Contenido interesante.', 4.70, GETDATE(), 5, 3);
 GO

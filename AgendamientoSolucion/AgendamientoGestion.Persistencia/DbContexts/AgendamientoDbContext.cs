@@ -58,6 +58,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
             {
                 entity.ToTable("Horario");
                 entity.HasKey(e => e.idHorario);
+                entity.Property(e => e.titulo).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.fechaInicio).IsRequired();
                 entity.Property(e => e.fechaFin).IsRequired();
                 entity.Property(e => e.horaInicio).IsRequired();

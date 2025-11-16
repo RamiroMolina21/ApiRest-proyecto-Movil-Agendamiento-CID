@@ -8,6 +8,7 @@ namespace AgendamientoGestion.Entidades.Entities;
 
 public class Horario {
     public int idHorario { get; set; }
+    public string titulo { get; set; }
     public DateTime fechaInicio { get; set; }
     public DateTime fechaFin { get; set; }
     public DateTime horaInicio { get; set; }

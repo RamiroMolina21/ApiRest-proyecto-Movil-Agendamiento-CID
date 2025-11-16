@@ -9,6 +9,10 @@ namespace AgendamientoGestion.Logica.Dtos
 {
     public class HorarioCreateDto
     {
+        [Required(ErrorMessage = "El título es obligatorio")]
+        [StringLength(100, ErrorMessage = "El título no puede exceder 100 caracteres")]
+        public string Titulo { get; set; }
+
         [Required(ErrorMessage = "La fecha de inicio es obligatoria")]
         public DateTime FechaInicio { get; set; }
 
