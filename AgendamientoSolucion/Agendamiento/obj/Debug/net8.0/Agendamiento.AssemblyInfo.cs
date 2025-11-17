@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Agendamiento")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+690b76c0b8e9a7550dd620ffa5854ffbc2768139")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5972f3b76b15c46a8632d6417ef8a07c781bb835")]
 [assembly: System.Reflection.AssemblyProductAttribute("Agendamiento")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Agendamiento")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

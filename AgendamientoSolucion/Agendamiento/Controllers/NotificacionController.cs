@@ -91,7 +91,11 @@ namespace Agendamiento.Controllers
         }
 
         // Nuevos endpoints para envío por email
+        // NOTA: El endpoint de recordatorio manual ha sido deshabilitado.
+        // Los recordatorios ahora se envían automáticamente 2 horas antes de la tutoría mediante un Background Service.
+        /*
         [HttpPost("email/recordatorio/{tutoriaId}")]
+        [Obsolete("Los recordatorios ahora se envían automáticamente. Este endpoint está deshabilitado.")]
         public async Task<IActionResult> EnviarRecordatorioPorEmail(int tutoriaId)
         {
             try
@@ -108,6 +112,7 @@ namespace Agendamiento.Controllers
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
+        */
 
         [HttpPost("email/cambio/{tutoriaId}")]
         public async Task<IActionResult> EnviarNotificacionCambioPorEmail(int tutoriaId, [FromBody] string motivo)

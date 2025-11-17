@@ -612,4 +612,31 @@ public class TutoriaService : ITutoriaService
 
         return estudiantes;
     }
+
+    public async Task<bool> EliminarEstudianteDeTutoriaAsync(int tutoriaId, int estudianteId)
+    {
+        // Verificar que la tutoría existe
+        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
+        if (tutoria == null)
+        {
+            throw new NotFoundException("Tutoría no encontrada");
+        }
+
+        // Verificar que el estudiante existe
+        var estudiante = await _usuarioRepository.GetByIdAsync(estudianteId);
+        if (estudiante == null)
+        {
+            throw new NotFoundException("Estudiante no encontrado");
+        }
+
+        // Verificar que el estudiante está asignado a la tutoría
+        var existeAsignacion = await _tutoriaEstudianteRepository.ExistsAsync(tutoriaId, estudianteId);
+        if (!existeAsignacion)
+        {
+            throw new NotFoundException("El estudiante no está asignado a esta tutoría");
+        }
+
+        // Eliminar la relación TutoriaEstudiante
+        return await _tutoriaEstudianteRepository.DeleteByTutoriaAndEstudianteAsync(tutoriaId, estudianteId);
+    }
 }

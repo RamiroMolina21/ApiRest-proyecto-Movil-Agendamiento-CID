@@ -249,5 +249,31 @@ namespace Agendamiento.Controllers
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
+
+        [HttpDelete("{tutoriaId}/estudiantes/{estudianteId}")]
+        public async Task<IActionResult> EliminarEstudianteDeTutoria(int tutoriaId, int estudianteId)
+        {
+            try
+            {
+                var result = await _tutoriaService.EliminarEstudianteDeTutoriaAsync(tutoriaId, estudianteId);
+                if (result)
+                {
+                    return Ok(new { message = "Estudiante eliminado de la tutoría exitosamente" });
+                }
+                return NotFound(new { message = "No se pudo eliminar el estudiante de la tutoría" });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor" });
+            }
+        }
     }
 }

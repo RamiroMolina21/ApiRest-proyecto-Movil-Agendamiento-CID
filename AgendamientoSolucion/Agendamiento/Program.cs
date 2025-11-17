@@ -54,6 +54,9 @@ builder.Services.AddScoped<IExcelService, ExcelService>();
 // 🔹 Configuración SMTP
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
+// 🔹 Servicio en segundo plano para recordatorios automáticos
+builder.Services.AddHostedService<Agendamiento.Services.RecordatorioTutoriaBackgroundService>();
+
 // 🔹 Conexión BD
 var conexion = builder.Configuration.GetConnectionString("local");
 builder.Services.AddDbContext<AgendamientoDbContext>(option => option.UseSqlServer(conexion));

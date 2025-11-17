@@ -104,4 +104,22 @@ public class TutoriaRepository : ITutoriaRepository
             .Where(t => t.idioma == idioma && t.nivel == nivel)
             .ToListAsync();
     }
+
+    public async Task<List<Tutoria>> GetProximasParaRecordatorioAsync(TimeSpan tiempoAntes)
+    {
+        var ahora = DateTime.Now;
+        var tiempoObjetivo = ahora.Add(tiempoAntes);
+        // Margen de 5 minutos para procesamiento
+        var tiempoInicio = tiempoObjetivo.AddMinutes(-5);
+        var tiempoFin = tiempoObjetivo.AddMinutes(5);
+
+        return await _context.Tutorias
+            .Include(t => t.Usuario)
+            .Include(t => t.Horario)
+            .Where(t => t.fechaHora >= tiempoInicio && 
+                       t.fechaHora <= tiempoFin &&
+                       t.fechaHora > ahora &&
+                       (t.estado.ToLower() == "programada" || t.estado.ToLower() == "activo"))
+            .ToListAsync();
+    }
 }

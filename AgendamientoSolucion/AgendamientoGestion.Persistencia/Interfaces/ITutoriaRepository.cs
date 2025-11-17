@@ -19,4 +19,5 @@ public interface ITutoriaRepository
     Task<List<Tutoria>> GetByEstadoAsync(string estado);
     Task<List<Tutoria>> GetByFechaAsync(DateTime fecha);
     Task<List<Tutoria>> GetByIdiomaNivelAsync(string idioma, string nivel);
+    Task<List<Tutoria>> GetProximasParaRecordatorioAsync(TimeSpan tiempoAntes);
 }

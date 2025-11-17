@@ -205,22 +205,6 @@
   },
   {
     "ContainingType": "Agendamiento.Controllers.NotificacionController",
-    "Method": "EnviarRecordatorioPorEmail",
-    "RelativePath": "api/Notificacion/email/recordatorio/{tutoriaId}",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "tutoriaId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Agendamiento.Controllers.NotificacionController",
     "Method": "EnviarReporteExcelPorEmail",
     "RelativePath": "api/Notificacion/email/reporte-excel/{tutoriaId}/docente/{docenteId}",
     "HttpMethod": "POST",
@@ -477,6 +461,27 @@
     "Parameters": [
       {
         "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.TutoriaController",
+    "Method": "EliminarEstudianteDeTutoria",
+    "RelativePath": "api/Tutoria/{tutoriaId}/estudiantes/{estudianteId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tutoriaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "estudianteId",
         "Type": "System.Int32",
         "IsRequired": true
       }

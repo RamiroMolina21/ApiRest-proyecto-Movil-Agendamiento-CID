@@ -65,4 +65,12 @@ public class NotificacionRepository : INotificacionRepository
             .Where(n => n.Usuario_idUsuario == usuarioId)
             .ToListAsync();
     }
+
+    public async Task<List<Notificacion>> GetByFechaAsync(DateTime fechaDesde)
+    {
+        return await _context.Notificaciones
+            .Include(n => n.Usuario)
+            .Where(n => n.fecha >= fechaDesde)
+            .ToListAsync();
+    }
 }

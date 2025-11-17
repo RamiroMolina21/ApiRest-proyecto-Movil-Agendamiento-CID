@@ -15,5 +15,6 @@ namespace AgendamientoGestion.Persistencia.Interfaces
         Task<Notificacion> UpdateAsync(Notificacion notificacion);
         Task<bool> DeleteAsync(int id);
         Task<List<Notificacion>> GetByUsuarioAsync(int usuarioId);
+        Task<List<Notificacion>> GetByFechaAsync(DateTime fechaDesde);
     }
 }

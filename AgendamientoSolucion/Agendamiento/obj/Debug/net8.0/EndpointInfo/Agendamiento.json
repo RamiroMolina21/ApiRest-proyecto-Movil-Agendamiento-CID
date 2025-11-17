@@ -299,29 +299,6 @@
         }
       }
     },
-    "/api/Notificacion/email/recordatorio/{tutoriaId}": {
-      "post": {
-        "tags": [
-          "Notificacion"
-        ],
-        "parameters": [
-          {
-            "name": "tutoriaId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Notificacion/email/cambio/{tutoriaId}": {
       "post": {
         "tags": [
@@ -843,6 +820,38 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Tutoria/{tutoriaId}/estudiantes/{estudianteId}": {
+      "delete": {
+        "tags": [
+          "Tutoria"
+        ],
+        "parameters": [
+          {
+            "name": "tutoriaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "estudianteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],

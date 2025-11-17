@@ -16,5 +16,6 @@ public interface ITutoriaEstudianteRepository
     Task<List<TutoriaEstudiante>> GetByUsuarioAsync(int usuarioId);
     Task<bool> ExistsAsync(int tutoriaId, int usuarioId);
     Task<bool> DeleteAsync(int id);
+    Task<bool> DeleteByTutoriaAndEstudianteAsync(int tutoriaId, int estudianteId);
 }
 

@@ -77,5 +77,18 @@ public class TutoriaEstudianteRepository : ITutoriaEstudianteRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> DeleteByTutoriaAndEstudianteAsync(int tutoriaId, int estudianteId)
+    {
+        var tutoriaEstudiante = await _context.TutoriaEstudiantes
+            .FirstOrDefaultAsync(te => te.Tutoria_idTutoria == tutoriaId && te.Usuario_idUsuario == estudianteId);
+        
+        if (tutoriaEstudiante == null)
+            return false;
+
+        _context.TutoriaEstudiantes.Remove(tutoriaEstudiante);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }
 
