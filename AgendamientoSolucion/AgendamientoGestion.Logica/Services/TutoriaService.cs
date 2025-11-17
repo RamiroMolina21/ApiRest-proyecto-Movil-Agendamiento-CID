@@ -3,6 +3,7 @@ using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Logica.Utils;
+using AgendamientoGestion.Persistencia.DbContexts;
 using AgendamientoGestion.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,8 +22,11 @@ public class TutoriaService : ITutoriaService
     private readonly INotificacionService _notificacionService;
     private readonly IRolRepository _rolRepository;
     private readonly ITutoriaEstudianteRepository _tutoriaEstudianteRepository;
+    private readonly IInformeRepository _informeRepository;
+    private readonly IRetroalimentacionRepository _retroalimentacionRepository;
+    private readonly AgendamientoDbContext _context;
 
-    public TutoriaService(ITutoriaRepository tutoriaRepository, IUsuarioRepository usuarioRepository, IHorarioRepository horarioRepository, INotificacionService notificacionService, IRolRepository rolRepository, ITutoriaEstudianteRepository tutoriaEstudianteRepository)
+    public TutoriaService(ITutoriaRepository tutoriaRepository, IUsuarioRepository usuarioRepository, IHorarioRepository horarioRepository, INotificacionService notificacionService, IRolRepository rolRepository, ITutoriaEstudianteRepository tutoriaEstudianteRepository, IInformeRepository informeRepository, IRetroalimentacionRepository retroalimentacionRepository, AgendamientoDbContext context)
     {
         _tutoriaRepository = tutoriaRepository;
         _usuarioRepository = usuarioRepository;
@@ -30,6 +34,9 @@ public class TutoriaService : ITutoriaService
         _notificacionService = notificacionService;
         _rolRepository = rolRepository;
         _tutoriaEstudianteRepository = tutoriaEstudianteRepository;
+        _informeRepository = informeRepository;
+        _retroalimentacionRepository = retroalimentacionRepository;
+        _context = context;
     }
 
     public async Task<TutoriaResponseDto> CreateTutoriaAsync(TutoriaCreateDto tutoriaDto)
@@ -293,7 +300,42 @@ public class TutoriaService : ITutoriaService
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        return await _tutoriaRepository.DeleteAsync(id);
+        // Usar una transacción para eliminar todos los registros relacionados en una sola operación
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // 1. Eliminar Informes relacionados
+            var informes = await _context.Informes
+                .Where(i => i.Tutoria_idTutoria == id)
+                .ToListAsync();
+            _context.Informes.RemoveRange(informes);
+
+            // 2. Eliminar Retroalimentaciones relacionadas
+            var retroalimentaciones = await _context.Retroalimentaciones
+                .Where(r => r.Tutoria_idTutoria == id)
+                .ToListAsync();
+            _context.Retroalimentaciones.RemoveRange(retroalimentaciones);
+
+            // 3. Eliminar TutoriaEstudiantes relacionados
+            var tutoriaEstudiantes = await _context.TutoriaEstudiantes
+                .Where(te => te.Tutoria_idTutoria == id)
+                .ToListAsync();
+            _context.TutoriaEstudiantes.RemoveRange(tutoriaEstudiantes);
+
+            // 4. Finalmente, eliminar la tutoría
+            _context.Tutorias.Remove(tutoria);
+
+            // Guardar todos los cambios en una sola transacción
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<bool> AgregarEstudiantesATutoriaAsync(int tutoriaId, AgregarEstudiantesTutoriaDto estudiantesDto)
