@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgendamientoGestion.Logica")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5972f3b76b15c46a8632d6417ef8a07c781bb835")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ec78c3a23777ae4239badcc820e653f994d7a14")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgendamientoGestion.Logica")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgendamientoGestion.Logica")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

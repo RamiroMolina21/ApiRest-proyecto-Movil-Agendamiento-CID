@@ -275,5 +275,24 @@ namespace Agendamiento.Controllers
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
+
+        [HttpGet("estado/{estado}")]
+        public async Task<IActionResult> GetTutoriasByEstado(string estado)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(estado))
+                {
+                    return BadRequest(new { message = "El estado es requerido" });
+                }
+
+                var tutorias = await _tutoriaService.GetTutoriasByEstadoAsync(estado);
+                return Ok(tutorias);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor" });
+            }
+        }
     }
 }

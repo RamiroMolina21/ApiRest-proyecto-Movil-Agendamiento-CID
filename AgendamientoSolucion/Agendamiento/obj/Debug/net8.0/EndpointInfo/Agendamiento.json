@@ -862,6 +862,28 @@
         }
       }
     },
+    "/api/Tutoria/estado/{estado}": {
+      "get": {
+        "tags": [
+          "Tutoria"
+        ],
+        "parameters": [
+          {
+            "name": "estado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Usuario": {
       "post": {
         "tags": [

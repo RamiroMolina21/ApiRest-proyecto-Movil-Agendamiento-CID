@@ -639,4 +639,57 @@ public class TutoriaService : ITutoriaService
         // Eliminar la relación TutoriaEstudiante
         return await _tutoriaEstudianteRepository.DeleteByTutoriaAndEstudianteAsync(tutoriaId, estudianteId);
     }
+
+    public async Task<List<TutoriaResponseDto>> GetTutoriasByEstadoAsync(string estado)
+    {
+        var tutorias = await _tutoriaRepository.GetByEstadoAsync(estado);
+        var tutoriasDto = new List<TutoriaResponseDto>();
+
+        foreach (var tutoria in tutorias)
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
+
+            // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
+            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
+            var estudiantes = new List<UsuarioResponseDto>();
+
+            foreach (var te in tutoriaEstudiantes)
+            {
+                // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
+                if (te.Usuario != null)
+                {
+                    estudiantes.Add(new UsuarioResponseDto
+                    {
+                        IdUsuario = te.Usuario.idUsuario,
+                        Nombres = te.Usuario.nombres,
+                        Apellidos = te.Usuario.apellidos,
+                        Correo = te.Usuario.correo,
+                        FechaRegistro = te.Usuario.fechaRegistro,
+                        TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
+                    });
+                }
+            }
+
+            tutoriasDto.Add(new TutoriaResponseDto
+            {
+                IdTutoria = tutoria.idTutoria,
+                Idioma = tutoria.idioma,
+                Nivel = tutoria.nivel,
+                Tema = tutoria.tema,
+                Modalidad = tutoria.modalidad,
+                Estado = tutoria.estado,
+                FechaTutoria = tutoria.fechaHora,
+                UsuarioNombre = usuario?.nombres ?? "N/A",
+                UsuarioApellidos = usuario?.apellidos ?? "N/A",
+                UsuarioCorreo = usuario?.correo ?? "N/A",
+                HorarioEspacio = horario?.espacio ?? "N/A",
+                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
+                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
+                Estudiantes = estudiantes
+            });
+        }
+
+        return tutoriasDto;
+    }
 }

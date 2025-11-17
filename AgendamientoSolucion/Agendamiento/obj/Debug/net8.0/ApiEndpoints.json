@@ -562,6 +562,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Agendamiento.Controllers.TutoriaController",
+    "Method": "GetTutoriasByEstado",
+    "RelativePath": "api/Tutoria/estado/{estado}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "estado",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Agendamiento.Controllers.UsuarioController",
     "Method": "CreateUsuario",
     "RelativePath": "api/Usuario",

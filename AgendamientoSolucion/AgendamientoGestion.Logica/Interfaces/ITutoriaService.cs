@@ -19,4 +19,5 @@ public interface ITutoriaService {
     Task<List<TutoriaResponseDto>> GetCalendarioPorIdiomaNivelAsync(string idioma, string nivel);
     Task<List<UsuarioResponseDto>> GetEstudiantesByTutoriaAsync(int tutoriaId);
     Task<bool> EliminarEstudianteDeTutoriaAsync(int tutoriaId, int estudianteId);
+    Task<List<TutoriaResponseDto>> GetTutoriasByEstadoAsync(string estado);
 }
