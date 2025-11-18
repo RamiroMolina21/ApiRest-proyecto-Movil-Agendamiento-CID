@@ -205,9 +205,9 @@
   },
   {
     "ContainingType": "Agendamiento.Controllers.NotificacionController",
-    "Method": "EnviarReporteExcelPorEmail",
-    "RelativePath": "api/Notificacion/email/reporte-excel/{tutoriaId}/docente/{docenteId}",
-    "HttpMethod": "POST",
+    "Method": "DescargarReporteExcel",
+    "RelativePath": "api/Notificacion/reporte-excel/{tutoriaId}/docente/{docenteId}",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [

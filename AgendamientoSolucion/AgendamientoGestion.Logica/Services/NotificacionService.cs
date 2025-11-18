@@ -629,63 +629,68 @@ public class NotificacionService : INotificacionService
         }
     }
 
-    public async Task<bool> EnviarReporteExcelPorEmailAsync(int tutoriaId, int docenteId)
+    public async Task<(byte[] archivoBytes, string nombreArchivo)> GenerarReporteExcelParaDescargaAsync(int tutoriaId, int docenteId)
     {
-        try
+        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
+        if (tutoria == null)
         {
-            var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
-            if (tutoria == null) return false;
+            throw new NotFoundException("Tutoría no encontrada");
+        }
 
-            var docente = await _usuarioRepository.GetByIdAsync(docenteId);
-            if (docente == null) return false;
+        var docente = await _usuarioRepository.GetByIdAsync(docenteId);
+        if (docente == null)
+        {
+            throw new NotFoundException("Docente no encontrado");
+        }
 
-            var tutoriaDto = new TutoriaResponseDto
+        var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
+
+        var tutoriaDto = new TutoriaResponseDto
+        {
+            IdTutoria = tutoria.idTutoria,
+            Idioma = tutoria.idioma,
+            Nivel = tutoria.nivel,
+            Tema = tutoria.tema,
+            Modalidad = tutoria.modalidad,
+            Estado = tutoria.estado,
+            FechaTutoria = tutoria.fechaHora,
+            HorarioEspacio = horario?.espacio ?? "N/A",
+            HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
+            HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue
+        };
+
+        var docenteDto = new UsuarioResponseDto
+        {
+            IdUsuario = docente.idUsuario,
+            Nombres = docente.nombres,
+            Apellidos = docente.apellidos,
+            Correo = docente.correo
+        };
+
+        // Obtener estudiantes reales de la tutoría
+        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
+        var estudiantes = new List<UsuarioResponseDto>();
+
+        foreach (var te in tutoriaEstudiantes)
+        {
+            // Usar el Usuario ya cargado en TutoriaEstudiante (incluido en GetByTutoriaAsync)
+            if (te.Usuario != null && te.Usuario.Rol != null && te.Usuario.Rol.tipoRol.ToLower() == "estudiante")
             {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora
-            };
-
-            var docenteDto = new UsuarioResponseDto
-            {
-                IdUsuario = docente.idUsuario,
-                Nombres = docente.nombres,
-                Apellidos = docente.apellidos,
-                Correo = docente.correo
-            };
-
-            // Generar reporte Excel
-            var estudiantes = new List<UsuarioResponseDto> { docenteDto };
-            var reporteBytes = _excelService.GenerarReporteTutoria(tutoriaDto, docenteDto, estudiantes);
-            
-            // Guardar archivo temporal
-            var nombreArchivo = _excelService.GenerarNombreArchivo(tutoriaId, $"{docente.nombres}_{docente.apellidos}");
-            var rutaArchivo = Path.Combine(Path.GetTempPath(), nombreArchivo);
-            await File.WriteAllBytesAsync(rutaArchivo, reporteBytes);
-
-            // Enviar email con adjunto
-            string asunto = $"Reporte de Tutoría - {tutoria.idioma} {tutoria.nivel}";
-            string contenido = $"<p>Adjunto encontrará el reporte de la tutoría {tutoriaId}.</p>";
-            
-            _correoService.EnviarConAdjunto(docente.correo, asunto, contenido, rutaArchivo);
-
-            // Limpiar archivo temporal
-            if (File.Exists(rutaArchivo))
-            {
-                File.Delete(rutaArchivo);
+                estudiantes.Add(new UsuarioResponseDto
+                {
+                    IdUsuario = te.Usuario.idUsuario,
+                    Nombres = te.Usuario.nombres,
+                    Apellidos = te.Usuario.apellidos,
+                    Correo = te.Usuario.correo
+                });
             }
+        }
 
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error enviando reporte Excel por email: {ex.Message}");
-            return false;
-        }
+        // Generar reporte Excel con estudiantes reales
+        var reporteBytes = _excelService.GenerarReporteTutoria(tutoriaDto, docenteDto, estudiantes);
+        var nombreArchivo = _excelService.GenerarNombreArchivo(tutoriaId, $"{docente.nombres}_{docente.apellidos}");
+
+        return (reporteBytes, nombreArchivo);
     }
 
     public async Task<bool> EnviarNotificacionEstudianteTutoriaAsync(TutoriaResponseDto tutoriaDto, UsuarioResponseDto estudianteDto, string tipoNotificacion)

@@ -132,17 +132,18 @@ namespace Agendamiento.Controllers
             }
         }
 
-        [HttpPost("email/reporte-excel/{tutoriaId}/docente/{docenteId}")]
-        public async Task<IActionResult> EnviarReporteExcelPorEmail(int tutoriaId, int docenteId)
+        [HttpGet("reporte-excel/{tutoriaId}/docente/{docenteId}")]
+        public async Task<IActionResult> DescargarReporteExcel(int tutoriaId, int docenteId)
         {
             try
             {
-                var result = await _notificacionService.EnviarReporteExcelPorEmailAsync(tutoriaId, docenteId);
-                if (result)
-                {
-                    return Ok(new { message = "Reporte Excel enviado por email exitosamente" });
-                }
-                return Ok(new { message = "Reporte Excel enviado por email exitosamente" });
+                var (archivoBytes, nombreArchivo) = await _notificacionService.GenerarReporteExcelParaDescargaAsync(tutoriaId, docenteId);
+                
+                return File(archivoBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nombreArchivo);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

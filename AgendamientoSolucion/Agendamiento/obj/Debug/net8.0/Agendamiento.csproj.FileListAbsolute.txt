@@ -151,9 +151,6 @@ C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
-C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
-C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
@@ -177,3 +174,12 @@ C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\Agendamiento.genruntimeconfig.cache
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\ref\Agendamiento.dll
 C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\obj\Debug\net8.0\Agendamiento.sourcelink.json
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\EPPlus.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\EPPlus.Interfaces.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\EPPlus.System.Drawing.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win\lib\net8.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\molin\Desktop\ApiRest Proyecto Movil\AgendamientoSolucion\Agendamiento\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

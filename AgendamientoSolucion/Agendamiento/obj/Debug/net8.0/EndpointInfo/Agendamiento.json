@@ -341,8 +341,8 @@
         }
       }
     },
-    "/api/Notificacion/email/reporte-excel/{tutoriaId}/docente/{docenteId}": {
-      "post": {
+    "/api/Notificacion/reporte-excel/{tutoriaId}/docente/{docenteId}": {
+      "get": {
         "tags": [
           "Notificacion"
         ],
