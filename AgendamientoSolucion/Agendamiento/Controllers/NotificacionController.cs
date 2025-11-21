@@ -132,12 +132,12 @@ namespace Agendamiento.Controllers
             }
         }
 
-        [HttpGet("reporte-excel/{tutoriaId}/docente/{docenteId}")]
-        public async Task<IActionResult> DescargarReporteExcel(int tutoriaId, int docenteId)
+        [HttpGet("reporte-excel/{tutoriaId}")]
+        public async Task<IActionResult> DescargarReporteExcel(int tutoriaId)
         {
             try
             {
-                var (archivoBytes, nombreArchivo) = await _notificacionService.GenerarReporteExcelParaDescargaAsync(tutoriaId, docenteId);
+                var (archivoBytes, nombreArchivo) = await _notificacionService.GenerarReporteExcelParaDescargaAsync(tutoriaId);
                 
                 return File(archivoBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nombreArchivo);
             }

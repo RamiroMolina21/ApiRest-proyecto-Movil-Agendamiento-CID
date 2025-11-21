@@ -24,6 +24,6 @@ namespace AgendamientoGestion.Logica.Interfaces
         Task<bool> EnviarRecordatorioPorEmailAsync(int tutoriaId);
         Task<bool> EnviarNotificacionCambioPorEmailAsync(int tutoriaId, string motivo, TutoriaResponseDto tutoriaAnterior = null);
         Task<bool> EnviarNotificacionEstudianteTutoriaAsync(TutoriaResponseDto tutoriaDto, UsuarioResponseDto estudianteDto, string tipoNotificacion);
-        Task<(byte[] archivoBytes, string nombreArchivo)> GenerarReporteExcelParaDescargaAsync(int tutoriaId, int docenteId);
+        Task<(byte[] archivoBytes, string nombreArchivo)> GenerarReporteExcelParaDescargaAsync(int tutoriaId);
     }
 }

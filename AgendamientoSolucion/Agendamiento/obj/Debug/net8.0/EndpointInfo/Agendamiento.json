@@ -341,7 +341,7 @@
         }
       }
     },
-    "/api/Notificacion/reporte-excel/{tutoriaId}/docente/{docenteId}": {
+    "/api/Notificacion/reporte-excel/{tutoriaId}": {
       "get": {
         "tags": [
           "Notificacion"
@@ -349,15 +349,6 @@
         "parameters": [
           {
             "name": "tutoriaId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "docenteId",
             "in": "path",
             "required": true,
             "schema": {

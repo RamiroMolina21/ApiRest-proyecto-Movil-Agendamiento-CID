@@ -629,7 +629,7 @@ public class NotificacionService : INotificacionService
         }
     }
 
-    public async Task<(byte[] archivoBytes, string nombreArchivo)> GenerarReporteExcelParaDescargaAsync(int tutoriaId, int docenteId)
+    public async Task<(byte[] archivoBytes, string nombreArchivo)> GenerarReporteExcelParaDescargaAsync(int tutoriaId)
     {
         var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
         if (tutoria == null)
@@ -637,7 +637,7 @@ public class NotificacionService : INotificacionService
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        var docente = await _usuarioRepository.GetByIdAsync(docenteId);
+        var docente = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
         if (docente == null)
         {
             throw new NotFoundException("Docente no encontrado");

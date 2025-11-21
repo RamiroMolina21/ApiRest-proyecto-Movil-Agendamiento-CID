@@ -206,18 +206,13 @@
   {
     "ContainingType": "Agendamiento.Controllers.NotificacionController",
     "Method": "DescargarReporteExcel",
-    "RelativePath": "api/Notificacion/reporte-excel/{tutoriaId}/docente/{docenteId}",
+    "RelativePath": "api/Notificacion/reporte-excel/{tutoriaId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "tutoriaId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "docenteId",
         "Type": "System.Int32",
         "IsRequired": true
       }
