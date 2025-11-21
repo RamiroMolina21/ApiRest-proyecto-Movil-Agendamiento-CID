@@ -20,4 +20,5 @@ public interface ITutoriaService {
     Task<List<UsuarioResponseDto>> GetEstudiantesByTutoriaAsync(int tutoriaId);
     Task<bool> EliminarEstudianteDeTutoriaAsync(int tutoriaId, int estudianteId);
     Task<List<TutoriaResponseDto>> GetTutoriasByEstadoAsync(string estado);
+    Task<List<TutoriaResponseDto>> GetTutoriasByEstadoAndUsuarioAsync(string estado, int usuarioId);
 }

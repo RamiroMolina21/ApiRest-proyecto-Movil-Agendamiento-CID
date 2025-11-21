@@ -87,6 +87,15 @@ public class TutoriaRepository : ITutoriaRepository
             .ToListAsync();
     }
 
+    public async Task<List<Tutoria>> GetByEstadoAndUsuarioAsync(string estado, int usuarioId)
+    {
+        return await _context.Tutorias
+            .Include(t => t.Usuario)
+            .Include(t => t.Horario)
+            .Where(t => t.estado == estado && t.Usuario_idUsuario == usuarioId)
+            .ToListAsync();
+    }
+
     public async Task<List<Tutoria>> GetByFechaAsync(DateTime fecha)
     {
         return await _context.Tutorias

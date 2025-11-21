@@ -17,6 +17,7 @@ public interface ITutoriaRepository
     Task<List<Tutoria>> GetByUsuarioAsync(int usuarioId);
     Task<List<Tutoria>> GetByHorarioAsync(int horarioId);
     Task<List<Tutoria>> GetByEstadoAsync(string estado);
+    Task<List<Tutoria>> GetByEstadoAndUsuarioAsync(string estado, int usuarioId);
     Task<List<Tutoria>> GetByFechaAsync(DateTime fecha);
     Task<List<Tutoria>> GetByIdiomaNivelAsync(string idioma, string nivel);
     Task<List<Tutoria>> GetProximasParaRecordatorioAsync(TimeSpan tiempoAntes);
