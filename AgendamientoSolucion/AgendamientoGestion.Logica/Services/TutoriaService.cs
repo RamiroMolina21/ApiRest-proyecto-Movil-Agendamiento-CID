@@ -787,4 +787,71 @@ public class TutoriaService : ITutoriaService
 
         return tutoriasDto;
     }
+
+    public async Task<TutoriaResponseDto> FinalizarTutoriaAsync(int tutoriaId)
+    {
+        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
+        if (tutoria == null)
+        {
+            throw new NotFoundException("Tutoría no encontrada");
+        }
+
+        // Verificar que la tutoría no esté ya finalizada
+        if (tutoria.estado.ToLower() == "finalizada")
+        {
+            throw new ValidationException("La tutoría ya está finalizada");
+        }
+
+        // Verificar que la tutoría no esté cancelada
+        if (tutoria.estado.ToLower() == "cancelada")
+        {
+            throw new ValidationException("No se puede finalizar una tutoría cancelada");
+        }
+
+        // Cambiar el estado a "finalizada"
+        tutoria.estado = "Finalizada";
+        await _tutoriaRepository.UpdateAsync(tutoria);
+
+        // Obtener información completa para el DTO
+        var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+        var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
+
+        // Obtener estudiantes asignados a la tutoría
+        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
+        var estudiantes = new List<UsuarioResponseDto>();
+
+        foreach (var te in tutoriaEstudiantes)
+        {
+            if (te.Usuario != null)
+            {
+                estudiantes.Add(new UsuarioResponseDto
+                {
+                    IdUsuario = te.Usuario.idUsuario,
+                    Nombres = te.Usuario.nombres,
+                    Apellidos = te.Usuario.apellidos,
+                    Correo = te.Usuario.correo,
+                    FechaRegistro = te.Usuario.fechaRegistro,
+                    TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
+                });
+            }
+        }
+
+        return new TutoriaResponseDto
+        {
+            IdTutoria = tutoria.idTutoria,
+            Idioma = tutoria.idioma,
+            Nivel = tutoria.nivel,
+            Tema = tutoria.tema,
+            Modalidad = tutoria.modalidad,
+            Estado = tutoria.estado,
+            FechaTutoria = tutoria.fechaHora,
+            UsuarioNombre = tutor?.nombres ?? "N/A",
+            UsuarioApellidos = tutor?.apellidos ?? "N/A",
+            UsuarioCorreo = tutor?.correo ?? "N/A",
+            HorarioEspacio = horario?.espacio ?? "N/A",
+            HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
+            HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
+            Estudiantes = estudiantes
+        };
+    }
 }

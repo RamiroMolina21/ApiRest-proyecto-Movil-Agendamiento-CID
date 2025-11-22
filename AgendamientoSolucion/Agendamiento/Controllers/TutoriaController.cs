@@ -322,5 +322,27 @@ namespace Agendamiento.Controllers
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
+
+        [HttpPut("{id}/finalizar")]
+        public async Task<IActionResult> FinalizarTutoria(int id)
+        {
+            try
+            {
+                var tutoria = await _tutoriaService.FinalizarTutoriaAsync(id);
+                return Ok(tutoria);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor" });
+            }
+        }
     }
 }

@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\tutoriacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\tutoriacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\tutoriacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|solutionrelative:agendamiento\\controllers\\tutoriacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2AF54CFD-6D3C-4DFA-BFB7-84DFAD53D5E1}|Agendamiento\\Agendamiento.csproj|c:\\users\\molin\\desktop\\apirest proyecto movil\\agendamientosolucion\\agendamiento\\controllers\\notificacioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -237,7 +237,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -305,8 +305,7 @@
               "RelativeToolTip": "AgendamientoGestion.Logica\\Services\\TutoriaService.cs",
               "ViewState": "AgIAAKoCAAAAAAAAAAAgwPEAAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-24T22:58:35.631Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-24T22:58:35.631Z"
             },
             {
               "$type": "Document",
@@ -330,12 +329,11 @@
               "RelativeToolTip": "Agendamiento\\Controllers\\NotificacionController.cs",
               "ViewState": "AgIAADgAAAAAAAAAAAA2wIsAAABXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-27T01:51:19.007Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-27T01:51:19.007Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Agendamiento\\Controllers\\AuthController.cs",
@@ -348,16 +346,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "TutoriaController.cs",
               "DocumentMoniker": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\TutoriaController.cs",
               "RelativeDocumentMoniker": "Agendamiento\\Controllers\\TutoriaController.cs",
               "ToolTip": "C:\\Users\\molin\\Desktop\\ApiRest Proyecto Movil\\AgendamientoSolucion\\Agendamiento\\Controllers\\TutoriaController.cs",
               "RelativeToolTip": "Agendamiento\\Controllers\\TutoriaController.cs",
-              "ViewState": "AgIAAA0BAAAAAAAAAADwvyABAABNAAAAAAAAAA==",
+              "ViewState": "AgIAAJsAAAAAAAAAAAAuwCABAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T02:25:58.315Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-20T02:25:58.315Z"
             },
             {
               "$type": "Document",

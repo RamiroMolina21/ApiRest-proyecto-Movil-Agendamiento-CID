@@ -464,6 +464,22 @@
   },
   {
     "ContainingType": "Agendamiento.Controllers.TutoriaController",
+    "Method": "FinalizarTutoria",
+    "RelativePath": "api/Tutoria/{id}/finalizar",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.TutoriaController",
     "Method": "EliminarEstudianteDeTutoria",
     "RelativePath": "api/Tutoria/{tutoriaId}/estudiantes/{estudianteId}",
     "HttpMethod": "DELETE",
