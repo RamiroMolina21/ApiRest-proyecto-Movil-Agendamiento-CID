@@ -22,6 +22,7 @@ public class NotificacionService : INotificacionService
     private readonly ICorreoService _correoService;
     private readonly IEmailTemplateService _emailTemplateService;
     private readonly IExcelService _excelService;
+    private readonly IRetroalimentacionRepository _retroalimentacionRepository;
 
     public NotificacionService(
         INotificacionRepository notificacionRepository, 
@@ -31,7 +32,8 @@ public class NotificacionService : INotificacionService
         IHorarioRepository horarioRepository,
         ICorreoService correoService,
         IEmailTemplateService emailTemplateService,
-        IExcelService excelService)
+        IExcelService excelService,
+        IRetroalimentacionRepository retroalimentacionRepository)
     {
         _notificacionRepository = notificacionRepository;
         _usuarioRepository = usuarioRepository;
@@ -41,6 +43,7 @@ public class NotificacionService : INotificacionService
         _correoService = correoService;
         _emailTemplateService = emailTemplateService;
         _excelService = excelService;
+        _retroalimentacionRepository = retroalimentacionRepository;
     }
 
     public async Task<NotificacionResponseDto> CreateNotificacionAsync(NotificacionCreateDto notificacionDto)
@@ -686,8 +689,26 @@ public class NotificacionService : INotificacionService
             }
         }
 
-        // Generar reporte Excel con estudiantes reales
-        var reporteBytes = _excelService.GenerarReporteTutoria(tutoriaDto, docenteDto, estudiantes);
+        // Obtener retroalimentaciones de la tutoría
+        var retroalimentaciones = await _retroalimentacionRepository.GetByTutoriaAsync(tutoriaId);
+        var retroalimentacionesDto = new List<RetroalimentacionResponseDto>();
+
+        foreach (var retroalimentacion in retroalimentaciones)
+        {
+            var usuarioRetro = await _usuarioRepository.GetByIdAsync(retroalimentacion.Usuario_idUsuario);
+            retroalimentacionesDto.Add(new RetroalimentacionResponseDto
+            {
+                IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
+                Comentario = retroalimentacion.comentario,
+                Calificacion = retroalimentacion.calificacion,
+                Fecha = retroalimentacion.fecha,
+                UsuarioNombre = usuarioRetro?.nombres ?? "N/A",
+                UsuarioApellidos = usuarioRetro?.apellidos ?? "N/A"
+            });
+        }
+
+        // Generar reporte Excel con estudiantes reales y retroalimentaciones
+        var reporteBytes = _excelService.GenerarReporteTutoria(tutoriaDto, docenteDto, estudiantes, retroalimentacionesDto);
         var nombreArchivo = _excelService.GenerarNombreArchivo(tutoriaId, $"{docente.nombres}_{docente.apellidos}");
 
         return (reporteBytes, nombreArchivo);

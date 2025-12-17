@@ -4,7 +4,7 @@ namespace AgendamientoGestion.Logica.Interfaces
 {
     public interface IExcelService
     {
-        byte[] GenerarReporteTutoria(TutoriaResponseDto tutoria, UsuarioResponseDto docente, List<UsuarioResponseDto> estudiantes);
+        byte[] GenerarReporteTutoria(TutoriaResponseDto tutoria, UsuarioResponseDto docente, List<UsuarioResponseDto> estudiantes, List<RetroalimentacionResponseDto> retroalimentaciones = null);
         string GenerarNombreArchivo(int tutoriaId, string docenteNombre);
     }
 }

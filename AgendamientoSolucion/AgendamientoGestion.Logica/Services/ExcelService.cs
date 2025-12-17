@@ -13,7 +13,7 @@ namespace AgendamientoGestion.Logica.Services
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        public byte[] GenerarReporteTutoria(TutoriaResponseDto tutoria, UsuarioResponseDto docente, List<UsuarioResponseDto> estudiantes)
+        public byte[] GenerarReporteTutoria(TutoriaResponseDto tutoria, UsuarioResponseDto docente, List<UsuarioResponseDto> estudiantes, List<RetroalimentacionResponseDto> retroalimentaciones = null)
         {
             using (var package = new ExcelPackage())
             {
@@ -197,11 +197,90 @@ namespace AgendamientoGestion.Logica.Services
                 // Aplicar bordes a la tabla de estudiantes
                 worksheet.Cells[startRowEstudiantes - 1, 1, row - 1, 3].Style.Border.BorderAround(ExcelBorderStyle.Medium);
                 worksheet.Column(3).Width = 35;
+                row += 2;
+
+                // Retroalimentaciones - Encabezado de sección
+                worksheet.Cells[row, 1, row, 4].Merge = true;
+                worksheet.Cells[row, 1].Value = "RETROALIMENTACIONES";
+                worksheet.Cells[row, 1].Style.Font.Size = 14;
+                worksheet.Cells[row, 1].Style.Font.Bold = true;
+                worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.White);
+                worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(68, 114, 196));
+                worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Cells[row, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Row(row).Height = 25;
+                row++;
+
+                // Encabezados de la tabla de retroalimentaciones
+                worksheet.Cells[row, 1].Value = "Fecha";
+                worksheet.Cells[row, 2].Value = "Usuario";
+                worksheet.Cells[row, 3].Value = "Calificación";
+                worksheet.Cells[row, 4].Value = "Comentario";
+                worksheet.Cells[row, 1, row, 4].Style.Font.Bold = true;
+                worksheet.Cells[row, 1, row, 4].Style.Font.Color.SetColor(Color.White);
+                worksheet.Cells[row, 1, row, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, 1, row, 4].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(31, 78, 121));
+                worksheet.Cells[row, 1, row, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                worksheet.Cells[row, 1, row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[row, 1, row, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Row(row).Height = 25;
+                row++;
+
+                // Datos de retroalimentaciones
+                int startRowRetroalimentaciones = row;
+                if (retroalimentaciones != null && retroalimentaciones.Count > 0)
+                {
+                    foreach (var retroalimentacion in retroalimentaciones)
+                    {
+                        worksheet.Cells[row, 1].Value = retroalimentacion.Fecha.ToString("yyyy-MM-dd HH:mm");
+                        worksheet.Cells[row, 2].Value = $"{retroalimentacion.UsuarioNombre} {retroalimentacion.UsuarioApellidos}";
+                        worksheet.Cells[row, 3].Value = retroalimentacion.Calificacion;
+                        worksheet.Cells[row, 4].Value = retroalimentacion.Comentario ?? "Sin comentario";
+
+                        // Alternar colores de fila para mejor legibilidad
+                        var fillColor = row % 2 == 0 ? Color.FromArgb(242, 242, 242) : Color.White;
+                        worksheet.Cells[row, 1, row, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 1, row, 4].Style.Fill.BackgroundColor.SetColor(fillColor);
+                        worksheet.Cells[row, 1, row, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                        worksheet.Cells[row, 1, row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        worksheet.Cells[row, 1, row, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                        worksheet.Cells[row, 4].Style.WrapText = true; // Permitir que el comentario se ajuste en múltiples líneas
+
+                        row++;
+                    }
+                }
+                else
+                {
+                    worksheet.Cells[row, 1, row, 4].Merge = true;
+                    worksheet.Cells[row, 1].Value = "No hay retroalimentaciones registradas";
+                    worksheet.Cells[row, 1].Style.Font.Italic = true;
+                    worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.Gray);
+                    worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    row++;
+                }
+
+                // Aplicar bordes a la tabla de retroalimentaciones
+                worksheet.Cells[startRowRetroalimentaciones - 1, 1, row - 1, 4].Style.Border.BorderAround(ExcelBorderStyle.Medium);
+                // Ajustar ancho de columnas para retroalimentaciones
+                worksheet.Column(1).Width = 20; // Fecha (ya estaba en 20)
+                worksheet.Column(2).Width = 30; // Usuario (mantener el ancho anterior que es mayor)
+                worksheet.Column(3).Width = 15; // Calificación
+                worksheet.Column(4).Width = 50; // Comentario
 
                 // Ajustar altura de todas las filas de datos
                 for (int i = startRowTutoria; i < row; i++)
                 {
-                    worksheet.Row(i).Height = 20;
+                    if (i >= startRowRetroalimentaciones && i < row)
+                    {
+                        // Filas de retroalimentaciones pueden necesitar más altura si tienen comentarios largos
+                        worksheet.Row(i).Height = 30;
+                    }
+                    else
+                    {
+                        worksheet.Row(i).Height = 20;
+                    }
                 }
 
                 return package.GetAsByteArray();
