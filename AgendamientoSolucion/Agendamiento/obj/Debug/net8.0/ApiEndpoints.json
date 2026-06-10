@@ -16,6 +16,80 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Agendamiento.Controllers.EncuestaController",
+    "Method": "EnviarEncuestas",
+    "RelativePath": "api/Encuesta/enviar/{tutoriaId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tutoriaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.EncuestaController",
+    "Method": "GetEstadisticas",
+    "RelativePath": "api/Encuesta/estadisticas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.EncuestaController",
+    "Method": "ResponderEncuesta",
+    "RelativePath": "api/Encuesta/responder",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "AgendamientoGestion.Logica.Dtos.EncuestaCreateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.EncuestaController",
+    "Method": "GetByTutoria",
+    "RelativePath": "api/Encuesta/tutoria/{tutoriaId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tutoriaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Agendamiento.Controllers.EncuestaController",
+    "Method": "VerificarToken",
+    "RelativePath": "api/Encuesta/verificar/{token}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Agendamiento.Controllers.HorarioController",
     "Method": "CreateHorario",
     "RelativePath": "api/Horario",

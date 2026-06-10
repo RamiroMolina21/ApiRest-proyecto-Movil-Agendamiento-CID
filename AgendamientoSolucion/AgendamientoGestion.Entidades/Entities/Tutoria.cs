@@ -23,5 +23,6 @@ namespace AgendamientoGestion.Entidades.Entities
         public ICollection<Informe> Informes { get; set; }
         public ICollection<Retroalimentacion> Retroalimentaciones { get; set; }
         public ICollection<TutoriaEstudiante> TutoriaEstudiantes { get; set; }
+        public ICollection<EncuestaSatisfaccion> EncuestasSatisfaccion { get; set; }
     }
 }

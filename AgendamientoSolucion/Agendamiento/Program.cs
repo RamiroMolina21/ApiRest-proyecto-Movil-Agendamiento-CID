@@ -33,6 +33,7 @@ builder.Services.AddScoped<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<IInformeRepository, InformeRepository>();
 builder.Services.AddScoped<IHorarioRepository, HorarioRepository>();
 builder.Services.AddScoped<ITutoriaEstudianteRepository, TutoriaEstudianteRepository>();
+builder.Services.AddScoped<IEncuestaRepository, EncuestaRepository>();
 
 // ----------------------
 // 🔹 SERVICIOS
@@ -45,6 +46,7 @@ builder.Services.AddScoped<INotificacionService, NotificacionService>();
 builder.Services.AddScoped<IInformeService, InformeService>();
 builder.Services.AddScoped<IHorarioServices, HorarioServices>();
 builder.Services.AddScoped<IMetricasService, MetricasService>();
+builder.Services.AddScoped<IEncuestaService, EncuestaService>();
 
 // 🔹 Servicios de correo
 builder.Services.AddScoped<ICorreoService, CorreoService>();

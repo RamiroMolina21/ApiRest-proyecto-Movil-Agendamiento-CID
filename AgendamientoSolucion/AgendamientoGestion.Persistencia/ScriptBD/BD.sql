@@ -50,7 +50,7 @@ CREATE TABLE Notificacion (
 GO
 
 -- =========================================
--- TABLA Horario (MODIFICADA - AGREGADO TITULO)
+-- TABLA Horario
 -- =========================================
 CREATE TABLE Horario (
     idHorario INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -143,7 +143,7 @@ CREATE TABLE Retroalimentacion (
 GO
 
 -- =========================================
--- TABLA TUtoriaEstudiante (TABLA INTERMEDIA)
+-- TABLA TutoriaEstudiante (TABLA INTERMEDIA)
 -- =========================================
 CREATE TABLE TutoriaEstudiante (
     idTutoriaEstudiante INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -162,10 +162,33 @@ CREATE TABLE TutoriaEstudiante (
     CONSTRAINT uk_TutoriaEstudiante_Unique
         UNIQUE (Tutoria_idTutoria, Usuario_idUsuario)
 );
-GO    
+GO
 
 -- =========================================
--- INSERTS (SIN ID MANUAL)
+-- TABLA EncuestaSatisfaccion
+-- =========================================
+CREATE TABLE EncuestaSatisfaccion (
+    idEncuesta INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    calificacion INT NOT NULL DEFAULT 0,
+    comentario VARCHAR(300) NULL,
+    fechaRespuesta DATETIME NULL,
+    tokenRespuesta VARCHAR(100) NOT NULL,
+    tokenUsado BIT NOT NULL DEFAULT 0,
+    estudianteNombre VARCHAR(100) NULL,
+    estudianteCorreo VARCHAR(100) NULL,
+    Tutoria_idTutoria INT NOT NULL,
+    CONSTRAINT uq_EncuestaSatisfaccion_Token
+        UNIQUE (tokenRespuesta),
+    CONSTRAINT fk_EncuestaSatisfaccion_Tutoria1
+        FOREIGN KEY (Tutoria_idTutoria)
+        REFERENCES Tutoria(idTutoria)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+GO
+
+-- =========================================
+-- INSERTS
 -- =========================================
 
 -- === Tabla Rol ===
@@ -195,7 +218,7 @@ INSERT INTO Notificacion (fecha, asunto, descripcion, Usuario_idUsuario) VALUES
 (GETDATE(), 'Recordatorio', 'No olvides asistir a la tutoría de mañana.', 4);
 GO
 
--- === Tabla Horario (MODIFICADA - AGREGADO TITULO) ===
+-- === Tabla Horario ===
 INSERT INTO Horario (titulo, fechaInicio, fechaFin, horaInicio, horaFin, cupos, espacio, estado, Usuario_idUsuario) VALUES
 ('Tutoría Inglés Básico', '2025-10-20', '2025-10-20', '2025-10-20 08:00:00', '2025-10-20 09:00:00', '10', 'Sala A', 'Disponible', 2),
 ('Tutoría Francés Intermedio', '2025-10-21', '2025-10-21', '2025-10-21 09:00:00', '2025-10-21 10:00:00', '8', 'Sala B', 'Ocupado', 2),

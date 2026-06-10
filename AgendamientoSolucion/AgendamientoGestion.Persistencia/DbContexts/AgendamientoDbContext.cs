@@ -18,6 +18,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
         public DbSet<Informe> Informes { get; set; }
         public DbSet<Horario> Horarios { get; set; }
         public DbSet<TutoriaEstudiante> TutoriaEstudiantes { get; set; }
+        public DbSet<EncuestaSatisfaccion> EncuestasSatisfaccion { get; set; }
 
         public AgendamientoDbContext(DbContextOptions<AgendamientoDbContext> options) : base(options)
         {
@@ -179,6 +180,28 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 // Índice único para evitar duplicados
                 entity.HasIndex(e => new { e.Tutoria_idTutoria, e.Usuario_idUsuario })
                     .IsUnique();
+            });
+
+            // Configuración de EncuestaSatisfaccion
+            modelBuilder.Entity<EncuestaSatisfaccion>(entity =>
+            {
+                entity.ToTable("EncuestaSatisfaccion");
+                entity.HasKey(e => e.idEncuesta);
+                entity.Property(e => e.calificacion).IsRequired();
+                entity.Property(e => e.comentario).HasMaxLength(300);
+                entity.Property(e => e.tokenRespuesta).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.estudianteNombre).HasMaxLength(100);
+                entity.Property(e => e.estudianteCorreo).HasMaxLength(100);
+                entity.Property(e => e.tokenUsado).IsRequired().HasDefaultValue(false);
+
+                // Índice único en tokenRespuesta
+                entity.HasIndex(e => e.tokenRespuesta).IsUnique();
+
+                // Relación con Tutoria
+                entity.HasOne(e => e.Tutoria)
+                    .WithMany(t => t.EncuestasSatisfaccion)
+                    .HasForeignKey(e => e.Tutoria_idTutoria)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
         }
     }

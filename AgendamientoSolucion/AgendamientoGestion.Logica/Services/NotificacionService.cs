@@ -23,17 +23,19 @@ public class NotificacionService : INotificacionService
     private readonly IEmailTemplateService _emailTemplateService;
     private readonly IExcelService _excelService;
     private readonly IRetroalimentacionRepository _retroalimentacionRepository;
+    private readonly IEncuestaRepository _encuestaRepository;
 
     public NotificacionService(
-        INotificacionRepository notificacionRepository, 
-        IUsuarioRepository usuarioRepository, 
+        INotificacionRepository notificacionRepository,
+        IUsuarioRepository usuarioRepository,
         ITutoriaRepository tutoriaRepository,
         ITutoriaEstudianteRepository tutoriaEstudianteRepository,
         IHorarioRepository horarioRepository,
         ICorreoService correoService,
         IEmailTemplateService emailTemplateService,
         IExcelService excelService,
-        IRetroalimentacionRepository retroalimentacionRepository)
+        IRetroalimentacionRepository retroalimentacionRepository,
+        IEncuestaRepository encuestaRepository)
     {
         _notificacionRepository = notificacionRepository;
         _usuarioRepository = usuarioRepository;
@@ -44,6 +46,7 @@ public class NotificacionService : INotificacionService
         _emailTemplateService = emailTemplateService;
         _excelService = excelService;
         _retroalimentacionRepository = retroalimentacionRepository;
+        _encuestaRepository = encuestaRepository;
     }
 
     public async Task<NotificacionResponseDto> CreateNotificacionAsync(NotificacionCreateDto notificacionDto)
@@ -707,8 +710,22 @@ public class NotificacionService : INotificacionService
             });
         }
 
-        // Generar reporte Excel con estudiantes reales y retroalimentaciones
-        var reporteBytes = _excelService.GenerarReporteTutoria(tutoriaDto, docenteDto, estudiantes, retroalimentacionesDto);
+        // Obtener encuestas de satisfacción de la tutoría
+        var encuestasEntidades = await _encuestaRepository.GetByTutoriaIdAsync(tutoriaId);
+        var encuestasDto = encuestasEntidades.Select(e => new EncuestaResponseDto
+        {
+            IdEncuesta = e.idEncuesta,
+            Calificacion = e.calificacion,
+            Comentario = e.comentario,
+            FechaRespuesta = e.fechaRespuesta,
+            EstudianteNombre = e.estudianteNombre,
+            EstudianteCorreo = e.estudianteCorreo,
+            TokenUsado = e.tokenUsado,
+            TutoriaId = e.Tutoria_idTutoria
+        }).ToList();
+
+        // Generar reporte Excel con estudiantes reales, retroalimentaciones y encuestas
+        var reporteBytes = _excelService.GenerarReporteTutoria(tutoriaDto, docenteDto, estudiantes, retroalimentacionesDto, encuestasDto);
         var nombreArchivo = _excelService.GenerarNombreArchivo(tutoriaId, $"{docente.nombres}_{docente.apellidos}");
 
         return (reporteBytes, nombreArchivo);

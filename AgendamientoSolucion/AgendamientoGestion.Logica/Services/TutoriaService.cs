@@ -25,8 +25,9 @@ public class TutoriaService : ITutoriaService
     private readonly IInformeRepository _informeRepository;
     private readonly IRetroalimentacionRepository _retroalimentacionRepository;
     private readonly AgendamientoDbContext _context;
+    private readonly IEncuestaService _encuestaService;
 
-    public TutoriaService(ITutoriaRepository tutoriaRepository, IUsuarioRepository usuarioRepository, IHorarioRepository horarioRepository, INotificacionService notificacionService, IRolRepository rolRepository, ITutoriaEstudianteRepository tutoriaEstudianteRepository, IInformeRepository informeRepository, IRetroalimentacionRepository retroalimentacionRepository, AgendamientoDbContext context)
+    public TutoriaService(ITutoriaRepository tutoriaRepository, IUsuarioRepository usuarioRepository, IHorarioRepository horarioRepository, INotificacionService notificacionService, IRolRepository rolRepository, ITutoriaEstudianteRepository tutoriaEstudianteRepository, IInformeRepository informeRepository, IRetroalimentacionRepository retroalimentacionRepository, AgendamientoDbContext context, IEncuestaService encuestaService)
     {
         _tutoriaRepository = tutoriaRepository;
         _usuarioRepository = usuarioRepository;
@@ -37,6 +38,7 @@ public class TutoriaService : ITutoriaService
         _informeRepository = informeRepository;
         _retroalimentacionRepository = retroalimentacionRepository;
         _context = context;
+        _encuestaService = encuestaService;
     }
 
     public async Task<TutoriaResponseDto> CreateTutoriaAsync(TutoriaCreateDto tutoriaDto)
@@ -811,6 +813,17 @@ public class TutoriaService : ITutoriaService
         // Cambiar el estado a "finalizada"
         tutoria.estado = "Finalizada";
         await _tutoriaRepository.UpdateAsync(tutoria);
+
+        // Enviar encuestas de satisfacción a los estudiantes
+        try
+        {
+            await _encuestaService.EnviarEncuestasAsync(tutoriaId);
+        }
+        catch (Exception ex)
+        {
+            // No fallar la finalización si el envío de encuestas falla
+            Console.WriteLine($"Error enviando encuestas de satisfacción: {ex.Message}");
+        }
 
         // Obtener información completa para el DTO
         var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);

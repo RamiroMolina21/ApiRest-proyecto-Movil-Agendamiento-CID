@@ -13,7 +13,7 @@ namespace AgendamientoGestion.Logica.Services
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        public byte[] GenerarReporteTutoria(TutoriaResponseDto tutoria, UsuarioResponseDto docente, List<UsuarioResponseDto> estudiantes, List<RetroalimentacionResponseDto> retroalimentaciones = null)
+        public byte[] GenerarReporteTutoria(TutoriaResponseDto tutoria, UsuarioResponseDto docente, List<UsuarioResponseDto> estudiantes, List<RetroalimentacionResponseDto> retroalimentaciones = null, List<EncuestaResponseDto> encuestas = null)
         {
             using (var package = new ExcelPackage())
             {
@@ -263,24 +263,103 @@ namespace AgendamientoGestion.Logica.Services
 
                 // Aplicar bordes a la tabla de retroalimentaciones
                 worksheet.Cells[startRowRetroalimentaciones - 1, 1, row - 1, 4].Style.Border.BorderAround(ExcelBorderStyle.Medium);
-                // Ajustar ancho de columnas para retroalimentaciones
-                worksheet.Column(1).Width = 20; // Fecha (ya estaba en 20)
-                worksheet.Column(2).Width = 30; // Usuario (mantener el ancho anterior que es mayor)
-                worksheet.Column(3).Width = 15; // Calificación
-                worksheet.Column(4).Width = 50; // Comentario
+                worksheet.Column(1).Width = 20;
+                worksheet.Column(2).Width = 30;
+                worksheet.Column(3).Width = 15;
+                worksheet.Column(4).Width = 50;
+                row += 2;
+
+                // ─── ENCUESTAS DE SATISFACCIÓN ───────────────────────────────────
+                worksheet.Cells[row, 1, row, 4].Merge = true;
+                worksheet.Cells[row, 1].Value = "ENCUESTAS DE SATISFACCIÓN";
+                worksheet.Cells[row, 1].Style.Font.Size = 14;
+                worksheet.Cells[row, 1].Style.Font.Bold = true;
+                worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.White);
+                worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(84, 130, 53)); // Verde oscuro
+                worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Cells[row, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Row(row).Height = 25;
+                row++;
+
+                // Encabezados de la tabla de encuestas
+                worksheet.Cells[row, 1].Value = "Estudiante";
+                worksheet.Cells[row, 2].Value = "Correo";
+                worksheet.Cells[row, 3].Value = "Calificación";
+                worksheet.Cells[row, 4].Value = "Comentario";
+                worksheet.Cells[row, 1, row, 4].Style.Font.Bold = true;
+                worksheet.Cells[row, 1, row, 4].Style.Font.Color.SetColor(Color.White);
+                worksheet.Cells[row, 1, row, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[row, 1, row, 4].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(55, 86, 35));
+                worksheet.Cells[row, 1, row, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                worksheet.Cells[row, 1, row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[row, 1, row, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Row(row).Height = 25;
+                row++;
+
+                int startRowEncuestas = row;
+                var encuestasRespondidas = encuestas?.Where(e => e.TokenUsado).ToList();
+
+                if (encuestasRespondidas != null && encuestasRespondidas.Count > 0)
+                {
+                    foreach (var enc in encuestasRespondidas)
+                    {
+                        var estrellas = new string('★', enc.Calificacion) + new string('☆', 5 - enc.Calificacion);
+
+                        worksheet.Cells[row, 1].Value = enc.EstudianteNombre ?? "N/A";
+                        worksheet.Cells[row, 2].Value = enc.EstudianteCorreo ?? "N/A";
+                        worksheet.Cells[row, 3].Value = $"{enc.Calificacion}/5  {estrellas}";
+                        worksheet.Cells[row, 4].Value = enc.Comentario ?? "Sin comentario";
+
+                        // Color de calificación
+                        Color ratingColor;
+                        if (enc.Calificacion >= 4) ratingColor = Color.FromArgb(198, 239, 206);       // Verde
+                        else if (enc.Calificacion == 3) ratingColor = Color.FromArgb(255, 235, 156);  // Amarillo
+                        else ratingColor = Color.FromArgb(255, 199, 206);                             // Rojo
+
+                        var fillColorEnc = row % 2 == 0 ? Color.FromArgb(242, 242, 242) : Color.White;
+                        worksheet.Cells[row, 1, row, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 1, row, 4].Style.Fill.BackgroundColor.SetColor(fillColorEnc);
+                        worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(ratingColor);
+                        worksheet.Cells[row, 1, row, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                        worksheet.Cells[row, 1, row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        worksheet.Cells[row, 1, row, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                        worksheet.Cells[row, 4].Style.WrapText = true;
+                        worksheet.Row(row).Height = 25;
+                        row++;
+                    }
+
+                    // Fila de promedio
+                    row++;
+                    double promedio = encuestasRespondidas.Average(e => e.Calificacion);
+                    worksheet.Cells[row, 1, row, 2].Merge = true;
+                    worksheet.Cells[row, 1].Value = "Promedio de satisfacción:";
+                    worksheet.Cells[row, 1].Style.Font.Bold = true;
+                    worksheet.Cells[row, 3].Value = $"{promedio:F1}/5";
+                    worksheet.Cells[row, 3].Style.Font.Bold = true;
+                    worksheet.Cells[row, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
+                    row++;
+                }
+                else
+                {
+                    worksheet.Cells[row, 1, row, 4].Merge = true;
+                    worksheet.Cells[row, 1].Value = encuestas == null || encuestas.Count == 0
+                        ? "No se enviaron encuestas para esta tutoría"
+                        : "Ningún estudiante ha respondido la encuesta todavía";
+                    worksheet.Cells[row, 1].Style.Font.Italic = true;
+                    worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.Gray);
+                    worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    row++;
+                }
+
+                worksheet.Cells[startRowEncuestas - 1, 1, row - 1, 4].Style.Border.BorderAround(ExcelBorderStyle.Medium);
 
                 // Ajustar altura de todas las filas de datos
                 for (int i = startRowTutoria; i < row; i++)
                 {
-                    if (i >= startRowRetroalimentaciones && i < row)
-                    {
-                        // Filas de retroalimentaciones pueden necesitar más altura si tienen comentarios largos
-                        worksheet.Row(i).Height = 30;
-                    }
-                    else
-                    {
+                    if (worksheet.Row(i).Height <= 0)
                         worksheet.Row(i).Height = 20;
-                    }
                 }
 
                 return package.GetAsByteArray();
