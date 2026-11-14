@@ -1,4 +1,4 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Entidades.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,6 +19,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
         public DbSet<Horario> Horarios { get; set; }
         public DbSet<TutoriaEstudiante> TutoriaEstudiantes { get; set; }
         public DbSet<EncuestaSatisfaccion> EncuestasSatisfaccion { get; set; }
+        public DbSet<AsuntoAtendido> AsuntosAtendidos { get; set; }
 
         public AgendamientoDbContext(DbContextOptions<AgendamientoDbContext> options) : base(options)
         {
@@ -38,6 +39,10 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.Property(e => e.correo).IsRequired().HasMaxLength(60);
                 entity.Property(e => e.contrasenaHash).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.fechaRegistro).IsRequired();
+                // Columna activo BIT NOT NULL DEFAULT 1 (ScriptBD/2026-11-11_usuario_activo_y_asuntos_atendidos.sql).
+                // Sin HasDefaultValue en EF a propósito: con default true y CLR false, EF omitiría el false al insertar.
+                // El valor por defecto de la entidad (true) cubre las inserciones desde la API.
+                entity.Property(e => e.activo).IsRequired();
 
                 // Relación con Rol
                 entity.HasOne(e => e.Rol)
@@ -72,7 +77,8 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.HasOne(e => e.Usuario)
                     .WithMany(u => u.Horarios)
                     .HasForeignKey(e => e.Usuario_idUsuario)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull); // usuario eliminado → se conserva desvinculado (ScriptBD 2026-11-12)
             });
 
             // Configuración de Tutoria
@@ -91,7 +97,8 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.HasOne(e => e.Usuario)
                     .WithMany(u => u.Tutorias)
                     .HasForeignKey(e => e.Usuario_idUsuario)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull); // usuario eliminado → se conserva desvinculado (ScriptBD 2026-11-12)
 
                 // Relación con Horario
                 entity.HasOne(e => e.Horario)
@@ -113,7 +120,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.HasOne(e => e.Usuario)
                     .WithMany(u => u.Notificaciones)
                     .HasForeignKey(e => e.Usuario_idUsuario)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade); // dato propio del usuario: se borra con él (ScriptBD 2026-11-12)
             });
 
             // Configuración de Retroalimentacion
@@ -135,7 +142,8 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.HasOne(e => e.Usuario)
                     .WithMany(u => u.Retroalimentaciones)
                     .HasForeignKey(e => e.Usuario_idUsuario)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull); // usuario eliminado → se conserva desvinculado (ScriptBD 2026-11-12)
             });
 
             // Configuración de Informe
@@ -156,7 +164,8 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.HasOne(e => e.Usuario)
                     .WithMany(u => u.Informes)
                     .HasForeignKey(e => e.Usuario_idUsuario)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull); // usuario eliminado → se conserva desvinculado (ScriptBD 2026-11-12)
             });
 
             // Configuración de TutoriaEstudiante
@@ -175,7 +184,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.HasOne(e => e.Usuario)
                     .WithMany(u => u.TutoriaEstudiantes)
                     .HasForeignKey(e => e.Usuario_idUsuario)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade); // dato propio del usuario: se borra con él (ScriptBD 2026-11-12)
 
                 // Índice único para evitar duplicados
                 entity.HasIndex(e => new { e.Tutoria_idTutoria, e.Usuario_idUsuario })
@@ -190,7 +199,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.Property(e => e.calificacion).IsRequired();
                 entity.Property(e => e.comentario).HasMaxLength(300);
                 entity.Property(e => e.tokenRespuesta).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.estudianteNombre).HasMaxLength(100);
+                entity.Property(e => e.estudianteNombre).HasMaxLength(100); // NOT NULL en la BD real; la entidad lo declara string? (deuda previa)
                 entity.Property(e => e.estudianteCorreo).HasMaxLength(100);
                 entity.Property(e => e.tokenUsado).IsRequired().HasDefaultValue(false);
 
@@ -202,6 +211,26 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                     .WithMany(t => t.EncuestasSatisfaccion)
                     .HasForeignKey(e => e.Tutoria_idTutoria)
                     .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            // Configuración de AsuntoAtendido (dashboard web: casos marcados como atendidos)
+            modelBuilder.Entity<AsuntoAtendido>(entity =>
+            {
+                entity.ToTable("AsuntoAtendido");
+                entity.HasKey(e => e.idAsuntoAtendido);
+                entity.Property(e => e.tipo).IsRequired().HasMaxLength(40).IsUnicode(false);
+                entity.Property(e => e.fecha).IsRequired().HasColumnType("datetime2");
+
+                // Un caso solo puede estar atendido una vez (idempotencia y concurrencia entre equipos).
+                entity.HasIndex(e => new { e.tipo, e.clave })
+                    .IsUnique()
+                    .HasDatabaseName("uq_AsuntoAtendido_tipo_clave");
+
+                entity.HasOne(e => e.Usuario)
+                    .WithMany()
+                    .HasForeignKey(e => e.Usuario_idUsuario)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull); // usuario eliminado → se conserva desvinculado (ScriptBD 2026-11-12)
             });
         }
     }

@@ -10,11 +10,14 @@ namespace AgendamientoGestion.Persistencia.Interfaces;
 public interface ITutoriaEstudianteRepository
 {
     Task<TutoriaEstudiante> CreateAsync(TutoriaEstudiante tutoriaEstudiante);
+    /// <summary>Inserta todas las asignaciones en un único SaveChanges (atómico: todas o ninguna).</summary>
+    Task CreateRangeAsync(IEnumerable<TutoriaEstudiante> tutoriaEstudiantes);
     Task<TutoriaEstudiante> GetByIdAsync(int id);
     Task<List<TutoriaEstudiante>> GetAllAsync();
     Task<List<TutoriaEstudiante>> GetByTutoriaAsync(int tutoriaId);
     Task<List<TutoriaEstudiante>> GetByUsuarioAsync(int usuarioId);
     Task<bool> ExistsAsync(int tutoriaId, int usuarioId);
+    Task<int> CountByTutoriaAsync(int tutoriaId);
     Task<bool> DeleteAsync(int id);
     Task<bool> DeleteByTutoriaAndEstudianteAsync(int tutoriaId, int estudianteId);
 }

@@ -15,12 +15,23 @@ namespace AgendamientoGestion.Logica.Dtos
         public string Modalidad { get; set; }
         public string Estado { get; set; }
         public DateTime FechaTutoria { get; set; }
-        public string UsuarioNombre { get; set; }
-        public string UsuarioApellidos { get; set; }
-        public string UsuarioCorreo { get; set; }
+        /// <summary>Id del docente/tutor asignado (Tutoria.Usuario_idUsuario). null: sin asignar porque el usuario fue eliminado (nombre/apellidos/correo también null).</summary>
+        public int? UsuarioId { get; set; }
+        /// <summary>Id del horario (Tutoria.Horario_idHorario). Aditivo.</summary>
+        public int HorarioId { get; set; }
+        public string? UsuarioNombre { get; set; }
+        public string? UsuarioApellidos { get; set; }
+        public string? UsuarioCorreo { get; set; }
         public string HorarioEspacio { get; set; }
         public DateTime HorarioHoraInicio { get; set; }
         public DateTime HorarioHoraFin { get; set; }
-        public List<UsuarioResponseDto> Estudiantes { get; set; }
+        /// <summary>Dueño del horario (Horario.Usuario_idUsuario): el Docente que agendó. null: usuario eliminado (nombre/apellidos también null).</summary>
+        public int? HorarioUsuarioId { get; set; }
+        public string? HorarioUsuarioNombre { get; set; }
+        public string? HorarioUsuarioApellidos { get; set; }
+        public string HorarioTitulo { get; set; }
+        /// <summary>Máximo de estudiantes; null si el valor guardado no es un entero ≥ 1 (sin límite). Aditivo.</summary>
+        public int? HorarioCupos { get; set; }
+        public List<UsuarioResponseDto> Estudiantes { get; set; } = new();
     }
 }

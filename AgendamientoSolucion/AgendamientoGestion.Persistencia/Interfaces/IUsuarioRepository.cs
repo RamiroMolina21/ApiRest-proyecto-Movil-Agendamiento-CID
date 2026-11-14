@@ -16,4 +16,19 @@ public interface IUsuarioRepository {
     Task<Usuario> UpdateAsync(Usuario usuario);
     Task<bool> DeleteAsync(int id);
     Task<List<Usuario>> GetByRolAsync(string tipoRol);
+    /// <summary>Estado de la cuenta sin cargar la entidad: null si el usuario no existe.</summary>
+    Task<bool?> GetActivoAsync(int id);
+    Task<int> ContarAdministradoresActivosAsync();
+
+    /// <summary>
+    /// Elimina definitivamente al usuario resolviendo todas sus dependencias (ver docs/api, "Eliminación de usuarios").
+    /// Debe llamarse dentro de una transacción. null si el usuario no existe.
+    /// </summary>
+    Task<ResultadoEliminacionUsuario?> EliminarConDependenciasAsync(int id);
+
+    /// <summary>
+    /// Página de usuarios filtrada y su total (antes de paginar). Cada término de <paramref name="terminos"/> debe
+    /// aparecer en nombres, apellidos o correo (sin distinguir mayúsculas ni tildes). Orden: apellidos, nombres, idUsuario.
+    /// </summary>
+    Task<(List<Usuario> Usuarios, int Total)> BuscarPaginadoAsync(IReadOnlyList<string> terminos, string? tipoRol, bool? activo, int skip, int take);
 }

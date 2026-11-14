@@ -1,4 +1,5 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Entidades.Constants;
+using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Persistencia.DbContexts;
 using AgendamientoGestion.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +71,30 @@ public class HorarioRepository : IHorarioRepository
     {
         return await _context.Horarios
             .Include(h => h.Usuario)
-            .Where(h => h.estado == "Disponible")
+            .Where(h => h.estado == EstadosHorario.Disponible || h.estado == EstadosHorario.Libre)
             .ToListAsync();
+    }
+
+    public async Task<bool> ReservarAsync(int horarioId)
+    {
+        // UPDATE ... WHERE estado disponible: si dos peticiones compiten, solo una afecta a la fila.
+        var filas = await _context.Horarios
+            .Where(h => h.idHorario == horarioId &&
+                        (h.estado.ToLower() == "disponible" || h.estado.ToLower() == "libre"))
+            .ExecuteUpdateAsync(s => s.SetProperty(h => h.estado, EstadosHorario.Ocupado));
+
+        if (filas == 0)
+            return false;
+
+        // ExecuteUpdate no pasa por el change tracker: sincronizar la entidad ya cargada (si la hay)
+        // para que no quede con el estado viejo ni se reescriba en el siguiente SaveChanges.
+        var cargado = _context.ChangeTracker.Entries<Horario>().FirstOrDefault(e => e.Entity.idHorario == horarioId);
+        if (cargado != null)
+        {
+            cargado.Entity.estado = EstadosHorario.Ocupado;
+            cargado.Property(h => h.estado).OriginalValue = EstadosHorario.Ocupado;
+        }
+
+        return true;
     }
 }

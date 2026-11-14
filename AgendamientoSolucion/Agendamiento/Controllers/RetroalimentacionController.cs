@@ -1,11 +1,9 @@
+using Agendamiento.Security;
 using AgendamientoGestion.Logica.Dtos;
-using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Logica.Exceptions;
+using AgendamientoGestion.Logica.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Agendamiento.Controllers
 {
@@ -20,140 +18,61 @@ namespace Agendamiento.Controllers
             _retroalimentacionService = retroalimentacionService;
         }
 
+        /// <summary>Lo usa MAUI al calificar una tutoría antes de finalizarla.</summary>
         [HttpPost]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> CreateRetroalimentacion([FromBody] RetroalimentacionCreateDto retroalimentacionDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var retroalimentacion = await _retroalimentacionService.CreateRetroalimentacionAsync(retroalimentacionDto);
-                return CreatedAtAction(nameof(GetRetroalimentacion), new { id = retroalimentacion.IdRetroalimentacion }, retroalimentacion);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            var retroalimentacion = await _retroalimentacionService.CreateRetroalimentacionAsync(retroalimentacionDto, User.ComoSolicitante());
+            return CreatedAtAction(nameof(GetRetroalimentacion), new { id = retroalimentacion.IdRetroalimentacion }, retroalimentacion);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetRetroalimentacion(int id)
         {
-            try
-            {
-                var retroalimentacion = await _retroalimentacionService.GetRetroalimentacionByIdAsync(id);
-                return Ok(retroalimentacion);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _retroalimentacionService.GetRetroalimentacionByIdAsync(id));
         }
 
         [HttpGet]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetAllRetroalimentaciones()
         {
-            try
-            {
-                var retroalimentaciones = await _retroalimentacionService.GetAllRetroalimentacionesAsync();
-                return Ok(retroalimentaciones);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _retroalimentacionService.GetAllRetroalimentacionesAsync());
         }
 
+        /// <summary>Admin/Aux: cualquiera. Docente/Tutor: solo tutorías en las que participan (403 si no).</summary>
         [HttpGet("tutoria/{tutoriaId}")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> GetRetroalimentacionesByTutoria(int tutoriaId)
         {
-            try
-            {
-                var retroalimentaciones = await _retroalimentacionService.GetRetroalimentacionesByTutoriaAsync(tutoriaId);
-                return Ok(retroalimentaciones);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _retroalimentacionService.GetRetroalimentacionesByTutoriaAsync(tutoriaId, User.ComoSolicitante()));
         }
 
         [HttpGet("usuario/{usuarioId}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetRetroalimentacionesByUsuario(int usuarioId)
         {
-            try
-            {
-                var retroalimentaciones = await _retroalimentacionService.GetRetroalimentacionesByUsuarioAsync(usuarioId);
-                return Ok(retroalimentaciones);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _retroalimentacionService.GetRetroalimentacionesByUsuarioAsync(usuarioId));
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> UpdateRetroalimentacion(int id, [FromBody] RetroalimentacionCreateDto retroalimentacionDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var retroalimentacion = await _retroalimentacionService.UpdateRetroalimentacionAsync(id, retroalimentacionDto);
-                return Ok(retroalimentacion);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _retroalimentacionService.UpdateRetroalimentacionAsync(id, retroalimentacionDto));
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> DeleteRetroalimentacion(int id)
         {
-            try
+            if (!await _retroalimentacionService.DeleteRetroalimentacionAsync(id))
             {
-                var result = await _retroalimentacionService.DeleteRetroalimentacionAsync(id);
-                if (result)
-                {
-                    return Ok(new { message = "Retroalimentación eliminada exitosamente" });
-                }
-                return NotFound(new { message = "Retroalimentación no encontrada" });
+                throw new NotFoundException("Retroalimentación no encontrada");
             }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+
+            return Ok(new { message = "Retroalimentación eliminada exitosamente" });
         }
     }
 }

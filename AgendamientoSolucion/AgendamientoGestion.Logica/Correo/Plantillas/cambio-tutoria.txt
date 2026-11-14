@@ -1,0 +1,20 @@
+Hola, {{destinatarioNombre}}:
+
+Hicimos ajustes en tu tutoría de {{idioma}} {{nivel}}. Revisa qué cambió y cómo queda.
+{{#hayCambios}}
+Qué cambió:
+{{#cambios}}  - {{.}}
+{{/cambios}}{{#motivo}}  Motivo: {{motivo}}
+{{/motivo}}{{/hayCambios}}{{^hayCambios}}
+No se detectaron cambios en la fecha, la hora, el lugar, el tema, la modalidad ni la persona a cargo; te compartimos la información vigente para que la tengas a mano.{{#motivo}} Motivo: {{motivo}}.{{/motivo}}
+{{/hayCambios}}
+Así queda tu tutoría:
+  Fecha y hora: {{fechaHora}}
+  Docente o tutor: {{profesor}}
+  Modalidad: {{modalidad}}{{#espacio}}
+  Lugar: {{espacio}}{{/espacio}}
+  Tema: {{tema}}
+  Idioma y nivel: {{idioma}} · {{nivel}}
+  Referencia: Tutoría n.º {{idTutoria}}
+
+Si con estos cambios ya no puedes asistir, avísanos{{#contactoCorreo}} respondiendo a este correo{{/contactoCorreo}} para liberar tu cupo.

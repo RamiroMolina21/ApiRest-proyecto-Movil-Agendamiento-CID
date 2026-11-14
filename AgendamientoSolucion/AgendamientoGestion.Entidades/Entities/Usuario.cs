@@ -14,6 +14,8 @@ namespace AgendamientoGestion.Entidades.Entities
         public string contrasenaHash { get; set; }
         public DateTime fechaRegistro { get; set; }
         public int Rol_idRol { get; set; }
+        /// <summary>Cuenta habilitada (columna Usuario.activo BIT NOT NULL DEFAULT 1). Inactivo: no inicia sesión ni se asigna a tutorías.</summary>
+        public bool activo { get; set; } = true;
 
         // Propiedades de navegación
         public Rol Rol { get; set; }

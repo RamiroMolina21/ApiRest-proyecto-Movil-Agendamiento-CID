@@ -1,0 +1,12 @@
+Hola, {{destinatarioNombre}}:
+
+Se programó una tutoría de {{idioma}} {{nivel}} en la que participas. Estos son los detalles:
+
+  Fecha y hora: {{fechaHora}}
+  Idioma y nivel: {{idioma}} · {{nivel}}
+  Tema: {{tema}}
+  Modalidad: {{modalidad}}{{#espacio}}
+  Lugar: {{espacio}}{{/espacio}}
+  Referencia: Tutoría n.º {{idTutoria}}
+
+{{#contactoCorreo}}¿Podrás asistir? Responde a este correo (o escribe a {{contactoCorreo}}) indicando «Confirmo asistencia» o «No podré asistir» y la tutoría n.º {{idTutoria}}.{{/contactoCorreo}}{{^contactoCorreo}}Si no puedes asistir, avísale con tiempo a la coordinación de tutorías para liberar tu cupo.{{/contactoCorreo}}

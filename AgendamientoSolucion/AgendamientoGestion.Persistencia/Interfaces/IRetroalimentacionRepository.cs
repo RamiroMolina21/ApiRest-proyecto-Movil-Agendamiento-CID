@@ -16,4 +16,5 @@ public interface IRetroalimentacionRepository
     Task<bool> DeleteAsync(int id);
     Task<List<Retroalimentacion>> GetByTutoriaAsync(int tutoriaId);
     Task<List<Retroalimentacion>> GetByUsuarioAsync(int usuarioId);
+    Task<bool> ExistsAsync(int tutoriaId, int usuarioId);
 }

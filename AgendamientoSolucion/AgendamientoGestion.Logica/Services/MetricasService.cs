@@ -1,4 +1,5 @@
-using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Logica.Utils;
+using AgendamientoGestion.Entidades.Constants;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
@@ -39,8 +40,6 @@ namespace AgendamientoGestion.Logica.Services
 
         public async Task<MetricasResponseDto> GetMetricasGeneralesAsync()
         {
-            try
-            {
                 var tutorias = await _tutoriaRepository.GetAllAsync();
                 var usuarios = await _usuarioRepository.GetAllAsync();
                 var horarios = await _horarioRepository.GetAllAsync();
@@ -49,36 +48,34 @@ namespace AgendamientoGestion.Logica.Services
                 var metricas = new MetricasResponseDto
                 {
                     TotalTutorias = tutorias.Count,
-                    TutoriasCompletadas = tutorias.Count(t => t.estado == "Completada"),
-                    TutoriasCanceladas = tutorias.Count(t => t.estado == "Cancelada"),
-                    TutoriasProgramadas = tutorias.Count(t => t.estado == "Programada"),
+                    // Tolerante a sinónimos (ver EstadosTutoria): "Finalizada"/"Completada" y "Pendiente"/"Programada"/"Activo".
+                    TutoriasCompletadas = tutorias.Count(t => EstadosTutoria.EsFinalizada(t.estado)),
+                    TutoriasCanceladas = tutorias.Count(t => EstadosTutoria.EsCancelada(t.estado)),
+                    TutoriasProgramadas = tutorias.Count(t => EstadosTutoria.EsPendiente(t.estado)),
                     PromedioCalificacion = retroalimentaciones.Any() ? retroalimentaciones.Average(r => r.calificacion) : 0,
                     TotalUsuarios = usuarios.Count,
-                    TotalDocentes = usuarios.Count(u => u.Rol?.tipoRol == "Docente"),
-                    TotalEstudiantes = usuarios.Count(u => u.Rol?.tipoRol == "Estudiante"),
+                    TotalDocentes = usuarios.Count(u => Roles.Es(u.Rol?.tipoRol, Roles.Docente)),
+                    TotalEstudiantes = usuarios.Count(u => Roles.Es(u.Rol?.tipoRol, Roles.Estudiante)),
                     TotalHorarios = horarios.Count,
-                    HorariosDisponibles = horarios.Count(h => h.estado == "Disponible")
+                    HorariosDisponibles = horarios.Count(h => EstadosHorario.EsDisponible(h.estado))
                 };
 
                 return metricas;
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"Error al obtener métricas generales: {ex.Message}");
-            }
         }
 
+        /// <summary>
+        /// Solo lectura. Antes este GET insertaba filas en la tabla Informe para tutorías "completada"
+        /// sin informes (efecto secundario en un GET); se eliminó.
+        /// </summary>
         public async Task<List<MetricasTutoriasDetalladasDto>> GetMetricasTutoriasAsync()
         {
-            try
-            {
                 var tutorias = await _tutoriaRepository.GetAllAsync();
                 var metricas = new List<MetricasTutoriasDetalladasDto>();
 
                 foreach (var tutoria in tutorias)
                 {
                     // Obtener tutor/profesor
-                    var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+                    var tutor = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario);
                     var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
 
                     // Obtener estudiantes asignados
@@ -134,28 +131,9 @@ namespace AgendamientoGestion.Logica.Services
                     };
 
                     metricas.Add(metrica);
-
-                    // Guardar métricas en Informe si la tutoría está completada
-                    if (tutoria.estado.ToLower() == "completada" && informes.Count == 0)
-                    {
-                        // Crear un informe consolidado para la tutoría
-                        var informe = new Informe
-                        {
-                            descripcion = $"Informe de métricas para tutoría {tutoria.idTutoria}. Asistencias: {numeroAsistencias}/{estudiantes.Count}. Idioma: {tutoria.idioma}, Nivel: {tutoria.nivel}",
-                            fechaGeneracion = DateTime.Now,
-                            Tutoria_idTutoria = tutoria.idTutoria,
-                            Usuario_idUsuario = tutor?.idUsuario ?? 0
-                        };
-                        await _informeRepository.CreateAsync(informe);
-                    }
                 }
 
                 return metricas;
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"Error al obtener métricas de tutorías: {ex.Message}");
-            }
         }
 
     }

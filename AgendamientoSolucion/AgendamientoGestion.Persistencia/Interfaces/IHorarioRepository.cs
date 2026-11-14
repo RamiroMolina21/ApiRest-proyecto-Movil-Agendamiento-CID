@@ -16,5 +16,11 @@ namespace AgendamientoGestion.Persistencia.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<List<Horario>> GetByUsuarioAsync(int usuarioId);
         Task<List<Horario>> GetDisponiblesAsync();
+
+        /// <summary>
+        /// Pasa el horario de Disponible/Libre a Ocupado con un UPDATE condicional (atómico frente a reservas
+        /// concurrentes). Devuelve false si ya no estaba disponible (otro lo reservó antes).
+        /// </summary>
+        Task<bool> ReservarAsync(int horarioId);
     }
 }

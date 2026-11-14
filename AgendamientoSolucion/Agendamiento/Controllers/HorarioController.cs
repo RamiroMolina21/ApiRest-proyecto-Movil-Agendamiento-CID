@@ -1,11 +1,9 @@
+using Agendamiento.Security;
 using AgendamientoGestion.Logica.Dtos;
-using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Logica.Exceptions;
+using AgendamientoGestion.Logica.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Agendamiento.Controllers
 {
@@ -21,139 +19,61 @@ namespace Agendamiento.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> CreateHorario([FromBody] HorarioCreateDto horarioDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var horario = await _horarioService.CreateHorarioAsync(horarioDto);
-                return CreatedAtAction(nameof(GetHorario), new { id = horario.IdHorario }, horario);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            var horario = await _horarioService.CreateHorarioAsync(horarioDto);
+            return CreatedAtAction(nameof(GetHorario), new { id = horario.IdHorario }, horario);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetHorario(int id)
         {
-            try
-            {
-                var horario = await _horarioService.GetHorarioByIdAsync(id);
-                return Ok(horario);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _horarioService.GetHorarioByIdAsync(id));
         }
 
         [HttpGet]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetAllHorarios()
         {
-            try
-            {
-                var horarios = await _horarioService.GetAllHorariosAsync();
-                return Ok(horarios);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _horarioService.GetAllHorariosAsync());
         }
 
+        /// <summary>Horarios con estado "Disponible" o "Libre".</summary>
         [HttpGet("disponibles")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> GetHorariosDisponibles()
         {
-            try
-            {
-                var horarios = await _horarioService.GetHorariosDisponiblesAsync();
-                return Ok(horarios);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _horarioService.GetHorariosDisponiblesAsync());
         }
 
+        /// <summary>Docente/Tutor solo pueden pedir sus propios horarios (usuarioId = su id).</summary>
         [HttpGet("usuario/{usuarioId}")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> GetHorariosByUsuario(int usuarioId)
         {
-            try
-            {
-                var horarios = await _horarioService.GetHorariosByUsuarioAsync(usuarioId);
-                return Ok(horarios);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            User.AsegurarAccesoADatosDe(usuarioId);
+            return Ok(await _horarioService.GetHorariosByUsuarioAsync(usuarioId));
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> UpdateHorario(int id, [FromBody] HorarioCreateDto horarioDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var horario = await _horarioService.UpdateHorarioAsync(id, horarioDto);
-                return Ok(horario);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _horarioService.UpdateHorarioAsync(id, horarioDto));
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> DeleteHorario(int id)
         {
-            try
+            if (!await _horarioService.DeleteHorarioAsync(id))
             {
-                var result = await _horarioService.DeleteHorarioAsync(id);
-                if (result)
-                {
-                    return Ok(new { message = "Horario eliminado exitosamente" });
-                }
-                return NotFound(new { message = "Horario no encontrado" });
+                throw new NotFoundException("Horario no encontrado");
             }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+
+            return Ok(new { message = "Horario eliminado exitosamente" });
         }
     }
 }

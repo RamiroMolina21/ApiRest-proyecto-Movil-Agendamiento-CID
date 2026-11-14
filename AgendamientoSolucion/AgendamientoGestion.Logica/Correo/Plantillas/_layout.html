@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>{{titulo}}</title>
+{{! Layout común de TODOS los correos de TutorPro.
+    Compatibilidad: estructura en tablas, estilos en línea (Gmail, Outlook, Apple Mail); el <style> solo añade
+    mejoras progresivas (móvil y modo oscuro) que los clientes sin soporte ignoran sin romper nada.
+    Marca sin imágenes: el isotipo es una celda de color con la inicial (no hay dominio público para alojar el logo;
+    una imagen externa se bloquearía por defecto y una a localhost no funcionaría).
+    Variables: titulo, colorEncabezado (acento por tipo de correo), preencabezado, nombreSistema, contactoCorreo,
+    anio y contenido (triple llave: cuerpo ya renderizado). }}
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<style>table, td, h1, p, a { font-family: Arial, Helvetica, sans-serif !important; }</style>
+<![endif]-->
+<style>
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+  body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  a { text-decoration: underline; }
+  @media only screen and (max-width: 620px) {
+    .tp-contenedor { width: 100% !important; }
+    .tp-pad { padding-left: 20px !important; padding-right: 20px !important; }
+  }
+  @media only screen and (max-width: 480px) {
+    .tp-titulo { font-size: 22px !important; line-height: 28px !important; }
+    .tp-fila td { display: block !important; width: 100% !important; padding-left: 0 !important; }
+    .tp-fila td + td { border-top: 0 !important; padding-top: 0 !important; }
+    .tp-etiqueta { padding-bottom: 2px !important; }
+    .tp-boton, .tp-boton a { display: block !important; width: 100% !important; box-sizing: border-box; text-align: center !important; }
+    .tp-boton-hueco { display: block !important; height: 10px !important; width: 100% !important; line-height: 10px !important; font-size: 10px !important; }
+  }
+  @media (prefers-color-scheme: dark) {
+    .tp-fondo { background-color: #0f172a !important; }
+    .tp-tarjeta { background-color: #1e293b !important; border-color: #334155 !important; }
+    .tp-texto, .tp-texto p, .tp-titulo { color: #f1f5f9 !important; }
+    .tp-suave { color: #cbd5e1 !important; }
+    .tp-detalle { background-color: #0f172a !important; border-color: #334155 !important; }
+    .tp-detalle td, .tp-texto td { color: #f1f5f9 !important; border-color: #334155 !important; }
+    .tp-detalle .tp-suave, .tp-texto .tp-suave { color: #cbd5e1 !important; }
+    .tp-detalle p { color: #fdba74 !important; }
+    .tp-marca-nombre { color: #f1f5f9 !important; }
+    a { color: #c4b5fd !important; }
+    .tp-boton a { color: #ffffff !important; }
+    .tp-boton-sec { border-color: #a78bfa !important; }
+    .tp-boton-sec a { color: #ddd6fe !important; }
+  }
+</style>
+</head>
+<body class="tp-fondo" style="margin:0; padding:0; background-color:#f3f1f8; word-spacing:normal;">
+<div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">{{preencabezado}}&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;</div>
+<table role="presentation" class="tp-fondo" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f1f8;">
+<tr>
+<td align="center" style="padding:24px 12px;">
+<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" class="tp-contenedor" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+
+  <!-- Marca -->
+  <tr>
+    <td class="tp-pad" style="padding:4px 32px 18px 32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="36" height="36" align="center" valign="middle" bgcolor="#7b42f6" style="width:36px; height:36px; background-color:#7b42f6; border-radius:9px; color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:20px; line-height:36px; font-weight:bold; mso-line-height-rule:exactly;">T</td>
+          <td style="padding-left:10px; font-family:Arial, Helvetica, sans-serif;">
+            <span class="tp-marca-nombre" style="font-size:18px; line-height:22px; font-weight:bold; color:#1f2937;">Tutor<span style="color:#6d28d9;">Pro</span></span><br>
+            <span class="tp-suave" style="font-size:12px; line-height:16px; color:#4b5563;">Corporación Universitaria del Caribe · CECAR</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Tarjeta -->
+  <tr>
+    <td>
+      <table role="presentation" class="tp-tarjeta" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff; border:1px solid #e5e1ef; border-radius:14px;">
+        <!-- Franja de acento del tipo de correo -->
+        <tr>
+          <td height="6" bgcolor="{{colorEncabezado}}" style="height:6px; line-height:6px; font-size:6px; background-color:{{colorEncabezado}}; border-radius:14px 14px 0 0; mso-line-height-rule:exactly;">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="tp-pad tp-texto" style="padding:28px 32px 8px 32px; font-family:Arial, Helvetica, sans-serif; color:#1f2937;">
+            <h1 class="tp-titulo" style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:24px; line-height:30px; font-weight:bold; color:#111827;">{{titulo}}</h1>
+          </td>
+        </tr>
+        <tr>
+          <td class="tp-pad tp-texto" style="padding:12px 32px 28px 32px; font-family:Arial, Helvetica, sans-serif; font-size:16px; line-height:24px; color:#1f2937;">
+{{{contenido}}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Pie institucional -->
+  <tr>
+    <td class="tp-pad" style="padding:22px 32px 8px 32px; font-family:Arial, Helvetica, sans-serif; font-size:13px; line-height:20px; color:#4b5563;">
+      <p class="tp-suave" style="margin:0 0 8px 0; color:#4b5563;">
+        {{#contactoCorreo}}¿Tienes dudas? Responde a este correo o escríbenos a <a href="mailto:{{contactoCorreo}}" style="color:#6d28d9; text-decoration:underline;">{{contactoCorreo}}</a>.{{/contactoCorreo}}
+        {{^contactoCorreo}}Este mensaje se generó automáticamente. Si tienes dudas, comunícate con la coordinación de tutorías de tu programa.{{/contactoCorreo}}
+      </p>
+      <p class="tp-suave" style="margin:0 0 8px 0; color:#4b5563;">Recibes este correo porque participas en tutorías gestionadas con TutorPro.</p>
+      <p class="tp-suave" style="margin:0; color:#6b7280;">{{nombreSistema}} · © {{anio}}</p>
+    </td>
+  </tr>
+
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td>
+</tr>
+</table>
+</body>
+</html>

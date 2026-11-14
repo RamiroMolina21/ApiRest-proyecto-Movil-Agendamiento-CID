@@ -12,8 +12,12 @@ namespace AgendamientoGestion.Logica.Dtos
         public string Comentario { get; set; }
         public decimal Calificacion { get; set; }
         public DateTime Fecha { get; set; }
-        public string UsuarioNombre { get; set; }
-        public string UsuarioApellidos { get; set; }
+        /// <summary>Autor. null: usuario eliminado (UsuarioNombre/UsuarioApellidos también null).</summary>
+        public int? UsuarioId { get; set; }
+        /// <summary>Aditivo.</summary>
+        public int TutoriaId { get; set; }
+        public string? UsuarioNombre { get; set; }
+        public string? UsuarioApellidos { get; set; }
         public string TutoriaTema { get; set; }
         public string TutoriaIdioma { get; set; }
         public string TutoriaNivel { get; set; }

@@ -1,0 +1,57 @@
+# .gitignore estándar para .NET / Visual Studio
+# NOTA: crear este archivo no "destrackea" lo que ya está en el índice (bin/, obj/, .vs/).
+# Para dejar de versionarlos (decisión del equipo, requiere commit):
+#   git rm -r --cached AgendamientoSolucion/**/bin AgendamientoSolucion/**/obj .vs AgendamientoSolucion/.vs
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+## Build
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+
+## Tests / cobertura
+[Tt]est[Rr]esult*/
+*.trx
+coverage*.json
+coverage*.xml
+*.coverage
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+project.lock.json
+
+## Rider / VS Code
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Secretos y configuración local (usar dotnet user-secrets / variables de entorno)
+appsettings.*.local.json
+appsettings.Local.json
+*.env
+.env*
+secrets.json
+
+## SO
+Thumbs.db
+Desktop.ini
+.DS_Store

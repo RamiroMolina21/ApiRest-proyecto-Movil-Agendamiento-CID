@@ -1,0 +1,11 @@
+Hola, {{destinatarioNombre}}:
+
+Tu tutoría de {{idioma}} {{nivel}} empieza en menos de dos horas. Te dejamos los datos a la mano:
+
+  Empieza: {{fechaHora}}{{#espacio}}
+  Lugar: {{espacio}}{{/espacio}}
+  Modalidad: {{modalidad}}
+  Tema: {{tema}}
+  Idioma y nivel: {{idioma}} · {{nivel}}
+
+Te sugerimos estar listo unos minutos antes de la hora de inicio para aprovechar la sesión completa.

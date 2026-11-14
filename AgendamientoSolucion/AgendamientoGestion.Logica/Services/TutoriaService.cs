@@ -1,114 +1,196 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Entidades.Constants;
+using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
+using AgendamientoGestion.Logica.Seguridad;
 using AgendamientoGestion.Logica.Utils;
-using AgendamientoGestion.Persistencia.DbContexts;
 using AgendamientoGestion.Persistencia.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace AgendamientoGestion.Logica.Services;
 
 public class TutoriaService : ITutoriaService
 {
+    public const string MensajeAsignadoInactivo = "El usuario asignado tiene la cuenta desactivada";
+
     private readonly ITutoriaRepository _tutoriaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IHorarioRepository _horarioRepository;
     private readonly INotificacionService _notificacionService;
-    private readonly IRolRepository _rolRepository;
     private readonly ITutoriaEstudianteRepository _tutoriaEstudianteRepository;
-    private readonly IInformeRepository _informeRepository;
     private readonly IRetroalimentacionRepository _retroalimentacionRepository;
-    private readonly AgendamientoDbContext _context;
     private readonly IEncuestaService _encuestaService;
+    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    private readonly ILogger<TutoriaService> _logger;
 
-    public TutoriaService(ITutoriaRepository tutoriaRepository, IUsuarioRepository usuarioRepository, IHorarioRepository horarioRepository, INotificacionService notificacionService, IRolRepository rolRepository, ITutoriaEstudianteRepository tutoriaEstudianteRepository, IInformeRepository informeRepository, IRetroalimentacionRepository retroalimentacionRepository, AgendamientoDbContext context, IEncuestaService encuestaService)
+    public TutoriaService(
+        ITutoriaRepository tutoriaRepository,
+        IUsuarioRepository usuarioRepository,
+        IHorarioRepository horarioRepository,
+        INotificacionService notificacionService,
+        ITutoriaEstudianteRepository tutoriaEstudianteRepository,
+        IRetroalimentacionRepository retroalimentacionRepository,
+        IEncuestaService encuestaService,
+        IUnidadDeTrabajo unidadDeTrabajo,
+        ILogger<TutoriaService> logger)
     {
         _tutoriaRepository = tutoriaRepository;
         _usuarioRepository = usuarioRepository;
         _horarioRepository = horarioRepository;
         _notificacionService = notificacionService;
-        _rolRepository = rolRepository;
         _tutoriaEstudianteRepository = tutoriaEstudianteRepository;
-        _informeRepository = informeRepository;
         _retroalimentacionRepository = retroalimentacionRepository;
-        _context = context;
         _encuestaService = encuestaService;
+        _unidadDeTrabajo = unidadDeTrabajo;
+        _logger = logger;
     }
 
-    public async Task<TutoriaResponseDto> CreateTutoriaAsync(TutoriaCreateDto tutoriaDto)
+    // ---------------------------------------------------------------------
+    // Crear (R4 validaciones, R9 estudiantes atómicos)
+    // ---------------------------------------------------------------------
+
+    public async Task<TutoriaResponseDto> CreateTutoriaAsync(TutoriaCreateDto tutoriaDto, Solicitante solicitante)
     {
-        // Buscar tutor por ID
-        var tutor = await _usuarioRepository.GetByIdAsync(tutoriaDto.UsuarioId);
-        if (tutor == null)
+        // Paridad MAUI: el Tutor no agenda. Solo Admin/Aux (cualquier horario) y Docente (sus horarios).
+        if (!solicitante.EsGestion && !solicitante.EsDocente)
+        {
+            throw new ForbiddenException("Solo un Docente, Administrador o Auxiliar puede agendar tutorías");
+        }
+
+        var asignado = await _usuarioRepository.GetByIdAsync(tutoriaDto.UsuarioId);
+        if (asignado == null)
         {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        // Verificar que el horario existe
+        if (!Roles.Es(asignado.Rol?.tipoRol, Roles.Docente) && !Roles.Es(asignado.Rol?.tipoRol, Roles.Tutor))
+        {
+            throw new ValidationException("El usuario asignado debe ser Docente o Tutor");
+        }
+
+        if (!asignado.activo)
+        {
+            throw new ValidationException(MensajeAsignadoInactivo);
+        }
+
         var horario = await _horarioRepository.GetByIdAsync(tutoriaDto.HorarioId);
         if (horario == null)
         {
             throw new NotFoundException("Horario no encontrado");
         }
 
-        // Cambiar estado del horario de "Libre" a "Ocupado"
-        if (horario.estado.ToLower() == "libre" || horario.estado.ToLower() == "disponible")
+        if (solicitante.EsDocente && horario.Usuario_idUsuario != solicitante.UsuarioId)
         {
-            horario.estado = "Ocupado";
-            await _horarioRepository.UpdateAsync(horario);
+            throw new ForbiddenException("Solo puede agendar tutorías en sus propios horarios");
         }
 
-        // Crear tutoría
-        var tutoria = new Tutoria
+        if (!EstadosHorario.EsDisponible(horario.estado))
         {
-            idioma = tutoriaDto.Idioma,
-            nivel = tutoriaDto.Nivel,
-            tema = tutoriaDto.Tema,
-            modalidad = tutoriaDto.Modalidad,
-            estado = tutoriaDto.Estado,
-            fechaHora = tutoriaDto.FechaTutoria,
-            Usuario_idUsuario = tutor.idUsuario,
-            Horario_idHorario = tutoriaDto.HorarioId
-        };
+            throw new ConflictException("El horario ya no está disponible");
+        }
 
-        var tutoriaCreada = await _tutoriaRepository.CreateAsync(tutoria);
+        var fechaHora = NormalizarFechaTutoria(tutoriaDto.FechaTutoria, horario);
 
-        // Enviar notificación automática por email al tutor
+        // Validar estudiantes y cupo ANTES de escribir nada.
+        var estudiantes = await ValidarEstudiantesNuevosAsync(tutoriaDto.EstudianteIds ?? new List<int>(), tutoriaId: null);
+        VerificarCupo(horario, actuales: 0, nuevos: estudiantes.Count);
+
+        Tutoria tutoriaCreada;
+        await using (var transaccion = await _unidadDeTrabajo.IniciarTransaccionAsync())
+        {
+            // UPDATE condicional: si otra petición reservó el horario entre la lectura y aquí → 409.
+            if (!await _horarioRepository.ReservarAsync(horario.idHorario))
+            {
+                throw new ConflictException("El horario ya no está disponible");
+            }
+
+            tutoriaCreada = await _tutoriaRepository.CreateAsync(new Tutoria
+            {
+                idioma = tutoriaDto.Idioma,
+                nivel = tutoriaDto.Nivel,
+                tema = tutoriaDto.Tema,
+                modalidad = tutoriaDto.Modalidad,
+                estado = tutoriaDto.Estado,
+                fechaHora = fechaHora,
+                Usuario_idUsuario = asignado.idUsuario,
+                Horario_idHorario = horario.idHorario
+            });
+
+            if (estudiantes.Count > 0)
+            {
+                await _tutoriaEstudianteRepository.CreateRangeAsync(estudiantes.Select(e => new TutoriaEstudiante
+                {
+                    Tutoria_idTutoria = tutoriaCreada.idTutoria,
+                    Usuario_idUsuario = e.idUsuario
+                }));
+            }
+
+            await transaccion.CommitAsync();
+        }
+
+        // Notificación automática (a los estudiantes asignados o, si no hay, al tutor). Un fallo de SMTP
+        // no deshace la creación.
         try
         {
             await _notificacionService.EnviarNotificacionTutoriaPorEmailAsync(tutoriaCreada.idTutoria, "asignacion");
         }
         catch (Exception ex)
         {
-            // Log del error pero no fallar la creación de la tutoría
-            Console.WriteLine($"Error enviando notificación automática: {ex.Message}");
+            _logger.LogError(ex, "Error enviando la notificación automática de la tutoría {TutoriaId}", tutoriaCreada.idTutoria);
         }
 
-        return new TutoriaResponseDto
-        {
-            IdTutoria = tutoriaCreada.idTutoria,
-            Idioma = tutoriaCreada.idioma,
-            Nivel = tutoriaCreada.nivel,
-            Tema = tutoriaCreada.tema,
-            Modalidad = tutoriaCreada.modalidad,
-            Estado = tutoriaCreada.estado,
-            FechaTutoria = tutoriaCreada.fechaHora,
-            UsuarioNombre = tutor.nombres,
-            UsuarioApellidos = tutor.apellidos,
-            UsuarioCorreo = tutor.correo,
-            HorarioEspacio = horario.espacio,
-            HorarioHoraInicio = horario.horaInicio,
-            HorarioHoraFin = horario.horaFin
-        };
+        tutoriaCreada.Usuario = asignado;
+        tutoriaCreada.Horario = horario;
+        return await MapConEstudiantesAsync(tutoriaCreada);
     }
 
-    public async Task<TutoriaResponseDto> GetTutoriaByIdAsync(int id)
+    /// <summary>
+    /// La fecha debe caer dentro de [fechaInicio, fechaFin] del horario. Si llega sin hora (00:00, como envía
+    /// MAUI a veces) se toma la hora de inicio del horario; si trae hora, debe estar en [horaInicio, horaFin).
+    /// </summary>
+    private static DateTime NormalizarFechaTutoria(DateTime fecha, Horario horario)
+    {
+        var dia = fecha.Date;
+        if (dia < horario.fechaInicio.Date || dia > horario.fechaFin.Date)
+        {
+            throw new ValidationException(
+                $"La fecha de la tutoría ({dia:dd/MM/yyyy}) debe estar dentro del horario ({horario.fechaInicio:dd/MM/yyyy} - {horario.fechaFin:dd/MM/yyyy})");
+        }
+
+        var inicio = horario.horaInicio.TimeOfDay;
+        var fin = horario.horaFin.TimeOfDay;
+
+        if (fecha.TimeOfDay == TimeSpan.Zero)
+        {
+            return dia + inicio;
+        }
+
+        // Si el horario cruza la medianoche (fin <= inicio) no se valida la hora.
+        if (fin > inicio && (fecha.TimeOfDay < inicio || fecha.TimeOfDay >= fin))
+        {
+            throw new ValidationException($"La hora de la tutoría debe estar entre {inicio:hh\\:mm} y {fin:hh\\:mm}");
+        }
+
+        return fecha;
+    }
+
+    // ---------------------------------------------------------------------
+    // Lectura con regla de propiedad (R2)
+    // ---------------------------------------------------------------------
+
+    public async Task<TutoriaResponseDto> GetTutoriaByIdAsync(int id, Solicitante solicitante)
+    {
+        var tutoria = await ObtenerConAccesoAsync(id, solicitante, AccionTutoria.Ver);
+        return await MapConEstudiantesAsync(tutoria);
+    }
+
+    public async Task AsegurarAccesoAsync(int tutoriaId, Solicitante solicitante, AccionTutoria accion)
+    {
+        await ObtenerConAccesoAsync(tutoriaId, solicitante, accion);
+    }
+
+    private async Task<Tutoria> ObtenerConAccesoAsync(int id, Solicitante solicitante, AccionTutoria accion)
     {
         var tutoria = await _tutoriaRepository.GetByIdAsync(id);
         if (tutoria == null)
@@ -116,100 +198,14 @@ public class TutoriaService : ITutoriaService
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-        var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-        // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
-        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(id);
-        var estudiantes = new List<UsuarioResponseDto>();
-
-        foreach (var te in tutoriaEstudiantes)
-        {
-            // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
-            if (te.Usuario != null)
-            {
-                estudiantes.Add(new UsuarioResponseDto
-                {
-                    IdUsuario = te.Usuario.idUsuario,
-                    Nombres = te.Usuario.nombres,
-                    Apellidos = te.Usuario.apellidos,
-                    Correo = te.Usuario.correo,
-                    FechaRegistro = te.Usuario.fechaRegistro,
-                    TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
-                });
-            }
-        }
-
-        return new TutoriaResponseDto
-        {
-            IdTutoria = tutoria.idTutoria,
-            Idioma = tutoria.idioma,
-            Nivel = tutoria.nivel,
-            Tema = tutoria.tema,
-            Modalidad = tutoria.modalidad,
-            Estado = tutoria.estado,
-            FechaTutoria = tutoria.fechaHora,
-            UsuarioNombre = tutor?.nombres ?? "N/A",
-            UsuarioApellidos = tutor?.apellidos ?? "N/A",
-            UsuarioCorreo = tutor?.correo ?? "N/A",
-            HorarioEspacio = horario?.espacio ?? "N/A",
-            HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-            HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-            Estudiantes = estudiantes
-        };
+        ReglasAccesoTutoria.Asegurar(solicitante, tutoria, accion);
+        return tutoria;
     }
 
     public async Task<List<TutoriaResponseDto>> GetAllTutoriasAsync()
     {
         var tutorias = await _tutoriaRepository.GetAllAsync();
-        var tutoriasDto = new List<TutoriaResponseDto>();
-
-        foreach (var tutoria in tutorias)
-        {
-            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-            
-            // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
-            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
-            var estudiantes = new List<UsuarioResponseDto>();
-
-            foreach (var te in tutoriaEstudiantes)
-            {
-                // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
-                if (te.Usuario != null)
-                {
-                    estudiantes.Add(new UsuarioResponseDto
-                    {
-                        IdUsuario = te.Usuario.idUsuario,
-                        Nombres = te.Usuario.nombres,
-                        Apellidos = te.Usuario.apellidos,
-                        Correo = te.Usuario.correo,
-                        FechaRegistro = te.Usuario.fechaRegistro,
-                        TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
-                    });
-                }
-            }
-            
-            tutoriasDto.Add(new TutoriaResponseDto
-            {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora,
-                UsuarioNombre = usuario?.nombres ?? "N/A",
-                UsuarioApellidos = usuario?.apellidos ?? "N/A",
-                UsuarioCorreo = usuario?.correo ?? "N/A",
-                HorarioEspacio = horario?.espacio ?? "N/A",
-                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Estudiantes = estudiantes
-            });
-        }
-
-        return tutoriasDto;
+        return await MapListaAsync(tutorias);
     }
 
     public async Task<TutoriaResponseDto> UpdateTutoriaAsync(int id, TutoriaCreateDto tutoriaDto)
@@ -220,23 +216,25 @@ public class TutoriaService : ITutoriaService
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        // Buscar tutor por ID
         var tutor = await _usuarioRepository.GetByIdAsync(tutoriaDto.UsuarioId);
         if (tutor == null)
         {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        // Verificar que el horario existe
+        // Solo al REASIGNAR: editar otros datos de una tutoría cuyo asignado ya está inactivo sigue permitido.
+        if (tutor.idUsuario != tutoria.Usuario_idUsuario && !tutor.activo)
+        {
+            throw new ValidationException(MensajeAsignadoInactivo);
+        }
+
         var horario = await _horarioRepository.GetByIdAsync(tutoriaDto.HorarioId);
         if (horario == null)
         {
             throw new NotFoundException("Horario no encontrado");
         }
 
-        // Guardar datos anteriores para detectar cambios
-        var horarioAnterior = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-        var tutorAnterior = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+        // Datos anteriores para detectar cambios en la notificación
         var tutoriaAnterior = new TutoriaResponseDto
         {
             IdTutoria = tutoria.idTutoria,
@@ -246,12 +244,13 @@ public class TutoriaService : ITutoriaService
             Modalidad = tutoria.modalidad,
             Estado = tutoria.estado,
             FechaTutoria = tutoria.fechaHora,
-            UsuarioNombre = tutorAnterior?.nombres ?? "",
-            UsuarioApellidos = tutorAnterior?.apellidos ?? "",
-            HorarioEspacio = horarioAnterior?.espacio ?? ""
+            UsuarioId = tutoria.Usuario_idUsuario,
+            HorarioId = tutoria.Horario_idHorario,
+            UsuarioNombre = tutoria.Usuario?.nombres ?? "",
+            UsuarioApellidos = tutoria.Usuario?.apellidos ?? "",
+            HorarioEspacio = tutoria.Horario?.espacio ?? ""
         };
 
-        // Actualizar datos
         tutoria.idioma = tutoriaDto.Idioma;
         tutoria.nivel = tutoriaDto.Nivel;
         tutoria.tema = tutoriaDto.Tema;
@@ -259,612 +258,365 @@ public class TutoriaService : ITutoriaService
         tutoria.estado = tutoriaDto.Estado;
         tutoria.fechaHora = tutoriaDto.FechaTutoria;
         tutoria.Usuario_idUsuario = tutor.idUsuario;
-        tutoria.Horario_idHorario = tutoriaDto.HorarioId;
+        tutoria.Usuario = tutor;
+        tutoria.Horario_idHorario = horario.idHorario;
+        tutoria.Horario = horario;
 
         await _tutoriaRepository.UpdateAsync(tutoria);
 
-        var tutoriaActualizada = new TutoriaResponseDto
-        {
-            IdTutoria = tutoria.idTutoria,
-            Idioma = tutoria.idioma,
-            Nivel = tutoria.nivel,
-            Tema = tutoria.tema,
-            Modalidad = tutoria.modalidad,
-            Estado = tutoria.estado,
-            FechaTutoria = tutoria.fechaHora,
-            UsuarioNombre = tutor.nombres,
-            UsuarioApellidos = tutor.apellidos,
-            UsuarioCorreo = tutor.correo,
-            HorarioEspacio = horario.espacio,
-            HorarioHoraInicio = horario.horaInicio,
-            HorarioHoraFin = horario.horaFin
-        };
-
-        // Enviar notificación de cambio a los estudiantes si hay cambios
         try
         {
             await _notificacionService.EnviarNotificacionCambioPorEmailAsync(tutoria.idTutoria, "Cambio realizado en la tutoría", tutoriaAnterior);
         }
         catch (Exception ex)
         {
-            // Log del error pero no fallar la actualización
-            Console.WriteLine($"Error enviando notificación de cambio: {ex.Message}");
+            _logger.LogError(ex, "Error enviando la notificación de cambio de la tutoría {TutoriaId}", tutoria.idTutoria);
         }
 
-        return tutoriaActualizada;
+        return MapTutoria(tutoria, tutor, horario, new List<UsuarioResponseDto>(), sinDatos: string.Empty);
     }
 
     public async Task<bool> DeleteTutoriaAsync(int id)
     {
-        var tutoria = await _tutoriaRepository.GetByIdAsync(id);
-        if (tutoria == null)
+        // Borra en una transacción Informe, Retroalimentacion, TutoriaEstudiante y EncuestaSatisfaccion
+        // (antes faltaba EncuestaSatisfaccion → violación de FK NO ACTION → HTTP 500).
+        var eliminado = await _tutoriaRepository.DeleteWithDependenciesAsync(id);
+        if (!eliminado)
         {
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        // Usar una transacción para eliminar todos los registros relacionados en una sola operación
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            // 1. Eliminar Informes relacionados
-            var informes = await _context.Informes
-                .Where(i => i.Tutoria_idTutoria == id)
-                .ToListAsync();
-            _context.Informes.RemoveRange(informes);
-
-            // 2. Eliminar Retroalimentaciones relacionadas
-            var retroalimentaciones = await _context.Retroalimentaciones
-                .Where(r => r.Tutoria_idTutoria == id)
-                .ToListAsync();
-            _context.Retroalimentaciones.RemoveRange(retroalimentaciones);
-
-            // 3. Eliminar TutoriaEstudiantes relacionados
-            var tutoriaEstudiantes = await _context.TutoriaEstudiantes
-                .Where(te => te.Tutoria_idTutoria == id)
-                .ToListAsync();
-            _context.TutoriaEstudiantes.RemoveRange(tutoriaEstudiantes);
-
-            // 4. Finalmente, eliminar la tutoría
-            _context.Tutorias.Remove(tutoria);
-
-            // Guardar todos los cambios en una sola transacción
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            return true;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        return true;
     }
 
-    public async Task<bool> AgregarEstudiantesATutoriaAsync(int tutoriaId, AgregarEstudiantesTutoriaDto estudiantesDto)
+    // ---------------------------------------------------------------------
+    // Estudiantes (R2 propiedad, R5 cupos)
+    // ---------------------------------------------------------------------
+
+    public async Task<bool> AgregarEstudiantesATutoriaAsync(int tutoriaId, AgregarEstudiantesTutoriaDto estudiantesDto, Solicitante solicitante)
     {
-        // Verificar que la tutoría existe y obtener información completa
-        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
-        if (tutoria == null)
+        var tutoria = await ObtenerConAccesoAsync(tutoriaId, solicitante, AccionTutoria.GestionarEstudiantes);
+
+        List<Usuario> nuevos;
+        await using (var transaccion = await _unidadDeTrabajo.IniciarTransaccionAsync())
         {
-            throw new NotFoundException("Tutoría no encontrada");
+            // Serializa las altas sobre ESTA tutoría: el recuento de cupo y el INSERT no pueden intercalarse
+            // con otra petición concurrente (evita superar el cupo).
+            await _tutoriaRepository.BloquearAsync(tutoriaId);
+
+            // 1) Validar TODOS los estudiantes antes de escribir nada (todo o nada).
+            nuevos = await ValidarEstudiantesNuevosAsync(estudiantesDto.EstudianteIds, tutoriaId);
+            if (nuevos.Count == 0)
+            {
+                return false;
+            }
+
+            // 2) Cupo del horario = máximo de estudiantes de la tutoría.
+            var actuales = await _tutoriaEstudianteRepository.CountByTutoriaAsync(tutoriaId);
+            VerificarCupo(tutoria.Horario, actuales, nuevos.Count);
+
+            // 3) Insertar todas las asignaciones en un único SaveChanges.
+            await _tutoriaEstudianteRepository.CreateRangeAsync(nuevos.Select(e => new TutoriaEstudiante
+            {
+                Tutoria_idTutoria = tutoriaId,
+                Usuario_idUsuario = e.idUsuario
+            }));
+
+            await transaccion.CommitAsync();
         }
 
-        // Obtener información del horario para construir el DTO de respuesta
-        var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-        var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-
-        // Crear el DTO de tutoría una sola vez para reutilizar en las notificaciones
-        var tutoriaDto = new TutoriaResponseDto
+        // 4) Notificar después de confirmar; un fallo de correo no deshace la asignación.
+        var tutoriaDto = MapTutoria(tutoria, tutoria.Usuario, tutoria.Horario, new List<UsuarioResponseDto>());
+        foreach (var estudiante in nuevos)
         {
-            IdTutoria = tutoria.idTutoria,
-            Idioma = tutoria.idioma,
-            Nivel = tutoria.nivel,
-            Tema = tutoria.tema,
-            Modalidad = tutoria.modalidad,
-            Estado = tutoria.estado,
-            FechaTutoria = tutoria.fechaHora,
-            UsuarioNombre = tutor?.nombres ?? "N/A",
-            UsuarioApellidos = tutor?.apellidos ?? "N/A",
-            UsuarioCorreo = tutor?.correo ?? "N/A",
-            HorarioEspacio = horario?.espacio ?? "N/A",
-            HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-            HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue
-        };
+            try
+            {
+                await _notificacionService.EnviarNotificacionEstudianteTutoriaAsync(tutoriaDto, MapEstudiante(estudiante), "asignacion");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error enviando la notificación de asignación al estudiante {EstudianteId} (tutoría {TutoriaId})",
+                    estudiante.idUsuario, tutoriaId);
+            }
+        }
 
-        var estudiantesAgregados = new List<Usuario>();
+        return true;
+    }
 
-        // Procesar cada ID de estudiante
-        foreach (var estudianteId in estudiantesDto.EstudianteIds)
+    /// <summary>
+    /// Comprueba que cada id existe y es Estudiante (404/400). Devuelve solo los que aún no están asignados
+    /// a <paramref name="tutoriaId"/> (null = tutoría nueva).
+    /// </summary>
+    private async Task<List<Usuario>> ValidarEstudiantesNuevosAsync(IEnumerable<int> estudianteIds, int? tutoriaId)
+    {
+        var resultado = new List<Usuario>();
+        foreach (var estudianteId in estudianteIds.Distinct())
         {
-            // Buscar estudiante por ID
             var estudiante = await _usuarioRepository.GetByIdAsync(estudianteId);
             if (estudiante == null)
             {
                 throw new NotFoundException($"Estudiante con ID {estudianteId} no encontrado");
             }
 
-            // Verificar que sea estudiante
-            if (estudiante.Rol == null || estudiante.Rol.tipoRol.ToLower() != "estudiante")
+            if (!Roles.Es(estudiante.Rol?.tipoRol, Roles.Estudiante))
             {
                 throw new ValidationException($"El usuario con ID {estudianteId} no tiene el rol de Estudiante");
             }
 
-            // Verificar que el estudiante no esté ya asignado a esta tutoría
-            var existeAsignacion = await _tutoriaEstudianteRepository.ExistsAsync(tutoriaId, estudiante.idUsuario);
-            if (!existeAsignacion)
+            if (tutoriaId == null || !await _tutoriaEstudianteRepository.ExistsAsync(tutoriaId.Value, estudiante.idUsuario))
             {
-                // Crear relación TutoriaEstudiante
-                var tutoriaEstudiante = new TutoriaEstudiante
+                // Solo se rechaza al AGREGAR: un estudiante ya inscrito que luego se desactiva no rompe la operación.
+                if (!estudiante.activo)
                 {
-                    Tutoria_idTutoria = tutoriaId,
-                    Usuario_idUsuario = estudiante.idUsuario
-                };
-
-                await _tutoriaEstudianteRepository.CreateAsync(tutoriaEstudiante);
-                estudiantesAgregados.Add(estudiante);
-
-                // Enviar notificación por email al estudiante
-                try
-                {
-                    var estudianteResponseDto = new UsuarioResponseDto
-                    {
-                        IdUsuario = estudiante.idUsuario,
-                        Nombres = estudiante.nombres,
-                        Apellidos = estudiante.apellidos,
-                        Correo = estudiante.correo,
-                        FechaRegistro = estudiante.fechaRegistro,
-                        TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
-                    };
-
-                    // Enviar notificación de asignación usando el DTO ya construido
-                    await _notificacionService.EnviarNotificacionEstudianteTutoriaAsync(tutoriaDto, estudianteResponseDto, "asignacion");
+                    throw new ValidationException($"El estudiante con ID {estudianteId} tiene la cuenta desactivada");
                 }
-                catch (Exception ex)
-                {
-                    // Log del error pero continuar con los demás estudiantes
-                    Console.WriteLine($"Error enviando notificación a estudiante {estudiante.correo}: {ex.Message}");
-                }
+
+                resultado.Add(estudiante);
             }
         }
 
-        return estudiantesAgregados.Count > 0;
+        return resultado;
     }
 
-    public async Task<List<TutoriaResponseDto>> GetCalendarioPorDocenteAsync(string nombre, string apellidos, string correo)
+    /// <summary>Cupos = máximo de estudiantes de la tutoría del horario. Cupos no numéricos (datos antiguos) = sin límite.</summary>
+    private void VerificarCupo(Horario? horario, int actuales, int nuevos)
     {
-        // Buscar docente por nombre, apellidos y correo
-        var docente = await _usuarioRepository.GetByNombreApellidosCorreoAsync(nombre, apellidos, correo);
-        if (docente == null)
+        if (nuevos == 0 || horario == null) return;
+
+        var cupo = Cupos.Interpretar(horario.cupos);
+        if (cupo == null)
         {
-            // Si no se encuentra con todos los datos, intentar por correo
-            docente = await _usuarioRepository.GetByEmailAsync(correo);
-            if (docente == null)
-            {
-                throw new NotFoundException("Docente no encontrado");
-            }
+            _logger.LogWarning("El horario {HorarioId} tiene cupos no numéricos ('{Cupos}'): se asignan estudiantes sin límite",
+                horario.idHorario, horario.cupos);
+            return;
         }
 
-        // Verificar que tenga rol de docente/tutor
-        if (docente.Rol == null || (docente.Rol.tipoRol.ToLower() != "docente" && docente.Rol.tipoRol.ToLower() != "tutor"))
+        if (actuales + nuevos > cupo.Value)
         {
-            throw new ValidationException("El usuario especificado no es un docente/tutor");
+            throw new ConflictException(
+                $"Cupo completo: {actuales} de {cupo.Value} ocupados (se intentaron agregar {nuevos})");
         }
-
-        // Obtener tutorías del docente
-        var tutorias = await _tutoriaRepository.GetByUsuarioAsync(docente.idUsuario);
-        var tutoriasDto = new List<TutoriaResponseDto>();
-
-        foreach (var tutoria in tutorias)
-        {
-            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-            // Obtener estudiantes asignados
-            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
-            var estudiantes = new List<UsuarioResponseDto>();
-
-            foreach (var te in tutoriaEstudiantes)
-            {
-                var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
-                if (estudiante != null)
-                {
-                    estudiantes.Add(new UsuarioResponseDto
-                    {
-                        IdUsuario = estudiante.idUsuario,
-                        Nombres = estudiante.nombres,
-                        Apellidos = estudiante.apellidos,
-                        Correo = estudiante.correo,
-                        FechaRegistro = estudiante.fechaRegistro,
-                        TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
-                    });
-                }
-            }
-
-            tutoriasDto.Add(new TutoriaResponseDto
-            {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora,
-                UsuarioNombre = docente.nombres,
-                UsuarioApellidos = docente.apellidos,
-                UsuarioCorreo = docente.correo,
-                HorarioEspacio = horario?.espacio ?? "N/A",
-                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Estudiantes = estudiantes
-            });
-        }
-
-        return tutoriasDto;
     }
 
-    public async Task<List<TutoriaResponseDto>> GetCalendarioPorEstudianteAsync(string nombre, string apellidos, string correo)
+    public async Task<List<UsuarioResponseDto>> GetEstudiantesByTutoriaAsync(int tutoriaId, Solicitante solicitante)
     {
-        // Buscar estudiante por nombre, apellidos y correo
-        var estudiante = await _usuarioRepository.GetByNombreApellidosCorreoAsync(nombre, apellidos, correo);
-        if (estudiante == null)
-        {
-            // Si no se encuentra con todos los datos, intentar por correo
-            estudiante = await _usuarioRepository.GetByEmailAsync(correo);
-            if (estudiante == null)
-            {
-                throw new NotFoundException("Estudiante no encontrado");
-            }
-        }
-
-        // Obtener tutorías donde el estudiante está asignado
-        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByUsuarioAsync(estudiante.idUsuario);
-        var tutoriasDto = new List<TutoriaResponseDto>();
-
-        foreach (var te in tutoriaEstudiantes)
-        {
-            var tutoria = await _tutoriaRepository.GetByIdAsync(te.Tutoria_idTutoria);
-            if (tutoria == null) continue;
-
-            var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-            // Obtener todos los estudiantes de esta tutoría
-            var todosEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
-            var estudiantes = new List<UsuarioResponseDto>();
-
-            foreach (var teItem in todosEstudiantes)
-            {
-                var est = await _usuarioRepository.GetByIdAsync(teItem.Usuario_idUsuario);
-                if (est != null)
-                {
-                    estudiantes.Add(new UsuarioResponseDto
-                    {
-                        IdUsuario = est.idUsuario,
-                        Nombres = est.nombres,
-                        Apellidos = est.apellidos,
-                        Correo = est.correo,
-                        FechaRegistro = est.fechaRegistro,
-                        TipoRol = est.Rol?.tipoRol ?? "Sin rol"
-                    });
-                }
-            }
-
-            tutoriasDto.Add(new TutoriaResponseDto
-            {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora,
-                UsuarioNombre = tutor?.nombres ?? "N/A",
-                UsuarioApellidos = tutor?.apellidos ?? "N/A",
-                UsuarioCorreo = tutor?.correo ?? "N/A",
-                HorarioEspacio = horario?.espacio ?? "N/A",
-                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Estudiantes = estudiantes
-            });
-        }
-
-        return tutoriasDto;
+        await ObtenerConAccesoAsync(tutoriaId, solicitante, AccionTutoria.Ver);
+        return await GetEstudiantesDtoAsync(tutoriaId);
     }
 
-    public async Task<List<TutoriaResponseDto>> GetCalendarioPorIdiomaNivelAsync(string idioma, string nivel)
+    public async Task<bool> EliminarEstudianteDeTutoriaAsync(int tutoriaId, int estudianteId, Solicitante solicitante)
     {
-        // Obtener tutorías por idioma y nivel
-        var tutorias = await _tutoriaRepository.GetByIdiomaNivelAsync(idioma, nivel);
-        var tutoriasDto = new List<TutoriaResponseDto>();
+        await ObtenerConAccesoAsync(tutoriaId, solicitante, AccionTutoria.GestionarEstudiantes);
 
-        foreach (var tutoria in tutorias)
-        {
-            var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-            // Obtener estudiantes asignados
-            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
-            var estudiantes = new List<UsuarioResponseDto>();
-
-            foreach (var te in tutoriaEstudiantes)
-            {
-                var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
-                if (estudiante != null)
-                {
-                    estudiantes.Add(new UsuarioResponseDto
-                    {
-                        IdUsuario = estudiante.idUsuario,
-                        Nombres = estudiante.nombres,
-                        Apellidos = estudiante.apellidos,
-                        Correo = estudiante.correo,
-                        FechaRegistro = estudiante.fechaRegistro,
-                        TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
-                    });
-                }
-            }
-
-            tutoriasDto.Add(new TutoriaResponseDto
-            {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora,
-                UsuarioNombre = tutor?.nombres ?? "N/A",
-                UsuarioApellidos = tutor?.apellidos ?? "N/A",
-                UsuarioCorreo = tutor?.correo ?? "N/A",
-                HorarioEspacio = horario?.espacio ?? "N/A",
-                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Estudiantes = estudiantes
-            });
-        }
-
-        return tutoriasDto;
-    }
-
-    public async Task<List<UsuarioResponseDto>> GetEstudiantesByTutoriaAsync(int tutoriaId)
-    {
-        // Verificar que la tutoría existe
-        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
-        if (tutoria == null)
-        {
-            throw new NotFoundException("Tutoría no encontrada");
-        }
-
-        // Obtener estudiantes asignados a la tutoría
-        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
-        var estudiantes = new List<UsuarioResponseDto>();
-
-        foreach (var te in tutoriaEstudiantes)
-        {
-            var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
-            if (estudiante != null)
-            {
-                estudiantes.Add(new UsuarioResponseDto
-                {
-                    IdUsuario = estudiante.idUsuario,
-                    Nombres = estudiante.nombres,
-                    Apellidos = estudiante.apellidos,
-                    Correo = estudiante.correo,
-                    FechaRegistro = estudiante.fechaRegistro,
-                    TipoRol = estudiante.Rol?.tipoRol ?? "Sin rol"
-                });
-            }
-        }
-
-        return estudiantes;
-    }
-
-    public async Task<bool> EliminarEstudianteDeTutoriaAsync(int tutoriaId, int estudianteId)
-    {
-        // Verificar que la tutoría existe
-        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
-        if (tutoria == null)
-        {
-            throw new NotFoundException("Tutoría no encontrada");
-        }
-
-        // Verificar que el estudiante existe
         var estudiante = await _usuarioRepository.GetByIdAsync(estudianteId);
         if (estudiante == null)
         {
             throw new NotFoundException("Estudiante no encontrado");
         }
 
-        // Verificar que el estudiante está asignado a la tutoría
-        var existeAsignacion = await _tutoriaEstudianteRepository.ExistsAsync(tutoriaId, estudianteId);
-        if (!existeAsignacion)
+        if (!await _tutoriaEstudianteRepository.ExistsAsync(tutoriaId, estudianteId))
         {
             throw new NotFoundException("El estudiante no está asignado a esta tutoría");
         }
 
-        // Eliminar la relación TutoriaEstudiante
         return await _tutoriaEstudianteRepository.DeleteByTutoriaAndEstudianteAsync(tutoriaId, estudianteId);
+    }
+
+    // ---------------------------------------------------------------------
+    // Calendarios y filtros (R1, R7)
+    // ---------------------------------------------------------------------
+
+    public async Task<List<TutoriaResponseDto>> GetCalendarioPorDocenteAsync(string nombre, string apellidos, string correo)
+    {
+        var docente = await _usuarioRepository.GetByNombreApellidosCorreoAsync(nombre, apellidos, correo)
+                      ?? await _usuarioRepository.GetByEmailAsync(correo);
+        if (docente == null)
+        {
+            throw new NotFoundException("Docente no encontrado");
+        }
+
+        if (!Roles.Es(docente.Rol?.tipoRol, Roles.Docente) && !Roles.Es(docente.Rol?.tipoRol, Roles.Tutor))
+        {
+            throw new ValidationException("El usuario especificado no es un docente/tutor");
+        }
+
+        var tutorias = await _tutoriaRepository.GetByUsuarioAsync(docente.idUsuario);
+        return await MapListaAsync(tutorias);
+    }
+
+    public async Task<List<TutoriaResponseDto>> GetCalendarioPorEstudianteAsync(string nombre, string apellidos, string correo)
+    {
+        var estudiante = await _usuarioRepository.GetByNombreApellidosCorreoAsync(nombre, apellidos, correo)
+                         ?? await _usuarioRepository.GetByEmailAsync(correo);
+        if (estudiante == null)
+        {
+            throw new NotFoundException("Estudiante no encontrado");
+        }
+
+        var asignaciones = await _tutoriaEstudianteRepository.GetByUsuarioAsync(estudiante.idUsuario);
+        var resultado = new List<TutoriaResponseDto>();
+        foreach (var te in asignaciones)
+        {
+            var tutoria = await _tutoriaRepository.GetByIdAsync(te.Tutoria_idTutoria);
+            if (tutoria == null) continue;
+            resultado.Add(await MapConEstudiantesAsync(tutoria));
+        }
+
+        return resultado;
+    }
+
+    public async Task<List<TutoriaResponseDto>> GetCalendarioPorIdiomaNivelAsync(string idioma, string nivel)
+    {
+        var tutorias = await _tutoriaRepository.GetByIdiomaNivelAsync(idioma, nivel);
+        return await MapListaAsync(tutorias);
     }
 
     public async Task<List<TutoriaResponseDto>> GetTutoriasByEstadoAsync(string estado)
     {
         var tutorias = await _tutoriaRepository.GetByEstadoAsync(estado);
-        var tutoriasDto = new List<TutoriaResponseDto>();
-
-        foreach (var tutoria in tutorias)
-        {
-            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-            // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
-            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
-            var estudiantes = new List<UsuarioResponseDto>();
-
-            foreach (var te in tutoriaEstudiantes)
-            {
-                // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
-                if (te.Usuario != null)
-                {
-                    estudiantes.Add(new UsuarioResponseDto
-                    {
-                        IdUsuario = te.Usuario.idUsuario,
-                        Nombres = te.Usuario.nombres,
-                        Apellidos = te.Usuario.apellidos,
-                        Correo = te.Usuario.correo,
-                        FechaRegistro = te.Usuario.fechaRegistro,
-                        TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
-                    });
-                }
-            }
-
-            tutoriasDto.Add(new TutoriaResponseDto
-            {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora,
-                UsuarioNombre = usuario?.nombres ?? "N/A",
-                UsuarioApellidos = usuario?.apellidos ?? "N/A",
-                UsuarioCorreo = usuario?.correo ?? "N/A",
-                HorarioEspacio = horario?.espacio ?? "N/A",
-                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Estudiantes = estudiantes
-            });
-        }
-
-        return tutoriasDto;
+        return await MapListaAsync(tutorias);
     }
 
+    /// <summary>Tutorías ASIGNADAS al usuario. El estado se interpreta como grupo de sinónimos (R7).</summary>
     public async Task<List<TutoriaResponseDto>> GetTutoriasByEstadoAndUsuarioAsync(string estado, int usuarioId)
     {
-        var tutorias = await _tutoriaRepository.GetByEstadoAndUsuarioAsync(estado, usuarioId);
-        var tutoriasDto = new List<TutoriaResponseDto>();
-
-        foreach (var tutoria in tutorias)
-        {
-            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-            var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-            // Obtener estudiantes asignados a la tutoría (el repository ya incluye Usuario y Rol)
-            var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoria.idTutoria);
-            var estudiantes = new List<UsuarioResponseDto>();
-
-            foreach (var te in tutoriaEstudiantes)
-            {
-                // Usar el Usuario ya cargado en TutoriaEstudiante en lugar de hacer otra consulta
-                if (te.Usuario != null)
-                {
-                    estudiantes.Add(new UsuarioResponseDto
-                    {
-                        IdUsuario = te.Usuario.idUsuario,
-                        Nombres = te.Usuario.nombres,
-                        Apellidos = te.Usuario.apellidos,
-                        Correo = te.Usuario.correo,
-                        FechaRegistro = te.Usuario.fechaRegistro,
-                        TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
-                    });
-                }
-            }
-
-            tutoriasDto.Add(new TutoriaResponseDto
-            {
-                IdTutoria = tutoria.idTutoria,
-                Idioma = tutoria.idioma,
-                Nivel = tutoria.nivel,
-                Tema = tutoria.tema,
-                Modalidad = tutoria.modalidad,
-                Estado = tutoria.estado,
-                FechaTutoria = tutoria.fechaHora,
-                UsuarioNombre = usuario?.nombres ?? "N/A",
-                UsuarioApellidos = usuario?.apellidos ?? "N/A",
-                UsuarioCorreo = usuario?.correo ?? "N/A",
-                HorarioEspacio = horario?.espacio ?? "N/A",
-                HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-                HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-                Estudiantes = estudiantes
-            });
-        }
-
-        return tutoriasDto;
+        var tutorias = await _tutoriaRepository.GetByEstadosAndUsuarioAsync(EstadosTutoria.SinonimosLower(estado), usuarioId);
+        return await MapListaAsync(tutorias);
     }
 
-    public async Task<TutoriaResponseDto> FinalizarTutoriaAsync(int tutoriaId)
+    /// <summary>Tutorías AGENDADAS en horarios del usuario (R1). Estado opcional, como grupo de sinónimos.</summary>
+    public async Task<List<TutoriaResponseDto>> GetTutoriasAgendadasPorUsuarioAsync(int usuarioId, string? estado)
     {
-        var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
-        if (tutoria == null)
-        {
-            throw new NotFoundException("Tutoría no encontrada");
-        }
+        var estados = string.IsNullOrWhiteSpace(estado) ? null : EstadosTutoria.SinonimosLower(estado);
+        var tutorias = await _tutoriaRepository.GetByDuenoHorarioAsync(usuarioId, estados);
+        return await MapListaAsync(tutorias);
+    }
 
-        // Verificar que la tutoría no esté ya finalizada
-        if (tutoria.estado.ToLower() == "finalizada")
+    // ---------------------------------------------------------------------
+    // Finalizar (R2, R8)
+    // ---------------------------------------------------------------------
+
+    public async Task<TutoriaResponseDto> FinalizarTutoriaAsync(int tutoriaId, FinalizarTutoriaDto? datos, Solicitante solicitante)
+    {
+        var tutoria = await ObtenerConAccesoAsync(tutoriaId, solicitante, AccionTutoria.Finalizar);
+
+        // Acepta ambos sinónimos ("Finalizada"/"Completada") como ya finalizada.
+        if (EstadosTutoria.EsFinalizada(tutoria.estado))
         {
             throw new ValidationException("La tutoría ya está finalizada");
         }
 
-        // Verificar que la tutoría no esté cancelada
-        if (tutoria.estado.ToLower() == "cancelada")
+        if (EstadosTutoria.EsCancelada(tutoria.estado))
         {
             throw new ValidationException("No se puede finalizar una tutoría cancelada");
         }
 
-        // Cambiar el estado a "finalizada"
-        tutoria.estado = "Finalizada";
-        await _tutoriaRepository.UpdateAsync(tutoria);
+        if (datos?.Calificacion == null && !string.IsNullOrWhiteSpace(datos?.Comentario))
+        {
+            throw new ValidationException("Para registrar la retroalimentación se requiere la calificación (1 a 5)");
+        }
 
-        // Enviar encuestas de satisfacción a los estudiantes
+        await using (var transaccion = await _unidadDeTrabajo.IniciarTransaccionAsync())
+        {
+            // UPDATE condicional: dos "finalizar" simultáneos no pueden pasar ambos (ni duplicar la retroalimentación).
+            if (!await _tutoriaRepository.MarcarFinalizadaAsync(tutoriaId))
+            {
+                throw new ValidationException("La tutoría ya está finalizada");
+            }
+
+            if (datos?.Calificacion is decimal calificacion)
+            {
+                if (await _retroalimentacionRepository.ExistsAsync(tutoriaId, solicitante.UsuarioId))
+                {
+                    throw new ConflictException("Ya registró una retroalimentación para esta tutoría");
+                }
+
+                await _retroalimentacionRepository.CreateAsync(new Retroalimentacion
+                {
+                    comentario = datos.Comentario?.Trim() ?? string.Empty,
+                    calificacion = calificacion,
+                    fecha = DateTime.Now,
+                    Tutoria_idTutoria = tutoriaId,
+                    Usuario_idUsuario = solicitante.UsuarioId
+                });
+            }
+
+            await transaccion.CommitAsync();
+        }
+
+        // Encuestas de satisfacción (idempotente). Un fallo no revierte la finalización.
         try
         {
             await _encuestaService.EnviarEncuestasAsync(tutoriaId);
         }
         catch (Exception ex)
         {
-            // No fallar la finalización si el envío de encuestas falla
-            Console.WriteLine($"Error enviando encuestas de satisfacción: {ex.Message}");
+            _logger.LogError(ex, "Error enviando encuestas de satisfacción de la tutoría {TutoriaId}", tutoriaId);
         }
 
-        // Obtener información completa para el DTO
-        var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-        var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-
-        // Obtener estudiantes asignados a la tutoría
-        var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
-        var estudiantes = new List<UsuarioResponseDto>();
-
-        foreach (var te in tutoriaEstudiantes)
-        {
-            if (te.Usuario != null)
-            {
-                estudiantes.Add(new UsuarioResponseDto
-                {
-                    IdUsuario = te.Usuario.idUsuario,
-                    Nombres = te.Usuario.nombres,
-                    Apellidos = te.Usuario.apellidos,
-                    Correo = te.Usuario.correo,
-                    FechaRegistro = te.Usuario.fechaRegistro,
-                    TipoRol = te.Usuario.Rol?.tipoRol ?? "Sin rol"
-                });
-            }
-        }
-
-        return new TutoriaResponseDto
-        {
-            IdTutoria = tutoria.idTutoria,
-            Idioma = tutoria.idioma,
-            Nivel = tutoria.nivel,
-            Tema = tutoria.tema,
-            Modalidad = tutoria.modalidad,
-            Estado = tutoria.estado,
-            FechaTutoria = tutoria.fechaHora,
-            UsuarioNombre = tutor?.nombres ?? "N/A",
-            UsuarioApellidos = tutor?.apellidos ?? "N/A",
-            UsuarioCorreo = tutor?.correo ?? "N/A",
-            HorarioEspacio = horario?.espacio ?? "N/A",
-            HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
-            HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
-            Estudiantes = estudiantes
-        };
+        return await MapConEstudiantesAsync(tutoria);
     }
+
+    // ---------------------------------------------------------------------
+    // Mapeo
+    // ---------------------------------------------------------------------
+
+    private async Task<List<TutoriaResponseDto>> MapListaAsync(IEnumerable<Tutoria> tutorias)
+    {
+        var resultado = new List<TutoriaResponseDto>();
+        foreach (var tutoria in tutorias)
+        {
+            resultado.Add(await MapConEstudiantesAsync(tutoria));
+        }
+        return resultado;
+    }
+
+    /// <summary>
+    /// El repositorio de tutorías ya incluye Usuario, Horario y Horario.Usuario, y el de TutoriaEstudiante
+    /// incluye Usuario+Rol. Queda 1 consulta de estudiantes por tutoría (N+1 parcial, ver propuestas en docs/api).
+    /// </summary>
+    private async Task<TutoriaResponseDto> MapConEstudiantesAsync(Tutoria tutoria)
+    {
+        var estudiantes = await GetEstudiantesDtoAsync(tutoria.idTutoria);
+        return MapTutoria(tutoria, tutoria.Usuario, tutoria.Horario, estudiantes);
+    }
+
+    private async Task<List<UsuarioResponseDto>> GetEstudiantesDtoAsync(int tutoriaId)
+    {
+        var asignaciones = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
+        return asignaciones
+            .Where(te => te.Usuario != null)
+            .Select(te => MapEstudiante(te.Usuario))
+            .ToList();
+    }
+
+    private static UsuarioResponseDto MapEstudiante(Usuario usuario) =>
+        UsuarioService.Map(usuario, usuario.Rol?.tipoRol);
+
+    private static TutoriaResponseDto MapTutoria(
+        Tutoria tutoria, Usuario? tutor, Horario? horario, List<UsuarioResponseDto> estudiantes, string sinDatos = "N/A") => new()
+    {
+        IdTutoria = tutoria.idTutoria,
+        Idioma = tutoria.idioma,
+        Nivel = tutoria.nivel,
+        Tema = tutoria.tema,
+        Modalidad = tutoria.modalidad,
+        Estado = tutoria.estado,
+        FechaTutoria = tutoria.fechaHora,
+        UsuarioId = tutoria.Usuario_idUsuario,
+        HorarioId = tutoria.Horario_idHorario,
+        // Asignado eliminado (Usuario_idUsuario null) → null en id y nombres: la UI muestra "Sin asignar (usuario eliminado)".
+        UsuarioNombre = tutoria.Usuario_idUsuario == null ? null : tutor?.nombres ?? sinDatos,
+        UsuarioApellidos = tutoria.Usuario_idUsuario == null ? null : tutor?.apellidos ?? sinDatos,
+        UsuarioCorreo = tutoria.Usuario_idUsuario == null ? null : tutor?.correo ?? sinDatos,
+        HorarioEspacio = horario?.espacio ?? sinDatos,
+        HorarioHoraInicio = horario?.horaInicio ?? DateTime.MinValue,
+        HorarioHoraFin = horario?.horaFin ?? DateTime.MinValue,
+        HorarioUsuarioId = horario?.Usuario_idUsuario,
+        HorarioUsuarioNombre = horario is { Usuario_idUsuario: null } ? null : horario?.Usuario?.nombres ?? sinDatos,
+        HorarioUsuarioApellidos = horario is { Usuario_idUsuario: null } ? null : horario?.Usuario?.apellidos ?? sinDatos,
+        HorarioTitulo = horario?.titulo ?? sinDatos,
+        HorarioCupos = Cupos.Interpretar(horario?.cupos),
+        Estudiantes = estudiantes
+    };
 }

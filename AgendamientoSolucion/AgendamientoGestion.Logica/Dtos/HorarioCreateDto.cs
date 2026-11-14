@@ -9,9 +9,12 @@ namespace AgendamientoGestion.Logica.Dtos
 {
     public class HorarioCreateDto
     {
-        [Required(ErrorMessage = "El título es obligatorio")]
+        /// <summary>
+        /// Opcional. Omitido, null o vacío → el servidor genera uno (ver TituloHorario). En PUT, vacío conserva
+        /// el título personalizado existente o regenera el generado automáticamente.
+        /// </summary>
         [StringLength(100, ErrorMessage = "El título no puede exceder 100 caracteres")]
-        public string Titulo { get; set; }
+        public string? Titulo { get; set; }
 
         [Required(ErrorMessage = "La fecha de inicio es obligatoria")]
         public DateTime FechaInicio { get; set; }
