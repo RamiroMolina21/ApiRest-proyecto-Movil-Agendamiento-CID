@@ -130,10 +130,22 @@ builder.Services.AddOptions<RateLimiterOptions>().Configure<IOptions<LoginRateLi
             }));
 });
 
-// ngrok / proxy inverso local: tomar la IP real del cliente de X-Forwarded-For (solo se confía en loopback,
-// que es el valor por defecto de KnownProxies/KnownNetworks).
+// Proxy inverso: tomar la IP real del cliente de X-Forwarded-For.
+// Por defecto solo se confía en loopback (ngrok / proxy local).
+// En plataformas donde el contenedor solo es accesible a través del balanceador del proveedor
+// (Render, Azure Container Apps...), activar ForwardedHeaders:ConfiarEnProxyDelProveedor=true
+// para que el límite de intentos de login cuente por cliente y no por la IP del balanceador.
+var confiarEnProxyDelProveedor = builder.Configuration.GetValue<bool>("ForwardedHeaders:ConfiarEnProxyDelProveedor");
 builder.Services.Configure<ForwardedHeadersOptions>(o =>
-    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+{
+    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    if (confiarEnProxyDelProveedor)
+    {
+        o.KnownNetworks.Clear();
+        o.KnownProxies.Clear();
+        o.ForwardLimit = 1; // solo el salto añadido por el balanceador del proveedor
+    }
+});
 
 // ----------------------
 // 🔹 ERRORES: ProblemDetails (RFC 9457) para todo
