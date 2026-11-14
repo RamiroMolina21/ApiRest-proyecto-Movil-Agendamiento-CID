@@ -12,6 +12,8 @@ namespace AgendamientoGestion.Persistencia.Interfaces
         Task<EncuestaSatisfaccion> UpdateAsync(EncuestaSatisfaccion encuesta);
 
         /// <summary>Por tutoría con al menos una encuesta sin responder: (tutoría, enviadas, sin responder).</summary>
+        /// <summary>Totales calculados en SQL: enviadas, respondidas y suma de calificaciones de las respondidas.</summary>
+        Task<(int Total, int Respondidas, long SumaCalificacion)> GetTotalesAsync();
         Task<List<(Tutoria Tutoria, int Enviadas, int SinResponder)>> GetPendientesPorTutoriaAsync();
     }
 }

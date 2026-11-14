@@ -15,6 +15,8 @@ public interface ITutoriaEstudianteRepository
     Task<TutoriaEstudiante> GetByIdAsync(int id);
     Task<List<TutoriaEstudiante>> GetAllAsync();
     Task<List<TutoriaEstudiante>> GetByTutoriaAsync(int tutoriaId);
+    /// <summary>Inscripciones (con Usuario y Rol, sin seguimiento) de varias tutorías en UNA consulta (evita N+1).</summary>
+    Task<List<TutoriaEstudiante>> GetByTutoriasAsync(IReadOnlyCollection<int> tutoriaIds);
     Task<List<TutoriaEstudiante>> GetByUsuarioAsync(int usuarioId);
     Task<bool> ExistsAsync(int tutoriaId, int usuarioId);
     Task<int> CountByTutoriaAsync(int tutoriaId);

@@ -1,4 +1,4 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Persistencia.DbContexts;
 using AgendamientoGestion.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +47,16 @@ public class InformeRepository : IInformeRepository {
             .Include(i => i.Tutoria)
             .Include(i => i.Usuario)
             .Where(i => i.Tutoria_idTutoria == tutoriaId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Informe>> GetByTutoriasAsync(IReadOnlyCollection<int> tutoriaIds)
+    {
+        if (tutoriaIds.Count == 0)
+            return new List<Informe>();
+
+        return await _context.Informes.AsNoTracking()
+            .Where(i => tutoriaIds.Contains(i.Tutoria_idTutoria))
             .ToListAsync();
     }
 

@@ -34,6 +34,9 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public FakeCorreoService Correo { get; } = new();
 
+    /// <summary>Cuenta los comandos SQL ejecutados (para detectar N+1 en los tests de rendimiento).</summary>
+    public ContadorConsultas Consultas { get; } = new();
+
     /// <summary>Permite a subclases cambiar configuración (p. ej. límite de login o clave JWT).</summary>
     protected virtual IDictionary<string, string?> Configuracion => new Dictionary<string, string?>
     {
@@ -58,7 +61,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.RemoveAll<IDbContextOptionsConfiguration<AgendamientoDbContext>>();
             SqliteCompatSqlServer.Registrar(_connection);
             _connection.Open();
-            services.AddDbContext<AgendamientoDbContext>(o => o.UseSqlite(_connection));
+            services.AddDbContext<AgendamientoDbContext>(o => o.UseSqlite(_connection).AddInterceptors(Consultas));
 
             services.RemoveAll<ICorreoService>();
             services.AddSingleton<ICorreoService>(Correo);
