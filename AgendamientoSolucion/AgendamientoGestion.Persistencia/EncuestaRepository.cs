@@ -79,6 +79,20 @@ public class EncuestaRepository : IEncuestaRepository
             .ToList();
     }
 
+    public async Task<(int Total, int Respondidas, long SumaCalificacion)> GetTotalesAsync()
+    {
+        var r = await _context.EncuestasSatisfaccion.AsNoTracking()
+            .GroupBy(e => 1)
+            .Select(g => new
+            {
+                Total = g.Count(),
+                Respondidas = g.Count(e => e.tokenUsado),
+                Suma = g.Sum(e => e.tokenUsado ? (long)e.calificacion : 0L)
+            })
+            .FirstOrDefaultAsync();
+        return r == null ? (0, 0, 0L) : (r.Total, r.Respondidas, r.Suma);
+    }
+
     public async Task<EncuestaSatisfaccion> UpdateAsync(EncuestaSatisfaccion encuesta)
     {
         _context.EncuestasSatisfaccion.Update(encuesta);

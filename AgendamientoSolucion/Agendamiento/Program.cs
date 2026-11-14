@@ -166,6 +166,7 @@ builder.Services.AddScoped<IHorarioRepository, HorarioRepository>();
 builder.Services.AddScoped<ITutoriaEstudianteRepository, TutoriaEstudianteRepository>();
 builder.Services.AddScoped<IEncuestaRepository, EncuestaRepository>();
 builder.Services.AddScoped<IAsuntoAtendidoRepository, AsuntoAtendidoRepository>();
+builder.Services.AddScoped<IMetricasRepository, MetricasRepository>();
 // Transacciones que abarcan varios repositorios (comparten el DbContext scoped).
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 

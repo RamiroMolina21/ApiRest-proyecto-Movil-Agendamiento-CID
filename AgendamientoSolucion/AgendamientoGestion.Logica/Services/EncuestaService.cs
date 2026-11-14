@@ -142,21 +142,22 @@ public class EncuestaService : IEncuestaService
 
     public async Task<EncuestaEstadisticasDto> GetEstadisticasAsync()
     {
-        var todas = await _encuestaRepository.GetAllAsync();
-        var respondidas = todas.Where(e => e.tokenUsado).ToList();
+        // Totales calculados en SQL (antes se cargaban todas las encuestas con su tutoría).
+        var (total, respondidas, suma) = await _encuestaRepository.GetTotalesAsync();
 
-        double promedio = respondidas.Count > 0
-            ? respondidas.Average(e => e.calificacion)
+        // Igual que Enumerable.Average(int): suma (long) / número de elementos, en double.
+        double promedio = respondidas > 0
+            ? (double)suma / respondidas
             : 0;
 
-        double tasa = todas.Count > 0
-            ? Math.Round((double)respondidas.Count / todas.Count * 100, 1)
+        double tasa = total > 0
+            ? Math.Round((double)respondidas / total * 100, 1)
             : 0;
 
         return new EncuestaEstadisticasDto
         {
-            TotalEnviadas = todas.Count,
-            TotalRespondidas = respondidas.Count,
+            TotalEnviadas = total,
+            TotalRespondidas = respondidas,
             PromedioCalificacion = Math.Round(promedio, 1),
             TasaRespuesta = tasa
         };

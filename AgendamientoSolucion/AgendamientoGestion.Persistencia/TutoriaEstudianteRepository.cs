@@ -55,6 +55,21 @@ public class TutoriaEstudianteRepository : ITutoriaEstudianteRepository
             .Include(te => te.Usuario)
                 .ThenInclude(u => u.Rol)
             .Where(te => te.Tutoria_idTutoria == tutoriaId)
+            .OrderBy(te => te.Usuario_idUsuario) // orden explícito = el que ya devolvía SQL Server (índice Tutoria+Usuario)
+            .ToListAsync();
+    }
+
+    public async Task<List<TutoriaEstudiante>> GetByTutoriasAsync(IReadOnlyCollection<int> tutoriaIds)
+    {
+        if (tutoriaIds.Count == 0)
+            return new List<TutoriaEstudiante>();
+
+        return await _context.TutoriaEstudiantes.AsNoTracking()
+            .Include(te => te.Usuario)
+                .ThenInclude(u => u.Rol)
+            .Where(te => tutoriaIds.Contains(te.Tutoria_idTutoria))
+            // Mismo orden que devolvía SQL Server por tutoría (índice único Tutoria+Usuario), ahora explícito.
+            .OrderBy(te => te.Tutoria_idTutoria).ThenBy(te => te.Usuario_idUsuario)
             .ToListAsync();
     }
 

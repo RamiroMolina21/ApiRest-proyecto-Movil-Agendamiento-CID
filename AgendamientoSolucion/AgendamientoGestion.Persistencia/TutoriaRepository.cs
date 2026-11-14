@@ -85,6 +85,18 @@ public class TutoriaRepository : ITutoriaRepository
         return true;
     }
 
+    public async Task<List<Tutoria>> GetByIdsAsync(IReadOnlyCollection<int> ids)
+    {
+        if (ids.Count == 0)
+            return new List<Tutoria>();
+
+        return await _context.Tutorias
+            .Include(t => t.Usuario)
+            .Include(t => t.Horario).ThenInclude(h => h.Usuario)
+            .Where(t => ids.Contains(t.idTutoria))
+            .ToListAsync();
+    }
+
     public async Task<List<Tutoria>> GetByUsuarioAsync(int usuarioId)
     {
         return await _context.Tutorias

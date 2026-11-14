@@ -95,7 +95,7 @@ public class NotificacionService : INotificacionService
             throw new NotFoundException("Notificación no encontrada");
         }
 
-        var usuario = await _usuarioRepository.BuscarAsync(notificacion.Usuario_idUsuario);
+        var usuario = notificacion.Usuario /* ya incluido por el repositorio */;
 
         return new NotificacionResponseDto
         {
@@ -116,7 +116,7 @@ public class NotificacionService : INotificacionService
 
         foreach (var notificacion in notificaciones)
         {
-            var usuario = await _usuarioRepository.BuscarAsync(notificacion.Usuario_idUsuario);
+            var usuario = notificacion.Usuario /* ya incluido por el repositorio */;
             
             notificacionesDto.Add(new NotificacionResponseDto
             {
@@ -185,7 +185,7 @@ public class NotificacionService : INotificacionService
 
         foreach (var notificacion in notificaciones)
         {
-            var usuario = await _usuarioRepository.BuscarAsync(notificacion.Usuario_idUsuario);
+            var usuario = notificacion.Usuario /* ya incluido por el repositorio */;
             
             notificacionesDto.Add(new NotificacionResponseDto
             {

@@ -99,8 +99,8 @@ public class RetroalimentacionService : IRetroalimentacionService
             throw new NotFoundException("Retroalimentación no encontrada");
         }
 
-        var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
-        var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
+        var usuario = retroalimentacion.Usuario /* ya incluido por el repositorio: sin consulta por fila */;
+        var tutoria = retroalimentacion.Tutoria;
 
         return new RetroalimentacionResponseDto
         {
@@ -125,8 +125,8 @@ public class RetroalimentacionService : IRetroalimentacionService
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
-            var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
+            var usuario = retroalimentacion.Usuario /* ya incluido por el repositorio: sin consulta por fila */;
+            var tutoria = retroalimentacion.Tutoria;
             
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {
@@ -225,8 +225,8 @@ public class RetroalimentacionService : IRetroalimentacionService
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
-            var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
+            var usuario = retroalimentacion.Usuario /* ya incluido por el repositorio: sin consulta por fila */;
+            var tutoria = retroalimentacion.Tutoria;
             
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {
@@ -254,8 +254,8 @@ public class RetroalimentacionService : IRetroalimentacionService
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
-            var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
+            var usuario = retroalimentacion.Usuario /* ya incluido por el repositorio: sin consulta por fila */;
+            var tutoria = retroalimentacion.Tutoria;
             
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {

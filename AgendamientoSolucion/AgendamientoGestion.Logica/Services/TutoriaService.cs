@@ -453,16 +453,17 @@ public class TutoriaService : ITutoriaService
             throw new NotFoundException("Estudiante no encontrado");
         }
 
+        // 3 consultas en total (inscripciones, tutorías, estudiantes) en lugar de 2 por inscripción.
         var asignaciones = await _tutoriaEstudianteRepository.GetByUsuarioAsync(estudiante.idUsuario);
-        var resultado = new List<TutoriaResponseDto>();
-        foreach (var te in asignaciones)
-        {
-            var tutoria = await _tutoriaRepository.GetByIdAsync(te.Tutoria_idTutoria);
-            if (tutoria == null) continue;
-            resultado.Add(await MapConEstudiantesAsync(tutoria));
-        }
+        var tutorias = (await _tutoriaRepository.GetByIdsAsync(asignaciones.Select(te => te.Tutoria_idTutoria).Distinct().ToList()))
+            .ToDictionary(t => t.idTutoria);
 
-        return resultado;
+        // Mismo orden que las inscripciones (como antes).
+        var ordenadas = asignaciones
+            .Where(te => tutorias.ContainsKey(te.Tutoria_idTutoria))
+            .Select(te => tutorias[te.Tutoria_idTutoria])
+            .ToList();
+        return await MapListaAsync(ordenadas);
     }
 
     public async Task<List<TutoriaResponseDto>> GetCalendarioPorIdiomaNivelAsync(string idioma, string nivel)
@@ -561,14 +562,25 @@ public class TutoriaService : ITutoriaService
     // Mapeo
     // ---------------------------------------------------------------------
 
+    /// <summary>
+    /// Listas: los estudiantes de TODAS las tutorías se cargan en una sola consulta (antes una por tutoría: N+1,
+    /// ~150 ms por ida y vuelta en producción). Se conserva el orden de la lista y el de los estudiantes.
+    /// </summary>
     private async Task<List<TutoriaResponseDto>> MapListaAsync(IEnumerable<Tutoria> tutorias)
     {
-        var resultado = new List<TutoriaResponseDto>();
-        foreach (var tutoria in tutorias)
-        {
-            resultado.Add(await MapConEstudiantesAsync(tutoria));
-        }
-        return resultado;
+        var lista = tutorias as IList<Tutoria> ?? tutorias.ToList();
+        var ids = lista.Select(t => t.idTutoria).Distinct().ToList();
+        var porTutoria = (await _tutoriaEstudianteRepository.GetByTutoriasAsync(ids))
+            .Where(te => te.Usuario != null)
+            .GroupBy(te => te.Tutoria_idTutoria)
+            .ToDictionary(g => g.Key, g => g.Select(te => te.Usuario).ToList());
+
+        return lista
+            .Select(t => MapTutoria(t, t.Usuario, t.Horario,
+                porTutoria.TryGetValue(t.idTutoria, out var usuarios)
+                    ? usuarios.Select(MapEstudiante).ToList()
+                    : new List<UsuarioResponseDto>()))
+            .ToList();
     }
 
     /// <summary>

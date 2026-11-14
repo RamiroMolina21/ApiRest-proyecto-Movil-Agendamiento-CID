@@ -19,6 +19,8 @@ public interface ITutoriaRepository
     /// EncuestaSatisfaccion) en una sola transacción. Devuelve false si no existe.
     /// </summary>
     Task<bool> DeleteWithDependenciesAsync(int id);
+    /// <summary>Tutorías (con Usuario, Horario y Horario.Usuario) por ids, en UNA consulta. Sin orden garantizado.</summary>
+    Task<List<Tutoria>> GetByIdsAsync(IReadOnlyCollection<int> ids);
     Task<List<Tutoria>> GetByUsuarioAsync(int usuarioId);
     Task<List<Tutoria>> GetByHorarioAsync(int horarioId);
     Task<List<Tutoria>> GetByEstadoAsync(string estado);
