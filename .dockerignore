@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/*.user
+**/TestResults/
+AgendamientoSolucion/Agendamiento.Tests/
+docs/
+.git/
+.github/
+WebPage/
+**/appsettings.Development.json
+**/secrets.json
