@@ -1,9 +1,12 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Logica.Correo;
+using AgendamientoGestion.Logica.Utils;
+using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +27,7 @@ public class NotificacionService : INotificacionService
     private readonly IExcelService _excelService;
     private readonly IRetroalimentacionRepository _retroalimentacionRepository;
     private readonly IEncuestaRepository _encuestaRepository;
+    private readonly ILogger<NotificacionService> _logger;
 
     public NotificacionService(
         INotificacionRepository notificacionRepository,
@@ -35,8 +39,10 @@ public class NotificacionService : INotificacionService
         IEmailTemplateService emailTemplateService,
         IExcelService excelService,
         IRetroalimentacionRepository retroalimentacionRepository,
-        IEncuestaRepository encuestaRepository)
+        IEncuestaRepository encuestaRepository,
+        ILogger<NotificacionService> logger)
     {
+        _logger = logger;
         _notificacionRepository = notificacionRepository;
         _usuarioRepository = usuarioRepository;
         _tutoriaRepository = tutoriaRepository;
@@ -89,7 +95,7 @@ public class NotificacionService : INotificacionService
             throw new NotFoundException("Notificación no encontrada");
         }
 
-        var usuario = await _usuarioRepository.GetByIdAsync(notificacion.Usuario_idUsuario);
+        var usuario = await _usuarioRepository.BuscarAsync(notificacion.Usuario_idUsuario);
 
         return new NotificacionResponseDto
         {
@@ -110,7 +116,7 @@ public class NotificacionService : INotificacionService
 
         foreach (var notificacion in notificaciones)
         {
-            var usuario = await _usuarioRepository.GetByIdAsync(notificacion.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(notificacion.Usuario_idUsuario);
             
             notificacionesDto.Add(new NotificacionResponseDto
             {
@@ -179,7 +185,7 @@ public class NotificacionService : INotificacionService
 
         foreach (var notificacion in notificaciones)
         {
-            var usuario = await _usuarioRepository.GetByIdAsync(notificacion.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(notificacion.Usuario_idUsuario);
             
             notificacionesDto.Add(new NotificacionResponseDto
             {
@@ -206,7 +212,7 @@ public class NotificacionService : INotificacionService
                 throw new NotFoundException("Tutoría no encontrada");
             }
 
-            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario);
             if (usuario == null)
             {
                 throw new NotFoundException("Usuario no encontrado");
@@ -266,7 +272,7 @@ public class NotificacionService : INotificacionService
                 throw new NotFoundException("Tutoría no encontrada");
             }
 
-            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario);
             if (usuario == null)
             {
                 throw new NotFoundException("Usuario no encontrado");
@@ -306,7 +312,7 @@ public class NotificacionService : INotificacionService
                 throw new NotFoundException("Tutoría no encontrada");
             }
 
-            var usuario = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario);
             if (usuario == null)
             {
                 throw new NotFoundException("Usuario no encontrado");
@@ -344,8 +350,8 @@ public class NotificacionService : INotificacionService
             var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
             if (tutoria == null) return false;
 
-            var tutor = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-            if (tutor == null) return false;
+            // Puede ser null si el asignado fue eliminado: se avisa igualmente a los estudiantes.
+            var tutor = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario);
 
             // Obtener estudiantes asignados a la tutoría
             var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
@@ -369,6 +375,7 @@ public class NotificacionService : INotificacionService
             // Si no hay estudiantes, al menos enviar al tutor
             if (estudiantes.Count == 0)
             {
+                if (tutor == null) return false;
                 estudiantes.Add(new UsuarioResponseDto
                 {
                     IdUsuario = tutor.idUsuario,
@@ -389,47 +396,36 @@ public class NotificacionService : INotificacionService
                 FechaTutoria = tutoria.fechaHora
             };
 
+            var todosEnviados = true;
             foreach (var estudiante in estudiantes)
             {
-                string htmlContent = "";
-                string asunto = "";
+                CorreoRenderizado? contenido = null;
                 string descripcion = "";
 
                 switch (tipoNotificacion.ToLower())
                 {
                     case "asignacion":
-                        htmlContent = _emailTemplateService.GenerarTemplateNotificacionTutoria(tutoriaDto, estudiante);
-                        asunto = $"Nueva Tutoría Asignada - {tutoria.idioma} {tutoria.nivel}";
+                        contenido = _emailTemplateService.GenerarTemplateNotificacionTutoria(tutoriaDto, estudiante);
                         descripcion = $"Se le ha asignado una nueva tutoría de {tutoria.idioma} nivel {tutoria.nivel} para el tema: {tutoria.tema}";
                         break;
                     case "recordatorio":
-                        htmlContent = _emailTemplateService.GenerarTemplateRecordatorio(tutoriaDto, estudiante);
-                        asunto = $"Recordatorio de Tutoría - {tutoria.fechaHora:dd/MM/yyyy}";
+                        contenido = _emailTemplateService.GenerarTemplateRecordatorio(tutoriaDto, estudiante);
                         descripcion = $"Recordatorio: Su tutoría de {tutoria.idioma} nivel {tutoria.nivel} está programada para el {tutoria.fechaHora:dd/MM/yyyy} a las {tutoria.fechaHora:HH:mm}";
                         break;
                 }
 
-                if (!string.IsNullOrEmpty(htmlContent))
+                if (contenido != null)
                 {
-                    _correoService.EnviarCorreo(estudiante.Correo, asunto, htmlContent);
-
-                    // Guardar notificación en la base de datos
-                    var notificacion = new Notificacion
-                    {
-                        fecha = DateTime.Now,
-                        asunto = asunto,
-                        descripcion = descripcion,
-                        Usuario_idUsuario = estudiante.IdUsuario
-                    };
-                    await _notificacionRepository.CreateAsync(notificacion);
+                    todosEnviados &= await EnviarYRegistrarAsync(estudiante, contenido, descripcion, tutoriaId);
                 }
             }
 
-            return true;
+            return todosEnviados;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error enviando notificación por email: {ex.Message}");
+            // SMTP sin configurar o caído: se registra y se devuelve false; la operación de negocio continúa.
+            _logger.LogError(ex, "Error enviando la notificación por email ({Tipo}) de la tutoría {TutoriaId}", tipoNotificacion, tutoriaId);
             return false;
         }
     }
@@ -446,7 +442,7 @@ public class NotificacionService : INotificacionService
             
             if (tutoriaEstudiantes == null || tutoriaEstudiantes.Count == 0)
             {
-                Console.WriteLine($"No hay estudiantes asignados a la tutoría {tutoriaId}");
+                _logger.LogInformation("No hay estudiantes asignados a la tutoría {TutoriaId}", tutoriaId);
                 return false;
             }
 
@@ -461,9 +457,9 @@ public class NotificacionService : INotificacionService
                 FechaTutoria = tutoria.fechaHora
             };
 
-            string asunto = $"Recordatorio de Tutoría - {tutoria.fechaHora:dd/MM/yyyy HH:mm}";
-            string descripcion = $"Recordatorio: Su tutoría de {tutoria.idioma} nivel {tutoria.nivel} está programada para el {tutoria.fechaHora:dd/MM/yyyy} a las {tutoria.fechaHora:HH:mm}";
+            string descripcion =$"Recordatorio: Su tutoría de {tutoria.idioma} nivel {tutoria.nivel} está programada para el {tutoria.fechaHora:dd/MM/yyyy} a las {tutoria.fechaHora:HH:mm}";
 
+            var todosEnviados = true;
             foreach (var te in tutoriaEstudiantes)
             {
                 var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
@@ -477,27 +473,16 @@ public class NotificacionService : INotificacionService
                         Correo = estudiante.correo
                     };
 
-                    string htmlContent = _emailTemplateService.GenerarTemplateRecordatorio(tutoriaDto, estudianteDto);
-                    
-                    _correoService.EnviarCorreo(estudianteDto.Correo, asunto, htmlContent);
-
-                    // Guardar notificación en la base de datos
-                    var notificacion = new Notificacion
-                    {
-                        fecha = DateTime.Now,
-                        asunto = asunto,
-                        descripcion = descripcion,
-                        Usuario_idUsuario = estudiante.idUsuario
-                    };
-                    await _notificacionRepository.CreateAsync(notificacion);
+                    var contenido = _emailTemplateService.GenerarTemplateRecordatorio(tutoriaDto, estudianteDto);
+                    todosEnviados &= await EnviarYRegistrarAsync(estudianteDto, contenido, descripcion, tutoriaId);
                 }
             }
 
-            return true;
+            return todosEnviados;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error enviando recordatorio por email: {ex.Message}");
+            _logger.LogError(ex, "Error enviando el recordatorio por email de la tutoría {TutoriaId}", tutoriaId);
             return false;
         }
     }
@@ -510,14 +495,14 @@ public class NotificacionService : INotificacionService
             if (tutoria == null) return false;
 
             var horarioActual = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
-            var tutorActual = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
+            var tutorActual = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario);
 
             // Obtener estudiantes asignados a la tutoría
             var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
             
             if (tutoriaEstudiantes == null || tutoriaEstudiantes.Count == 0)
             {
-                Console.WriteLine($"No hay estudiantes asignados a la tutoría {tutoriaId}");
+                _logger.LogInformation("No hay estudiantes asignados a la tutoría {TutoriaId}", tutoriaId);
                 return false;
             }
 
@@ -591,12 +576,12 @@ public class NotificacionService : INotificacionService
                 }
             }
 
-            string asunto = $"Cambio en Tutoría - {tutoria.idioma} {tutoria.nivel}";
             var cambiosTexto = cambios.ObtenerListaCambios();
             string descripcion = cambiosTexto.Count > 0 
                 ? $"Se ha realizado un cambio en su tutoría de {tutoria.idioma} nivel {tutoria.nivel}. Cambios: {string.Join(", ", cambiosTexto)}. Motivo: {motivo}"
                 : $"Se ha realizado un cambio en su tutoría de {tutoria.idioma} nivel {tutoria.nivel}. Motivo: {motivo}";
 
+            var todosEnviados = true;
             foreach (var te in tutoriaEstudiantes)
             {
                 var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
@@ -610,29 +595,47 @@ public class NotificacionService : INotificacionService
                         Correo = estudiante.correo
                     };
 
-                    string htmlContent = _emailTemplateService.GenerarTemplateCambio(tutoriaDto, estudianteDto, motivo, cambios);
-                    
-                    _correoService.EnviarCorreo(estudianteDto.Correo, asunto, htmlContent);
-
-                    // Guardar notificación en la base de datos
-                    var notificacion = new Notificacion
-                    {
-                        fecha = DateTime.Now,
-                        asunto = asunto,
-                        descripcion = descripcion,
-                        Usuario_idUsuario = estudiante.idUsuario
-                    };
-                    await _notificacionRepository.CreateAsync(notificacion);
+                    var contenido = _emailTemplateService.GenerarTemplateCambio(tutoriaDto, estudianteDto, motivo, cambios);
+                    todosEnviados &= await EnviarYRegistrarAsync(estudianteDto, contenido, descripcion, tutoriaId);
                 }
             }
 
-            return true;
+            return todosEnviados;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error enviando notificación de cambio por email: {ex.Message}");
+            _logger.LogError(ex, "Error enviando la notificación de cambio por email de la tutoría {TutoriaId}", tutoriaId);
             return false;
         }
+    }
+
+    /// <summary>
+    /// Envía un correo y, SOLO si el envío tuvo éxito, guarda la fila Notificacion (misma semántica que antes).
+    /// Un fallo de SMTP con un destinatario se registra y devuelve false, sin cortar el envío a los demás.
+    /// Un fallo al guardar en BD no se captura aquí (no es un problema de correo).
+    /// </summary>
+    private async Task<bool> EnviarYRegistrarAsync(UsuarioResponseDto destinatario, CorreoRenderizado contenido, string descripcion, int tutoriaId)
+    {
+        var usuarioId = destinatario.IdUsuario;
+        try
+        {
+            _correoService.Enviar(MensajeCorreo.Desde(contenido, destinatario.Correo, $"{destinatario.Nombres} {destinatario.Apellidos}".Trim()));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error enviando el correo '{Asunto}' al usuario {UsuarioId} (tutoría {TutoriaId})", contenido.Asunto, usuarioId, tutoriaId);
+            return false;
+        }
+
+        await _notificacionRepository.CreateAsync(new Notificacion
+        {
+            fecha = DateTime.Now,
+            // Notificacion.asunto es VARCHAR(45).
+            asunto = contenido.Asunto.Length > 45 ? contenido.Asunto[..45] : contenido.Asunto,
+            descripcion = descripcion,
+            Usuario_idUsuario = usuarioId
+        });
+        return true;
     }
 
     public async Task<(byte[] archivoBytes, string nombreArchivo)> GenerarReporteExcelParaDescargaAsync(int tutoriaId)
@@ -643,11 +646,9 @@ public class NotificacionService : INotificacionService
             throw new NotFoundException("Tutoría no encontrada");
         }
 
-        var docente = await _usuarioRepository.GetByIdAsync(tutoria.Usuario_idUsuario);
-        if (docente == null)
-        {
-            throw new NotFoundException("Docente no encontrado");
-        }
+        // Asignado eliminado: el reporte se sigue generando (historial), con "Usuario eliminado".
+        var docente = await _usuarioRepository.BuscarAsync(tutoria.Usuario_idUsuario)
+                      ?? new Usuario { idUsuario = 0, nombres = "Usuario", apellidos = "eliminado", correo = string.Empty };
 
         var horario = await _horarioRepository.GetByIdAsync(tutoria.Horario_idHorario);
 
@@ -698,7 +699,7 @@ public class NotificacionService : INotificacionService
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuarioRetro = await _usuarioRepository.GetByIdAsync(retroalimentacion.Usuario_idUsuario);
+            var usuarioRetro = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {
                 IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
@@ -735,56 +736,41 @@ public class NotificacionService : INotificacionService
     {
         try
         {
-            string htmlContent = "";
-            string asunto = "";
-            string descripcion = "";
+            CorreoRenderizado contenido;
+            string descripcion;
 
             switch (tipoNotificacion.ToLower())
             {
-                case "asignacion":
-                    htmlContent = _emailTemplateService.GenerarTemplateNotificacionTutoria(tutoriaDto, estudianteDto);
-                    asunto = $"Nueva Tutoría Asignada - {tutoriaDto.Idioma} {tutoriaDto.Nivel}";
-                    descripcion = $"Se le ha asignado una nueva tutoría de {tutoriaDto.Idioma} nivel {tutoriaDto.Nivel} para el tema: {tutoriaDto.Tema}";
-                    break;
                 case "recordatorio":
-                    htmlContent = _emailTemplateService.GenerarTemplateRecordatorio(tutoriaDto, estudianteDto);
-                    asunto = $"Recordatorio de Tutoría - {tutoriaDto.FechaTutoria:dd/MM/yyyy}";
+                    contenido = _emailTemplateService.GenerarTemplateRecordatorio(tutoriaDto, estudianteDto);
                     descripcion = $"Recordatorio: Su tutoría de {tutoriaDto.Idioma} nivel {tutoriaDto.Nivel} está programada para el {tutoriaDto.FechaTutoria:dd/MM/yyyy} a las {tutoriaDto.FechaTutoria:HH:mm}";
                     break;
                 case "cambio":
-                    htmlContent = _emailTemplateService.GenerarTemplateCambio(tutoriaDto, estudianteDto, "", new CambioTutoriaDto());
-                    asunto = $"Cambio en Tutoría - {tutoriaDto.Idioma} {tutoriaDto.Nivel}";
+                    contenido = _emailTemplateService.GenerarTemplateCambio(tutoriaDto, estudianteDto, "", new CambioTutoriaDto());
                     descripcion = $"Se ha realizado un cambio en su tutoría de {tutoriaDto.Idioma} nivel {tutoriaDto.Nivel}";
                     break;
-                default:
-                    htmlContent = _emailTemplateService.GenerarTemplateNotificacionTutoria(tutoriaDto, estudianteDto);
-                    asunto = $"Notificación de Tutoría - {tutoriaDto.Idioma} {tutoriaDto.Nivel}";
-                    descripcion = $"Información sobre su tutoría de {tutoriaDto.Idioma} nivel {tutoriaDto.Nivel}";
+                default: // "asignacion" y cualquier otro valor
+                    contenido = _emailTemplateService.GenerarTemplateNotificacionTutoria(tutoriaDto, estudianteDto);
+                    descripcion = $"Se le ha asignado una nueva tutoría de {tutoriaDto.Idioma} nivel {tutoriaDto.Nivel} para el tema: {tutoriaDto.Tema}";
                     break;
             }
 
-            if (!string.IsNullOrEmpty(htmlContent))
+            _correoService.Enviar(MensajeCorreo.Desde(contenido, estudianteDto.Correo, $"{estudianteDto.Nombres} {estudianteDto.Apellidos}".Trim()));
+
+            await _notificacionRepository.CreateAsync(new Notificacion
             {
-                _correoService.EnviarCorreo(estudianteDto.Correo, asunto, htmlContent);
+                fecha = DateTime.Now,
+                asunto = contenido.Asunto.Length > 45 ? contenido.Asunto[..45] : contenido.Asunto,
+                descripcion = descripcion,
+                Usuario_idUsuario = estudianteDto.IdUsuario
+            });
 
-                // Guardar notificación en la base de datos
-                var notificacion = new Notificacion
-                {
-                    fecha = DateTime.Now,
-                    asunto = asunto,
-                    descripcion = descripcion,
-                    Usuario_idUsuario = estudianteDto.IdUsuario
-                };
-                await _notificacionRepository.CreateAsync(notificacion);
-
-                return true;
-            }
-
-            return false;
+            return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error enviando notificación a estudiante: {ex.Message}");
+            _logger.LogError(ex, "Error enviando la notificación ({Tipo}) al estudiante {EstudianteId} de la tutoría {TutoriaId}",
+                tipoNotificacion, estudianteDto?.IdUsuario, tutoriaDto?.IdTutoria);
             return false;
         }
     }

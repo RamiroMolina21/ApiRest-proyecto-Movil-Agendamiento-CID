@@ -1,16 +1,13 @@
-using AgendamientoGestion.Logica.Dtos;
+using Agendamiento.Security;
 using AgendamientoGestion.Logica.Interfaces;
-using AgendamientoGestion.Logica.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Agendamiento.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = Politicas.GestionWeb)]
     public class MetricasController : ControllerBase
     {
         private readonly IMetricasService _metricasService;
@@ -23,37 +20,14 @@ namespace Agendamiento.Controllers
         [HttpGet("generales")]
         public async Task<IActionResult> GetMetricasGenerales()
         {
-            try
-            {
-                var metricas = await _metricasService.GetMetricasGeneralesAsync();
-                return Ok(metricas);
-            }
-            catch (BusinessException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _metricasService.GetMetricasGeneralesAsync());
         }
 
+        /// <summary>Solo lectura (ya no inserta filas en Informe).</summary>
         [HttpGet("tutorias")]
         public async Task<IActionResult> GetMetricasTutorias()
         {
-            try
-            {
-                var metricas = await _metricasService.GetMetricasTutoriasAsync();
-                return Ok(metricas);
-            }
-            catch (BusinessException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _metricasService.GetMetricasTutoriasAsync());
         }
     }
 }

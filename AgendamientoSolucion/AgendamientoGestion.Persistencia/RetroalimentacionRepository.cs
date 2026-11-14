@@ -78,4 +78,9 @@ public class RetroalimentacionRepository : IRetroalimentacionRepository
             .ToListAsync();
     }
 
+    public async Task<bool> ExistsAsync(int tutoriaId, int usuarioId)
+    {
+        return await _context.Retroalimentaciones
+            .AnyAsync(r => r.Tutoria_idTutoria == tutoriaId && r.Usuario_idUsuario == usuarioId);
+    }
 }

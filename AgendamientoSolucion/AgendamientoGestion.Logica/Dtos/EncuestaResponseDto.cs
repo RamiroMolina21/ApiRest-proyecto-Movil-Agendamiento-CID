@@ -6,7 +6,7 @@ namespace AgendamientoGestion.Logica.Dtos
     {
         public int IdEncuesta { get; set; }
         public int Calificacion { get; set; }
-        public string Comentario { get; set; }
+        public string? Comentario { get; set; }
         public DateTime? FechaRespuesta { get; set; }
         public string EstudianteNombre { get; set; }
         public string EstudianteCorreo { get; set; }

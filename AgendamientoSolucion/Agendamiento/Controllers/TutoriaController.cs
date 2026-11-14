@@ -1,14 +1,17 @@
+using Agendamiento.Security;
 using AgendamientoGestion.Logica.Dtos;
-using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Logica.Exceptions;
+using AgendamientoGestion.Logica.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Agendamiento.Controllers
 {
+    /// <summary>
+    /// Regla de propiedad (Docente dueño del horario o asignado; Tutor solo asignado; Admin/Aux todo):
+    /// ver AgendamientoGestion.Logica.Seguridad.ReglasAccesoTutoria y docs/api/autenticacion-y-autorizacion.md.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class TutoriaController : ControllerBase
@@ -20,328 +23,165 @@ namespace Agendamiento.Controllers
             _tutoriaService = tutoriaService;
         }
 
+        /// <summary>Admin/Aux en cualquier horario; Docente solo en sus horarios; Tutor 403.</summary>
         [HttpPost]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> CreateTutoria([FromBody] TutoriaCreateDto tutoriaDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var tutoria = await _tutoriaService.CreateTutoriaAsync(tutoriaDto);
-                return CreatedAtAction(nameof(GetTutoria), new { id = tutoria.IdTutoria }, tutoria);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            var tutoria = await _tutoriaService.CreateTutoriaAsync(tutoriaDto, User.ComoSolicitante());
+            return CreatedAtAction(nameof(GetTutoria), new { id = tutoria.IdTutoria }, tutoria);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> GetTutoria(int id)
         {
-            try
-            {
-                var tutoria = await _tutoriaService.GetTutoriaByIdAsync(id);
-                return Ok(tutoria);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetTutoriaByIdAsync(id, User.ComoSolicitante()));
         }
 
         [HttpGet]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetAllTutorias()
         {
-            try
-            {
-                var tutorias = await _tutoriaService.GetAllTutoriasAsync();
-                return Ok(tutorias);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetAllTutoriasAsync());
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> UpdateTutoria(int id, [FromBody] TutoriaCreateDto tutoriaDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var tutoria = await _tutoriaService.UpdateTutoriaAsync(id, tutoriaDto);
-                return Ok(tutoria);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.UpdateTutoriaAsync(id, tutoriaDto));
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> DeleteTutoria(int id)
         {
-            try
-            {
-                var result = await _tutoriaService.DeleteTutoriaAsync(id);
-                if (result)
-                {
-                    return Ok(new { message = "Tutoría eliminada exitosamente" });
-                }
-                return NotFound(new { message = "Tutoría no encontrada" });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            await _tutoriaService.DeleteTutoriaAsync(id);
+            return Ok(new { message = "Tutoría eliminada exitosamente" });
         }
 
         [HttpPost("{id}/estudiantes")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> AgregarEstudiantesATutoria(int id, [FromBody] AgregarEstudiantesTutoriaDto estudiantesDto)
         {
-            try
+            if (!await _tutoriaService.AgregarEstudiantesATutoriaAsync(id, estudiantesDto, User.ComoSolicitante()))
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+                throw new ValidationException("No se pudieron agregar los estudiantes (ya estaban asignados a la tutoría)");
+            }
 
-                var result = await _tutoriaService.AgregarEstudiantesATutoriaAsync(id, estudiantesDto);
-                if (result)
-                {
-                    return Ok(new { message = "Estudiantes agregados exitosamente" });
-                }
-                return BadRequest(new { message = "No se pudieron agregar los estudiantes" });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(new { message = "Estudiantes agregados exitosamente" });
         }
 
         [HttpGet("calendario/docente")]
-        public async Task<IActionResult> GetCalendarioPorDocente([FromQuery] string nombre, [FromQuery] string apellidos, [FromQuery] string correo)
+        [Authorize(Policy = Politicas.GestionWeb)]
+        public async Task<IActionResult> GetCalendarioPorDocente([FromQuery] string? nombre, [FromQuery] string? apellidos, [FromQuery] string? correo)
         {
-            try
+            if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellidos) || string.IsNullOrEmpty(correo))
             {
-                if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellidos) || string.IsNullOrEmpty(correo))
-                {
-                    return BadRequest(new { message = "Se requieren nombre, apellidos y correo del docente" });
-                }
+                throw new ValidationException("Se requieren nombre, apellidos y correo del docente");
+            }
 
-                var tutorias = await _tutoriaService.GetCalendarioPorDocenteAsync(nombre, apellidos, correo);
-                return Ok(tutorias);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetCalendarioPorDocenteAsync(nombre, apellidos, correo));
         }
 
         [HttpGet("calendario/estudiante")]
-        public async Task<IActionResult> GetCalendarioPorEstudiante([FromQuery] string nombre, [FromQuery] string apellidos, [FromQuery] string correo)
+        [Authorize(Policy = Politicas.GestionWeb)]
+        public async Task<IActionResult> GetCalendarioPorEstudiante([FromQuery] string? nombre, [FromQuery] string? apellidos, [FromQuery] string? correo)
         {
-            try
+            if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellidos) || string.IsNullOrEmpty(correo))
             {
-                if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellidos) || string.IsNullOrEmpty(correo))
-                {
-                    return BadRequest(new { message = "Se requieren nombre, apellidos y correo del estudiante" });
-                }
+                throw new ValidationException("Se requieren nombre, apellidos y correo del estudiante");
+            }
 
-                var tutorias = await _tutoriaService.GetCalendarioPorEstudianteAsync(nombre, apellidos, correo);
-                return Ok(tutorias);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetCalendarioPorEstudianteAsync(nombre, apellidos, correo));
         }
 
         [HttpGet("calendario/idioma-nivel")]
-        public async Task<IActionResult> GetCalendarioPorIdiomaNivel([FromQuery] string idioma, [FromQuery] string nivel)
+        [Authorize(Policy = Politicas.GestionWeb)]
+        public async Task<IActionResult> GetCalendarioPorIdiomaNivel([FromQuery] string? idioma, [FromQuery] string? nivel)
         {
-            try
+            if (string.IsNullOrEmpty(idioma) || string.IsNullOrEmpty(nivel))
             {
-                if (string.IsNullOrEmpty(idioma) || string.IsNullOrEmpty(nivel))
-                {
-                    return BadRequest(new { message = "Se requieren idioma y nivel" });
-                }
+                throw new ValidationException("Se requieren idioma y nivel");
+            }
 
-                var tutorias = await _tutoriaService.GetCalendarioPorIdiomaNivelAsync(idioma, nivel);
-                return Ok(tutorias);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetCalendarioPorIdiomaNivelAsync(idioma, nivel));
         }
 
         [HttpGet("{id}/estudiantes")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> GetEstudiantesByTutoria(int id)
         {
-            try
-            {
-                var estudiantes = await _tutoriaService.GetEstudiantesByTutoriaAsync(id);
-                return Ok(estudiantes);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetEstudiantesByTutoriaAsync(id, User.ComoSolicitante()));
         }
 
+        /// <summary>Antes solo GestionWeb; ahora también el Docente participante (el Tutor recibe 403).</summary>
         [HttpDelete("{tutoriaId}/estudiantes/{estudianteId}")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> EliminarEstudianteDeTutoria(int tutoriaId, int estudianteId)
         {
-            try
+            if (!await _tutoriaService.EliminarEstudianteDeTutoriaAsync(tutoriaId, estudianteId, User.ComoSolicitante()))
             {
-                var result = await _tutoriaService.EliminarEstudianteDeTutoriaAsync(tutoriaId, estudianteId);
-                if (result)
-                {
-                    return Ok(new { message = "Estudiante eliminado de la tutoría exitosamente" });
-                }
-                return NotFound(new { message = "No se pudo eliminar el estudiante de la tutoría" });
+                throw new NotFoundException("No se pudo eliminar el estudiante de la tutoría");
             }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+
+            return Ok(new { message = "Estudiante eliminado de la tutoría exitosamente" });
         }
 
+        /// <summary>Filtro exacto por el valor guardado (no aplica sinónimos; ver EstadosTutoria).</summary>
         [HttpGet("estado/{estado}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetTutoriasByEstado(string estado)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(estado))
-                {
-                    return BadRequest(new { message = "El estado es requerido" });
-                }
-
-                var tutorias = await _tutoriaService.GetTutoriasByEstadoAsync(estado);
-                return Ok(tutorias);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            return Ok(await _tutoriaService.GetTutoriasByEstadoAsync(estado));
         }
 
+        /// <summary>
+        /// Tutorías ASIGNADAS al usuario. El estado es un grupo de sinónimos sin distinguir mayúsculas
+        /// (pendiente = Pendiente/Programada/Activo; finalizada = Finalizada/Completada).
+        /// Docente/Tutor solo pueden pedir su propio usuarioId.
+        /// </summary>
         [HttpGet("estado/{estado}/usuario/{usuarioId}")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> GetTutoriasByEstadoAndUsuario(string estado, int usuarioId)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(estado))
-                {
-                    return BadRequest(new { message = "El estado es requerido" });
-                }
-
-                if (usuarioId <= 0)
-                {
-                    return BadRequest(new { message = "El ID de usuario debe ser mayor a 0" });
-                }
-
-                var tutorias = await _tutoriaService.GetTutoriasByEstadoAndUsuarioAsync(estado, usuarioId);
-                return Ok(tutorias);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
-            }
+            ValidarUsuarioId(usuarioId);
+            User.AsegurarAccesoADatosDe(usuarioId);
+            return Ok(await _tutoriaService.GetTutoriasByEstadoAndUsuarioAsync(estado, usuarioId));
         }
 
-        [HttpPut("{id}/finalizar")]
-        public async Task<IActionResult> FinalizarTutoria(int id)
+        /// <summary>
+        /// Tutorías AGENDADAS en horarios del usuario (dueño del horario), aunque estén asignadas a otro.
+        /// <c>estado</c> opcional (mismos grupos de sinónimos). Docente/Tutor solo su propio usuarioId.
+        /// </summary>
+        [HttpGet("agendadas/usuario/{usuarioId}")]
+        [Authorize(Policy = Politicas.Personal)]
+        public async Task<IActionResult> GetTutoriasAgendadas(int usuarioId, [FromQuery] string? estado)
         {
-            try
+            ValidarUsuarioId(usuarioId);
+            User.AsegurarAccesoADatosDe(usuarioId);
+            return Ok(await _tutoriaService.GetTutoriasAgendadasPorUsuarioAsync(usuarioId, estado));
+        }
+
+        /// <summary>
+        /// Marca la tutoría como "Finalizada" y envía las encuestas (idempotente). Cuerpo OPCIONAL
+        /// <c>{ calificacion, comentario }</c>: crea la retroalimentación del usuario del token en la misma transacción.
+        /// </summary>
+        [HttpPut("{id}/finalizar")]
+        [Authorize(Policy = Politicas.Personal)]
+        public async Task<IActionResult> FinalizarTutoria(
+            int id,
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] FinalizarTutoriaDto? datos)
+        {
+            return Ok(await _tutoriaService.FinalizarTutoriaAsync(id, datos, User.ComoSolicitante()));
+        }
+
+        private static void ValidarUsuarioId(int usuarioId)
+        {
+            if (usuarioId <= 0)
             {
-                var tutoria = await _tutoriaService.FinalizarTutoriaAsync(id);
-                return Ok(tutoria);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor" });
+                throw new ValidationException("El ID de usuario debe ser mayor a 0");
             }
         }
     }

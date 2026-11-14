@@ -26,6 +26,12 @@ public class TutoriaEstudianteRepository : ITutoriaEstudianteRepository
         return tutoriaEstudiante;
     }
 
+    public async Task CreateRangeAsync(IEnumerable<TutoriaEstudiante> tutoriaEstudiantes)
+    {
+        _context.TutoriaEstudiantes.AddRange(tutoriaEstudiantes);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<TutoriaEstudiante> GetByIdAsync(int id)
     {
         return await _context.TutoriaEstudiantes
@@ -65,6 +71,11 @@ public class TutoriaEstudianteRepository : ITutoriaEstudianteRepository
     {
         return await _context.TutoriaEstudiantes
             .AnyAsync(te => te.Tutoria_idTutoria == tutoriaId && te.Usuario_idUsuario == usuarioId);
+    }
+
+    public async Task<int> CountByTutoriaAsync(int tutoriaId)
+    {
+        return await _context.TutoriaEstudiantes.CountAsync(te => te.Tutoria_idTutoria == tutoriaId);
     }
 
     public async Task<bool> DeleteAsync(int id)

@@ -1,7 +1,9 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Logica.Utils;
+using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
+using AgendamientoGestion.Logica.Seguridad;
 using AgendamientoGestion.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,8 +27,14 @@ public class RetroalimentacionService : IRetroalimentacionService
         _tutoriaRepository = tutoriaRepository;
     }
 
-    public async Task<RetroalimentacionResponseDto> CreateRetroalimentacionAsync(RetroalimentacionCreateDto retroalimentacionDto)
+    public async Task<RetroalimentacionResponseDto> CreateRetroalimentacionAsync(RetroalimentacionCreateDto retroalimentacionDto, Solicitante solicitante)
     {
+        // Docente/Tutor solo firman a su nombre (antes cualquiera podía firmar por otro usuario).
+        if (!solicitante.EsGestion && retroalimentacionDto.UsuarioId != solicitante.UsuarioId)
+        {
+            throw new ForbiddenException("Solo puede registrar retroalimentaciones a su propio nombre");
+        }
+
         // Verificar que el usuario existe
         var usuario = await _usuarioRepository.GetByIdAsync(retroalimentacionDto.UsuarioId);
         if (usuario == null)
@@ -47,10 +55,18 @@ public class RetroalimentacionService : IRetroalimentacionService
             throw new ValidationException("La calificación debe estar entre 1 y 5");
         }
 
-        // Crear retroalimentación
+        // Misma regla que finalizar: el Docente/Tutor debe participar en la tutoría.
+        ReglasAccesoTutoria.Asegurar(solicitante, tutoria, AccionTutoria.Finalizar);
+
+        // Una retroalimentación por usuario y tutoría: hace seguro reintentar desde los clientes.
+        if (await _retroalimentacionRepository.ExistsAsync(retroalimentacionDto.TutoriaId, retroalimentacionDto.UsuarioId))
+        {
+            throw new ConflictException("Ya existe una retroalimentación de este usuario para esta tutoría");
+        }
+
         var retroalimentacion = new Retroalimentacion
         {
-            comentario = retroalimentacionDto.Comentario,
+            comentario = retroalimentacionDto.Comentario ?? string.Empty,
             calificacion = retroalimentacionDto.Calificacion,
             fecha = DateTime.Now,
             Tutoria_idTutoria = retroalimentacionDto.TutoriaId,
@@ -62,6 +78,8 @@ public class RetroalimentacionService : IRetroalimentacionService
         return new RetroalimentacionResponseDto
         {
             IdRetroalimentacion = retroalimentacionCreada.idRetroalimentacion,
+            UsuarioId = retroalimentacionCreada.Usuario_idUsuario,
+            TutoriaId = retroalimentacionCreada.Tutoria_idTutoria,
             Comentario = retroalimentacionCreada.comentario,
             Calificacion = retroalimentacionCreada.calificacion,
             Fecha = retroalimentacionCreada.fecha,
@@ -81,17 +99,19 @@ public class RetroalimentacionService : IRetroalimentacionService
             throw new NotFoundException("Retroalimentación no encontrada");
         }
 
-        var usuario = await _usuarioRepository.GetByIdAsync(retroalimentacion.Usuario_idUsuario);
+        var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
         var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
 
         return new RetroalimentacionResponseDto
         {
             IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
+            UsuarioId = retroalimentacion.Usuario_idUsuario,
+            TutoriaId = retroalimentacion.Tutoria_idTutoria,
             Comentario = retroalimentacion.comentario,
             Calificacion = retroalimentacion.calificacion,
             Fecha = retroalimentacion.fecha,
-            UsuarioNombre = usuario?.nombres ?? "N/A",
-            UsuarioApellidos = usuario?.apellidos ?? "N/A",
+            UsuarioNombre = usuario?.nombres,
+            UsuarioApellidos = usuario?.apellidos,
             TutoriaTema = tutoria?.tema ?? "N/A",
             TutoriaIdioma = tutoria?.idioma ?? "N/A",
             TutoriaNivel = tutoria?.nivel ?? "N/A"
@@ -105,17 +125,19 @@ public class RetroalimentacionService : IRetroalimentacionService
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuario = await _usuarioRepository.GetByIdAsync(retroalimentacion.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
             var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
             
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {
                 IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
+                UsuarioId = retroalimentacion.Usuario_idUsuario,
+                TutoriaId = retroalimentacion.Tutoria_idTutoria,
                 Comentario = retroalimentacion.comentario,
                 Calificacion = retroalimentacion.calificacion,
                 Fecha = retroalimentacion.fecha,
-                UsuarioNombre = usuario?.nombres ?? "N/A",
-                UsuarioApellidos = usuario?.apellidos ?? "N/A",
+                UsuarioNombre = usuario?.nombres,
+                UsuarioApellidos = usuario?.apellidos,
                 TutoriaTema = tutoria?.tema ?? "N/A",
                 TutoriaIdioma = tutoria?.idioma ?? "N/A",
                 TutoriaNivel = tutoria?.nivel ?? "N/A"
@@ -154,7 +176,7 @@ public class RetroalimentacionService : IRetroalimentacionService
         }
 
         // Actualizar datos
-        retroalimentacion.comentario = retroalimentacionDto.Comentario;
+        retroalimentacion.comentario = retroalimentacionDto.Comentario ?? string.Empty;
         retroalimentacion.calificacion = retroalimentacionDto.Calificacion;
         retroalimentacion.Tutoria_idTutoria = retroalimentacionDto.TutoriaId;
         retroalimentacion.Usuario_idUsuario = retroalimentacionDto.UsuarioId;
@@ -164,6 +186,8 @@ public class RetroalimentacionService : IRetroalimentacionService
         return new RetroalimentacionResponseDto
         {
             IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
+            UsuarioId = retroalimentacion.Usuario_idUsuario,
+            TutoriaId = retroalimentacion.Tutoria_idTutoria,
             Comentario = retroalimentacion.comentario,
             Calificacion = retroalimentacion.calificacion,
             Fecha = retroalimentacion.fecha,
@@ -186,24 +210,34 @@ public class RetroalimentacionService : IRetroalimentacionService
         return await _retroalimentacionRepository.DeleteAsync(id);
     }
 
-    public async Task<List<RetroalimentacionResponseDto>> GetRetroalimentacionesByTutoriaAsync(int tutoriaId)
+    public async Task<List<RetroalimentacionResponseDto>> GetRetroalimentacionesByTutoriaAsync(int tutoriaId, Solicitante solicitante)
     {
+        // Admin/Aux: sin cambios (tutoría inexistente → lista vacía). Docente/Tutor: deben participar (R10).
+        if (!solicitante.EsGestion)
+        {
+            var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId)
+                          ?? throw new NotFoundException("Tutoría no encontrada");
+            ReglasAccesoTutoria.Asegurar(solicitante, tutoria, AccionTutoria.Ver);
+        }
+
         var retroalimentaciones = await _retroalimentacionRepository.GetByTutoriaAsync(tutoriaId);
         var retroalimentacionesDto = new List<RetroalimentacionResponseDto>();
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuario = await _usuarioRepository.GetByIdAsync(retroalimentacion.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
             var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
             
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {
                 IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
+                UsuarioId = retroalimentacion.Usuario_idUsuario,
+                TutoriaId = retroalimentacion.Tutoria_idTutoria,
                 Comentario = retroalimentacion.comentario,
                 Calificacion = retroalimentacion.calificacion,
                 Fecha = retroalimentacion.fecha,
-                UsuarioNombre = usuario?.nombres ?? "N/A",
-                UsuarioApellidos = usuario?.apellidos ?? "N/A",
+                UsuarioNombre = usuario?.nombres,
+                UsuarioApellidos = usuario?.apellidos,
                 TutoriaTema = tutoria?.tema ?? "N/A",
                 TutoriaIdioma = tutoria?.idioma ?? "N/A",
                 TutoriaNivel = tutoria?.nivel ?? "N/A"
@@ -220,17 +254,19 @@ public class RetroalimentacionService : IRetroalimentacionService
 
         foreach (var retroalimentacion in retroalimentaciones)
         {
-            var usuario = await _usuarioRepository.GetByIdAsync(retroalimentacion.Usuario_idUsuario);
+            var usuario = await _usuarioRepository.BuscarAsync(retroalimentacion.Usuario_idUsuario);
             var tutoria = await _tutoriaRepository.GetByIdAsync(retroalimentacion.Tutoria_idTutoria);
             
             retroalimentacionesDto.Add(new RetroalimentacionResponseDto
             {
                 IdRetroalimentacion = retroalimentacion.idRetroalimentacion,
+                UsuarioId = retroalimentacion.Usuario_idUsuario,
+                TutoriaId = retroalimentacion.Tutoria_idTutoria,
                 Comentario = retroalimentacion.comentario,
                 Calificacion = retroalimentacion.calificacion,
                 Fecha = retroalimentacion.fecha,
-                UsuarioNombre = usuario?.nombres ?? "N/A",
-                UsuarioApellidos = usuario?.apellidos ?? "N/A",
+                UsuarioNombre = usuario?.nombres,
+                UsuarioApellidos = usuario?.apellidos,
                 TutoriaTema = tutoria?.tema ?? "N/A",
                 TutoriaIdioma = tutoria?.idioma ?? "N/A",
                 TutoriaNivel = tutoria?.nivel ?? "N/A"

@@ -1,0 +1,32 @@
+{{! Cancelación de tutoría. HOY NO SE ENVÍA (ningún flujo la dispara); diseñada igual que el resto. }}
+<p style="margin:0 0 16px 0;">Hola, {{destinatarioNombre}}:</p>
+<p style="margin:0 0 20px 0;">Lamentamos avisarte que la tutoría de <strong>{{idioma}} {{nivel}}</strong> programada para el <strong>{{fechaHora}}</strong> se canceló. No necesitas presentarte.</p>
+
+<table role="presentation" class="tp-detalle" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f5f7" style="background-color:#f5f5f7; border:1px solid #e2e2e8; border-radius:10px;">
+  <tr><td style="padding:6px 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; font-size:14px; line-height:20px; color:#4b5563;">Estaba prevista</td>
+        <td valign="top" style="padding:12px 0; font-size:16px; line-height:22px; color:#111827; font-weight:bold;">{{fechaHora}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e2e2e8; font-size:14px; line-height:20px; color:#4b5563;">Tema</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e2e2e8; font-size:16px; line-height:22px; color:#111827;">{{tema}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e2e2e8; font-size:14px; line-height:20px; color:#4b5563;">Idioma y nivel</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e2e2e8; font-size:16px; line-height:22px; color:#111827;">{{idioma}} · {{nivel}}</td>
+      </tr>
+      {{#motivo}}<tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e2e2e8; font-size:14px; line-height:20px; color:#4b5563;">Motivo</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e2e2e8; font-size:16px; line-height:22px; color:#111827;">{{motivo}}</td>
+      </tr>{{/motivo}}
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e2e2e8; font-size:14px; line-height:20px; color:#4b5563;">Referencia</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e2e2e8; font-size:16px; line-height:22px; color:#111827;">Tutoría n.º {{idTutoria}}</td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+
+<p style="margin:24px 0 0 0;">Si necesitas reprogramarla o tienes preguntas, {{#contactoCorreo}}responde a este correo y te ayudamos.{{/contactoCorreo}}{{^contactoCorreo}}comunícate con la coordinación de tutorías.{{/contactoCorreo}}</p>

@@ -1,97 +1,139 @@
-using System.Net;
-using System.Net.Mail;
-using Microsoft.Extensions.Options;
 using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Logica.Models;
+using MailKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.Utils;
+using System.Net.Sockets;
 
 namespace AgendamientoGestion.Logica.Services
 {
+    /// <summary>
+    /// Envío SMTP con MailKit (Microsoft desaconseja System.Net.Mail.SmtpClient para desarrollo nuevo y recomienda
+    /// MailKit). Construye mensajes RFC 5322 correctos: multipart/alternative (texto + HTML) en UTF-8, From con nombre
+    /// visible = cuenta autenticada, Reply-To opcional, Message-ID con el dominio del remitente, Date, y cabeceras de
+    /// correo automático. TLS obligatorio si EnableSsl. Reintenta errores transitorios con espera creciente.
+    /// </summary>
     public class CorreoService : ICorreoService
     {
-        private readonly SmtpSettings _smtpSettings;
+        private static readonly TimeSpan[] Esperas = { TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10) };
 
-        public CorreoService(IOptions<SmtpSettings> smtpOptions)
+        private readonly SmtpSettings _smtp;
+        private readonly ILogger<CorreoService> _logger;
+
+        public CorreoService(IOptions<SmtpSettings> smtpOptions, ILogger<CorreoService> logger)
         {
-            _smtpSettings = smtpOptions.Value;
+            _smtp = smtpOptions.Value;
+            _logger = logger;
         }
 
-        public void EnviarCorreo(string destinatario, string asunto, string htmlCuerpo, string rutaAdjunto = null)
+        public string Enviar(MensajeCorreo mensaje)
         {
-            try
+            ValidarConfiguracion(_smtp);
+            using var mime = ConstruirMensaje(_smtp, mensaje);
+
+            var intentos = Math.Max(0, _smtp.Reintentos) + 1;
+            for (var intento = 1; ; intento++)
             {
-                // Validaciones básicas
-                if (string.IsNullOrWhiteSpace(_smtpSettings.Remitente) ||
-                    string.IsNullOrWhiteSpace(_smtpSettings.User) ||
-                    string.IsNullOrWhiteSpace(_smtpSettings.Password) ||
-                    string.IsNullOrWhiteSpace(destinatario) ||
-                    string.IsNullOrWhiteSpace(asunto) ||
-                    string.IsNullOrWhiteSpace(htmlCuerpo))
+                try
                 {
-                    throw new ArgumentException("Faltan datos necesarios para enviar el correo.");
+                    using var cliente = new SmtpClient { Timeout = Math.Max(5, _smtp.TimeoutSegundos) * 1000 };
+                    cliente.Connect(_smtp.Host, _smtp.Port, OpcionesTls(_smtp));
+                    cliente.Authenticate(_smtp.User, _smtp.Password);
+                    var respuesta = cliente.Send(mime);
+                    cliente.Disconnect(true);
+
+                    // Sin datos personales en el log: id del mensaje y dominio del destinatario.
+                    _logger.LogInformation("Correo enviado {MessageId} a @{Dominio} (intento {Intento}). Respuesta SMTP: {Respuesta}",
+                        mime.MessageId, Dominio(mensaje.Destinatario), intento, respuesta);
+                    return mime.MessageId;
                 }
-
-                var mensaje = new MailMessage(_smtpSettings.Remitente, destinatario, asunto, htmlCuerpo)
+                catch (Exception ex) when (EsTransitorio(ex) && intento < intentos)
                 {
-                    IsBodyHtml = true
-                };
-
-                // Validar y adjuntar archivo
-                if (!string.IsNullOrWhiteSpace(rutaAdjunto))
-                {
-                    if (File.Exists(rutaAdjunto))
-                    {
-                        mensaje.Attachments.Add(new Attachment(rutaAdjunto));
-                    }
-                    else
-                    {
-                        throw new FileNotFoundException("El archivo adjunto no se encontró.", rutaAdjunto);
-                    }
+                    var espera = Esperas[Math.Min(intento - 1, Esperas.Length - 1)];
+                    _logger.LogWarning(ex, "Fallo transitorio enviando {MessageId} (intento {Intento}/{Total}); reintento en {Espera}s",
+                        mime.MessageId, intento, intentos, espera.TotalSeconds);
+                    Thread.Sleep(espera);
                 }
-
-                using var cliente = new SmtpClient(_smtpSettings.Host, _smtpSettings.Port)
+                catch (Exception ex)
                 {
-                    Credentials = new NetworkCredential(_smtpSettings.User, _smtpSettings.Password),
-                    EnableSsl = _smtpSettings.EnableSsl
-                };
-
-                cliente.Send(mensaje);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error al enviar correo: {ex}");
-                throw;
+                    _logger.LogError(ex, "No se pudo enviar el correo {MessageId} a @{Dominio} tras {Intento} intento(s)",
+                        mime.MessageId, Dominio(mensaje.Destinatario), intento);
+                    throw;
+                }
             }
         }
 
-        public void EnviarConAdjunto(string destino, string asunto, string contenidoHtml, string rutaAdjunto)
+        /// <summary>Falla ANTES de abrir conexión si falta configuración (SMTP sin configurar a propósito en desarrollo).</summary>
+        public static void ValidarConfiguracion(SmtpSettings s)
         {
-            Console.WriteLine("📤 Remitente que se usará: " + _smtpSettings.Remitente);
+            if (string.IsNullOrWhiteSpace(s.Host) || string.IsNullOrWhiteSpace(s.User) ||
+                string.IsNullOrWhiteSpace(s.Password) || string.IsNullOrWhiteSpace(s.DireccionRemitente))
+                throw new InvalidOperationException("SMTP sin configurar: faltan SmtpSettings Host, User, Password o Remitente.");
+        }
 
-            if (string.IsNullOrWhiteSpace(_smtpSettings.Remitente))
-                throw new Exception("El campo 'Remitente' está vacío.");
+        /// <summary>Construye el MIME (público para poder verificar cabeceras y estructura en pruebas sin enviar).</summary>
+        public static MimeMessage ConstruirMensaje(SmtpSettings s, MensajeCorreo m)
+        {
+            if (string.IsNullOrWhiteSpace(m.Destinatario)) throw new ArgumentException("Falta el destinatario", nameof(m));
+            if (string.IsNullOrWhiteSpace(m.Asunto)) throw new ArgumentException("Falta el asunto", nameof(m));
+            if (string.IsNullOrWhiteSpace(m.Html)) throw new ArgumentException("Falta el cuerpo", nameof(m));
 
-            var mensaje = new MailMessage
+            var desde = MailboxAddress.Parse(s.DireccionRemitente);
+            desde.Name = string.IsNullOrWhiteSpace(s.NombreRemitente) ? null : s.NombreRemitente.Trim();
+
+            var mensaje = new MimeMessage();
+            mensaje.From.Add(desde);
+            mensaje.To.Add(new MailboxAddress(m.NombreDestinatario?.Trim(), m.Destinatario.Trim()));
+            if (!string.IsNullOrWhiteSpace(s.ResponderA))
+                mensaje.ReplyTo.Add(MailboxAddress.Parse(s.ResponderA.Trim()));
+
+            // Asunto en una línea (evita inyección de cabeceras con \r\n en datos dinámicos).
+            mensaje.Subject = m.Asunto.Replace("\r", " ").Replace("\n", " ").Trim();
+            mensaje.Date = DateTimeOffset.Now;
+            mensaje.MessageId = MimeUtils.GenerateMessageId(desde.Domain);
+            // Correo transaccional automático (RFC 3834): evita respuestas automáticas en bucle.
+            mensaje.Headers.Add("Auto-Submitted", "auto-generated");
+            mensaje.Headers.Add("X-Auto-Response-Suppress", "All");
+            mensaje.Headers.Add(HeaderId.ContentLanguage, "es");
+
+            var cuerpo = new BodyBuilder
             {
-                From = new MailAddress(_smtpSettings.Remitente),
-                Subject = asunto,
-                Body = contenidoHtml,
-                IsBodyHtml = true
+                TextBody = string.IsNullOrWhiteSpace(m.Texto) ? Correo.HtmlATexto.Convertir(m.Html) : m.Texto,
+                HtmlBody = m.Html
             };
-
-            mensaje.To.Add(destino);
-
-            if (!string.IsNullOrWhiteSpace(rutaAdjunto) && File.Exists(rutaAdjunto))
+            if (!string.IsNullOrWhiteSpace(m.RutaAdjunto))
             {
-                mensaje.Attachments.Add(new Attachment(rutaAdjunto));
+                if (!File.Exists(m.RutaAdjunto)) throw new FileNotFoundException("El archivo adjunto no se encontró.", m.RutaAdjunto);
+                cuerpo.Attachments.Add(m.RutaAdjunto);
             }
+            mensaje.Body = cuerpo.ToMessageBody();
+            foreach (var parte in mensaje.BodyParts.OfType<TextPart>())
+                parte.ContentType.Charset = "utf-8";
+            return mensaje;
+        }
 
-            using var smtp = new SmtpClient(_smtpSettings.Host, _smtpSettings.Port)
-            {
-                EnableSsl = _smtpSettings.EnableSsl,
-                Credentials = new NetworkCredential(_smtpSettings.User, _smtpSettings.Password)
-            };
+        private static SecureSocketOptions OpcionesTls(SmtpSettings s) =>
+            !s.EnableSsl ? SecureSocketOptions.None
+            : s.Port == 465 ? SecureSocketOptions.SslOnConnect
+            : SecureSocketOptions.StartTls; // falla si el servidor no ofrece STARTTLS: nunca se degrada a texto plano
 
-            smtp.Send(mensaje);
+        private static bool EsTransitorio(Exception ex) => ex switch
+        {
+            SmtpCommandException c => (int)c.StatusCode >= 400 && (int)c.StatusCode < 500,
+            SmtpProtocolException or ServiceNotConnectedException => true,
+            IOException or SocketException or TimeoutException => true,
+            OperationCanceledException => true,
+            _ => false
+        };
+
+        private static string Dominio(string correo)
+        {
+            var i = correo.LastIndexOf('@');
+            return i >= 0 ? correo[(i + 1)..] : "?";
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,9 +16,10 @@ public class Horario {
     public string cupos { get; set; }
     public string espacio { get; set; }
     public string estado { get; set; }
-    public int Usuario_idUsuario { get; set; }
+    /// <summary>Dueño (Docente). null: el usuario fue eliminado y el horario se conservó porque tiene tutorías.</summary>
+    public int? Usuario_idUsuario { get; set; }
 
     // Propiedades de navegación
-    public Usuario Usuario { get; set; }
+    public Usuario? Usuario { get; set; }
     public ICollection<Tutoria> Tutorias { get; set; }
 }

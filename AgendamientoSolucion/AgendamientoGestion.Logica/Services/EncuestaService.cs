@@ -1,7 +1,11 @@
+using AgendamientoGestion.Logica.Correo;
 using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
 using AgendamientoGestion.Logica.Interfaces;
+using AgendamientoGestion.Logica.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using AgendamientoGestion.Persistencia.Interfaces;
 
 namespace AgendamientoGestion.Logica.Services;
@@ -13,33 +17,57 @@ public class EncuestaService : IEncuestaService
     private readonly ITutoriaEstudianteRepository _tutoriaEstudianteRepository;
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly ICorreoService _correoService;
+    private readonly IPlantillasCorreo _plantillas;
+    private readonly EncuestaSettings _settings;
+    private readonly ILogger<EncuestaService> _logger;
 
     public EncuestaService(
         IEncuestaRepository encuestaRepository,
         ITutoriaRepository tutoriaRepository,
         ITutoriaEstudianteRepository tutoriaEstudianteRepository,
         IUsuarioRepository usuarioRepository,
-        ICorreoService correoService)
+        ICorreoService correoService,
+        IPlantillasCorreo plantillas,
+        IOptions<EncuestaSettings> settings,
+        ILogger<EncuestaService> logger)
     {
+        _settings = settings.Value;
+        _logger = logger;
         _encuestaRepository = encuestaRepository;
         _tutoriaRepository = tutoriaRepository;
         _tutoriaEstudianteRepository = tutoriaEstudianteRepository;
         _usuarioRepository = usuarioRepository;
         _correoService = correoService;
+        _plantillas = plantillas;
     }
 
-    public async Task EnviarEncuestasAsync(int tutoriaId)
+    public async Task<EnvioEncuestasResultadoDto> EnviarEncuestasAsync(int tutoriaId)
     {
         var tutoria = await _tutoriaRepository.GetByIdAsync(tutoriaId);
         if (tutoria == null)
             throw new NotFoundException("Tutoría no encontrada");
 
+        var resultado = new EnvioEncuestasResultadoDto();
         var tutoriaEstudiantes = await _tutoriaEstudianteRepository.GetByTutoriaAsync(tutoriaId);
+
+        // Idempotencia: PUT /Tutoria/{id}/finalizar ya envía las encuestas y la app MAUI además llama a
+        // POST /Encuesta/enviar/{id}. No se crea una segunda encuesta para el mismo estudiante y tutoría.
+        var existentes = await _encuestaRepository.GetByTutoriaIdAsync(tutoriaId);
+        var correosConEncuesta = new HashSet<string>(
+            existentes.Where(e => !string.IsNullOrWhiteSpace(e.estudianteCorreo))
+                      .Select(e => e.estudianteCorreo!.Trim()),
+            StringComparer.OrdinalIgnoreCase);
 
         foreach (var te in tutoriaEstudiantes)
         {
-            var estudiante = await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
+            var estudiante = te.Usuario ?? await _usuarioRepository.GetByIdAsync(te.Usuario_idUsuario);
             if (estudiante == null) continue;
+
+            if (!correosConEncuesta.Add(estudiante.correo.Trim()))
+            {
+                resultado.YaExistentes++;
+                continue;
+            }
 
             var token = Guid.NewGuid().ToString("N");
 
@@ -53,45 +81,27 @@ public class EncuestaService : IEncuestaService
             };
 
             await _encuestaRepository.CreateAsync(encuesta);
+            resultado.Enviadas++;
 
-            // Enlace a la página pública de encuesta en React
-            var enlace = $"http://localhost:5173/encuesta?token={token}";
+            // Enlace a la página pública de encuesta en React (configurable: Encuesta:UrlBase)
+            var enlace = _settings.ConstruirEnlace(token);
 
-            var htmlCuerpo = $@"
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
-                    <h2 style='color: #1a73e8;'>Encuesta de Satisfacción - Tutoría</h2>
-                    <p>Hola <strong>{estudiante.nombres}</strong>,</p>
-                    <p>Has participado en una tutoría de <strong>{tutoria.idioma} - {tutoria.nivel}</strong>
-                       sobre el tema <strong>{tutoria.tema}</strong>.</p>
-                    <p>Tu opinión es muy importante para nosotros. Por favor toma un momento para calificar tu experiencia:</p>
-                    <div style='text-align: center; margin: 30px 0;'>
-                        <a href='{enlace}'
-                           style='background-color: #1a73e8; color: white; padding: 14px 28px;
-                                  text-decoration: none; border-radius: 6px; font-size: 16px;'>
-                            ✏️ Responder Encuesta
-                        </a>
-                    </div>
-                    <p style='color: #666; font-size: 13px;'>
-                        Si el botón no funciona, copia y pega este enlace en tu navegador:<br/>
-                        <a href='{enlace}'>{enlace}</a>
-                    </p>
-                    <hr style='border: 1px solid #eee;'/>
-                    <p style='color: #999; font-size: 12px;'>Sistema de Tutorías - CECAR</p>
-                </div>";
+            var contenido = _plantillas.Renderizar(new EncuestaSatisfaccionCorreo(
+                estudiante.nombres, tutoria.idioma, tutoria.nivel, tutoria.tema, enlace));
 
             try
             {
-                _correoService.EnviarCorreo(
-                    estudiante.correo,
-                    "Encuesta de satisfacción - Tutoría",
-                    htmlCuerpo
-                );
+                _correoService.Enviar(MensajeCorreo.Desde(contenido, estudiante.correo, $"{estudiante.nombres} {estudiante.apellidos}".Trim()));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error enviando encuesta a {estudiante.correo}: {ex.Message}");
+                // La encuesta queda creada; el fallo de SMTP no debe tumbar el flujo.
+                _logger.LogError(ex, "Error enviando la encuesta {IdEncuesta} de la tutoría {TutoriaId} al estudiante {EstudianteId}",
+                    encuesta.idEncuesta, tutoriaId, estudiante.idUsuario);
             }
         }
+
+        return resultado;
     }
 
     public async Task<EncuestaResponseDto> VerificarTokenAsync(string token)
@@ -150,6 +160,19 @@ public class EncuestaService : IEncuestaService
             PromedioCalificacion = Math.Round(promedio, 1),
             TasaRespuesta = tasa
         };
+    }
+
+    public async Task<List<EncuestasPendientesDto>> GetPendientesAsync()
+    {
+        var pendientes = await _encuestaRepository.GetPendientesPorTutoriaAsync();
+        return pendientes.Select(p => new EncuestasPendientesDto
+        {
+            TutoriaId = p.Tutoria.idTutoria,
+            Tema = p.Tutoria.tema,
+            FechaHora = p.Tutoria.fechaHora,
+            Enviadas = p.Enviadas,
+            SinResponder = p.SinResponder
+        }).ToList();
     }
 
     private EncuestaResponseDto MapToDto(EncuestaSatisfaccion encuesta)

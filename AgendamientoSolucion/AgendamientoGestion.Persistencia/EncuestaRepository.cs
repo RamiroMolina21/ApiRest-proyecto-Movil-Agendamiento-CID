@@ -50,6 +50,35 @@ public class EncuestaRepository : IEncuestaRepository
             .ToListAsync();
     }
 
+    public async Task<List<(Tutoria Tutoria, int Enviadas, int SinResponder)>> GetPendientesPorTutoriaAsync()
+    {
+        // Agregado en SQL (GROUP BY) y luego una sola consulta de las tutorías implicadas.
+        var conteos = await _context.EncuestasSatisfaccion.AsNoTracking()
+            .GroupBy(e => e.Tutoria_idTutoria)
+            .Select(g => new
+            {
+                TutoriaId = g.Key,
+                Enviadas = g.Count(),
+                SinResponder = g.Count(e => !e.tokenUsado)
+            })
+            .Where(x => x.SinResponder > 0)
+            .ToListAsync();
+
+        if (conteos.Count == 0)
+            return new List<(Tutoria, int, int)>();
+
+        var ids = conteos.Select(c => c.TutoriaId).ToList();
+        var tutorias = await _context.Tutorias.AsNoTracking()
+            .Where(t => ids.Contains(t.idTutoria))
+            .ToDictionaryAsync(t => t.idTutoria);
+
+        return conteos
+            .Where(c => tutorias.ContainsKey(c.TutoriaId))
+            .Select(c => (tutorias[c.TutoriaId], c.Enviadas, c.SinResponder))
+            .OrderByDescending(x => x.Item1.fechaHora).ThenBy(x => x.Item1.idTutoria)
+            .ToList();
+    }
+
     public async Task<EncuestaSatisfaccion> UpdateAsync(EncuestaSatisfaccion encuesta)
     {
         _context.EncuestasSatisfaccion.Update(encuesta);

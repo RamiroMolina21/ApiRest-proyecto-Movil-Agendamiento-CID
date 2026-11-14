@@ -17,8 +17,10 @@ namespace AgendamientoGestion.Logica.Dtos
         public string Cupos { get; set; }
         public string Espacio { get; set; }
         public string Estado { get; set; }
-        public string UsuarioNombre { get; set; }
-        public string UsuarioApellidos { get; set; }
-        public string UsuarioCorreo { get; set; }
+        /// <summary>Id del usuario dueño del horario (Horario.Usuario_idUsuario). null: el dueño fue eliminado (UsuarioNombre/Apellidos/Correo también null).</summary>
+        public int? UsuarioId { get; set; }
+        public string? UsuarioNombre { get; set; }
+        public string? UsuarioApellidos { get; set; }
+        public string? UsuarioCorreo { get; set; }
     }
 }

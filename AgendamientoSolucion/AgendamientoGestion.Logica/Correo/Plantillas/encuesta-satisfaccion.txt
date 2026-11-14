@@ -1,0 +1,10 @@
+Hola, {{destinatarioNombre}}:
+
+Gracias por participar en la tutoría de {{idioma}} {{nivel}} sobre {{tema}}.
+
+Cuéntanos cómo te fue: responder toma menos de un minuto y nos ayuda a mejorar las próximas sesiones.
+
+Responder la encuesta:
+{{enlace}}
+
+El enlace es personal y solo se puede usar una vez.

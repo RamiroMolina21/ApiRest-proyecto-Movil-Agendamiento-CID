@@ -1,0 +1,59 @@
+{{! Cambio en una tutoría (edición desde gestión o aviso manual). Primero QUÉ cambió; después cómo queda. }}
+<p style="margin:0 0 16px 0;">Hola, {{destinatarioNombre}}:</p>
+<p style="margin:0 0 20px 0;">Hicimos ajustes en tu tutoría de <strong>{{idioma}} {{nivel}}</strong>. Revisa qué cambió y cómo queda.</p>
+
+{{#hayCambios}}
+<table role="presentation" class="tp-detalle" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#fff4ec" style="background-color:#fff4ec; border:1px solid #f7cfb2; border-radius:10px;">
+  <tr><td style="padding:16px 20px;">
+    <p style="margin:0 0 8px 0; font-size:14px; line-height:20px; font-weight:bold; color:#9a3412;">Qué cambió</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      {{#cambios}}<tr>
+        <td width="18" valign="top" style="padding:4px 0; font-size:16px; line-height:22px; color:#9a3412;">&#8226;</td>
+        <td valign="top" style="padding:4px 0; font-size:16px; line-height:22px; color:#111827;">{{.}}</td>
+      </tr>{{/cambios}}
+    </table>
+    {{#motivo}}<p style="margin:10px 0 0 0; font-size:14px; line-height:20px; color:#374151;"><strong>Motivo:</strong> {{motivo}}</p>{{/motivo}}
+  </td></tr>
+</table>
+{{/hayCambios}}
+{{^hayCambios}}
+<p style="margin:0 0 16px 0;">No se detectaron cambios en la fecha, la hora, el lugar, el tema, la modalidad ni la persona a cargo; te compartimos la información vigente para que la tengas a mano.{{#motivo}} Motivo: {{motivo}}.{{/motivo}}</p>
+{{/hayCambios}}
+
+<p style="margin:24px 0 10px 0; font-size:14px; line-height:20px; font-weight:bold; color:#374151;" class="tp-suave">Así queda tu tutoría</p>
+<table role="presentation" class="tp-detalle" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f8f7fc" style="background-color:#f8f7fc; border:1px solid #e5e1ef; border-radius:10px;">
+  <tr><td style="padding:6px 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; font-size:14px; line-height:20px; color:#4b5563;">Fecha y hora</td>
+        <td valign="top" style="padding:12px 0; font-size:16px; line-height:22px; color:#111827; font-weight:bold;">{{fechaHora}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e5e1ef; font-size:14px; line-height:20px; color:#4b5563;">Docente o tutor</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e5e1ef; font-size:16px; line-height:22px; color:#111827;">{{profesor}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e5e1ef; font-size:14px; line-height:20px; color:#4b5563;">Modalidad</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e5e1ef; font-size:16px; line-height:22px; color:#111827;">{{modalidad}}</td>
+      </tr>
+      {{#espacio}}<tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e5e1ef; font-size:14px; line-height:20px; color:#4b5563;">Lugar</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e5e1ef; font-size:16px; line-height:22px; color:#111827;">{{espacio}}</td>
+      </tr>{{/espacio}}
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e5e1ef; font-size:14px; line-height:20px; color:#4b5563;">Tema</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e5e1ef; font-size:16px; line-height:22px; color:#111827;">{{tema}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e5e1ef; font-size:14px; line-height:20px; color:#4b5563;">Idioma y nivel</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e5e1ef; font-size:16px; line-height:22px; color:#111827;">{{idioma}} · {{nivel}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #e5e1ef; font-size:14px; line-height:20px; color:#4b5563;">Referencia</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #e5e1ef; font-size:16px; line-height:22px; color:#111827;">Tutoría n.º {{idTutoria}}</td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+
+<p style="margin:24px 0 0 0;">Si con estos cambios ya no puedes asistir, avísanos{{#contactoCorreo}} respondiendo a este correo{{/contactoCorreo}} para liberar tu cupo.</p>

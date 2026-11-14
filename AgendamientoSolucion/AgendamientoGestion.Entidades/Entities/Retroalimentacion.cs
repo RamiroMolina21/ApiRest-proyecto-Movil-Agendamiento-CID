@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +12,11 @@ namespace AgendamientoGestion.Entidades.Entities
         public decimal calificacion { get; set; }
         public DateTime fecha { get; set; }
         public int Tutoria_idTutoria { get; set; }
-        public int Usuario_idUsuario { get; set; }
+        /// <summary>Autor. null: el usuario fue eliminado (la retroalimentación se conserva en el historial de la tutoría).</summary>
+        public int? Usuario_idUsuario { get; set; }
 
         // Propiedades de navegación
         public Tutoria Tutoria { get; set; }
-        public Usuario Usuario { get; set; }
+        public Usuario? Usuario { get; set; }
     }
 }

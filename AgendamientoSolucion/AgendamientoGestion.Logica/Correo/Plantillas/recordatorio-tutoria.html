@@ -1,0 +1,32 @@
+{{! Recordatorio automático: se envía cuando la tutoría empieza en las próximas 2 horas. }}
+<p style="margin:0 0 16px 0;">Hola, {{destinatarioNombre}}:</p>
+<p style="margin:0 0 20px 0;">Tu tutoría de <strong>{{idioma}} {{nivel}}</strong> empieza en menos de dos horas. Te dejamos los datos a la mano:</p>
+
+<table role="presentation" class="tp-detalle" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#fff8eb" style="background-color:#fff8eb; border:1px solid #f5d9a8; border-radius:10px;">
+  <tr><td style="padding:6px 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; font-size:14px; line-height:20px; color:#4b5563;">Empieza</td>
+        <td valign="top" style="padding:12px 0; font-size:18px; line-height:24px; color:#111827; font-weight:bold;">{{fechaHora}}</td>
+      </tr>
+      {{#espacio}}<tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #f5d9a8; font-size:14px; line-height:20px; color:#4b5563;">Lugar</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #f5d9a8; font-size:16px; line-height:22px; color:#111827; font-weight:bold;">{{espacio}}</td>
+      </tr>{{/espacio}}
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #f5d9a8; font-size:14px; line-height:20px; color:#4b5563;">Modalidad</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #f5d9a8; font-size:16px; line-height:22px; color:#111827;">{{modalidad}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #f5d9a8; font-size:14px; line-height:20px; color:#4b5563;">Tema</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #f5d9a8; font-size:16px; line-height:22px; color:#111827;">{{tema}}</td>
+      </tr>
+      <tr class="tp-fila">
+        <td class="tp-etiqueta tp-suave" width="140" valign="top" style="padding:12px 12px 12px 0; border-top:1px solid #f5d9a8; font-size:14px; line-height:20px; color:#4b5563;">Idioma y nivel</td>
+        <td valign="top" style="padding:12px 0; border-top:1px solid #f5d9a8; font-size:16px; line-height:22px; color:#111827;">{{idioma}} · {{nivel}}</td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+
+<p style="margin:24px 0 0 0;">Te sugerimos estar listo unos minutos antes de la hora de inicio para aprovechar la sesión completa.</p>

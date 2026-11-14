@@ -1,0 +1,11 @@
+Hola, {{destinatarioNombre}}:
+
+Lamentamos avisarte que la tutoría de {{idioma}} {{nivel}} programada para el {{fechaHora}} se canceló. No necesitas presentarte.
+
+  Estaba prevista: {{fechaHora}}
+  Tema: {{tema}}
+  Idioma y nivel: {{idioma}} · {{nivel}}{{#motivo}}
+  Motivo: {{motivo}}{{/motivo}}
+  Referencia: Tutoría n.º {{idTutoria}}
+
+Si necesitas reprogramarla o tienes preguntas, {{#contactoCorreo}}responde a este correo y te ayudamos.{{/contactoCorreo}}{{^contactoCorreo}}comunícate con la coordinación de tutorías.{{/contactoCorreo}}

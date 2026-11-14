@@ -37,5 +37,11 @@ namespace AgendamientoGestion.Logica.Dtos
 
         [Required(ErrorMessage = "El ID del horario es obligatorio")]
         public int HorarioId { get; set; }
+
+        /// <summary>
+        /// Opcional (solo POST): estudiantes a asignar en la misma operación. Se crea la tutoría y se asignan
+        /// todos o ninguno (respeta los cupos del horario). Se ignora en PUT.
+        /// </summary>
+        public List<int>? EstudianteIds { get; set; }
     }
 }

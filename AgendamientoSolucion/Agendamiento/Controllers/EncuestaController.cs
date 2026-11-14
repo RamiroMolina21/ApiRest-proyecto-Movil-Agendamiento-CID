@@ -1,6 +1,8 @@
+using Agendamiento.Security;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Interfaces;
-using AgendamientoGestion.Logica.Exceptions;
+using AgendamientoGestion.Logica.Seguridad;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamiento.Controllers
@@ -11,116 +13,70 @@ namespace Agendamiento.Controllers
     {
         private readonly IEncuestaService _encuestaService;
 
-        public EncuestaController(IEncuestaService encuestaService)
+        private readonly ITutoriaService _tutoriaService;
+
+        public EncuestaController(IEncuestaService encuestaService, ITutoriaService tutoriaService)
         {
             _encuestaService = encuestaService;
+            _tutoriaService = tutoriaService;
         }
 
         // POST api/encuesta/enviar/{tutoriaId}
-        // Llama cuando se finaliza una tutoría para enviar encuestas a los estudiantes
+        // Idempotente: PUT /Tutoria/{id}/finalizar ya las envía; repetir la llamada no duplica encuestas.
         [HttpPost("enviar/{tutoriaId}")]
+        [Authorize(Policy = Politicas.Personal)]
         public async Task<IActionResult> EnviarEncuestas(int tutoriaId)
         {
-            try
+            // Misma regla de propiedad que finalizar (Docente participante / Tutor asignado / Admin-Aux).
+            await _tutoriaService.AsegurarAccesoAsync(tutoriaId, User.ComoSolicitante(), AccionTutoria.Finalizar);
+            var resultado = await _encuestaService.EnviarEncuestasAsync(tutoriaId);
+            return Ok(new
             {
-                await _encuestaService.EnviarEncuestasAsync(tutoriaId);
-                return Ok(new { message = "Encuestas enviadas correctamente a los estudiantes" });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
-            }
+                message = "Encuestas enviadas correctamente a los estudiantes",
+                enviadas = resultado.Enviadas,
+                yaExistentes = resultado.YaExistentes
+            });
         }
 
-        // GET api/encuesta/verificar/{token}
-        // Valida que el token exista y no haya sido usado (llamado por React al cargar la página pública)
+        // GET api/encuesta/verificar/{token} — PÚBLICO (página de encuesta de la web, sin login)
         [HttpGet("verificar/{token}")]
+        [AllowAnonymous]
         public async Task<IActionResult> VerificarToken(string token)
         {
-            try
-            {
-                var encuesta = await _encuestaService.VerificarTokenAsync(token);
-                return Ok(encuesta);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (BusinessException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
-            }
+            return Ok(await _encuestaService.VerificarTokenAsync(token));
         }
 
-        // POST api/encuesta/responder
-        // Endpoint público — el estudiante envía su respuesta sin login
+        // POST api/encuesta/responder — PÚBLICO (el token de un solo uso autoriza la respuesta)
         [HttpPost("responder")]
+        [AllowAnonymous]
         public async Task<IActionResult> ResponderEncuesta([FromBody] EncuestaCreateDto dto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var resultado = await _encuestaService.ResponderEncuestaAsync(dto);
-                return Ok(new { message = "¡Gracias por tu respuesta!", encuesta = resultado });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (BusinessException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
-            }
+            var resultado = await _encuestaService.ResponderEncuestaAsync(dto);
+            return Ok(new { message = "¡Gracias por tu respuesta!", encuesta = resultado });
         }
 
         // GET api/encuesta/tutoria/{tutoriaId}
-        // Ver todas las encuestas respondidas de una tutoría específica
         [HttpGet("tutoria/{tutoriaId}")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetByTutoria(int tutoriaId)
         {
-            try
-            {
-                var encuestas = await _encuestaService.GetByTutoriaIdAsync(tutoriaId);
-                return Ok(encuestas);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
-            }
+            return Ok(await _encuestaService.GetByTutoriaIdAsync(tutoriaId));
         }
 
         // GET api/encuesta/estadisticas
-        // Para el Dashboard: promedio, total enviadas/respondidas, tasa de respuesta
         [HttpGet("estadisticas")]
+        [Authorize(Policy = Politicas.GestionWeb)]
         public async Task<IActionResult> GetEstadisticas()
         {
-            try
-            {
-                var estadisticas = await _encuestaService.GetEstadisticasAsync();
-                return Ok(estadisticas);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
-            }
+            return Ok(await _encuestaService.GetEstadisticasAsync());
+        }
+
+        // GET api/encuesta/pendientes — tutorías con encuestas sin responder (dashboard: "encuestas-sin-responder")
+        [HttpGet("pendientes")]
+        [Authorize(Policy = Politicas.GestionWeb)]
+        public async Task<IActionResult> GetPendientes()
+        {
+            return Ok(await _encuestaService.GetPendientesAsync());
         }
     }
 }

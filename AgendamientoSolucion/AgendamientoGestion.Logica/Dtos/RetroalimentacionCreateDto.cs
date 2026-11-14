@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AgendamientoGestion.Logica.Dtos
 {
     public class RetroalimentacionCreateDto
     {
-        [Required(ErrorMessage = "El comentario es obligatorio")]
+        /// <summary>
+        /// Opcional: puede ser null o "". La app MAUI envía "" cuando el docente no escribe comentario;
+        /// antes [Required] lo rechazaba con 400 y la tutoría no llegaba a finalizarse.
+        /// Se guarda como "" porque la columna es NOT NULL.
+        /// </summary>
         [StringLength(300, ErrorMessage = "El comentario no puede exceder 300 caracteres")]
-        public string Comentario { get; set; }
+        public string? Comentario { get; set; }
 
         [Required(ErrorMessage = "La calificación es obligatoria")]
         [Range(1, 5, ErrorMessage = "La calificación debe estar entre 1 y 5")]

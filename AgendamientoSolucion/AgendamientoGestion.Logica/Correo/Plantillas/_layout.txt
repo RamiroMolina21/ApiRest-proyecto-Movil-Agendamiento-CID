@@ -1,0 +1,11 @@
+TutorPro · Corporación Universitaria del Caribe (CECAR)
+
+{{titulo}}
+========================================
+
+{{{contenido}}}
+
+----------------------------------------
+{{#contactoCorreo}}¿Tienes dudas? Responde a este correo o escríbenos a {{contactoCorreo}}.{{/contactoCorreo}}{{^contactoCorreo}}Este mensaje se generó automáticamente. Si tienes dudas, comunícate con la coordinación de tutorías de tu programa.{{/contactoCorreo}}
+Recibes este correo porque participas en tutorías gestionadas con TutorPro.
+{{nombreSistema}} · © {{anio}}
