@@ -112,14 +112,14 @@ Administrador, Auxiliar, Docente y Tutor (política `Personal`). Cuerpo `{ "cont
 | `GestionWeb` | Administrador, Auxiliar |
 | `SoloAdministrador` | Administrador (reservada; hoy ningún endpoint la usa directamente, ver Usuario) |
 | `Personal` | Administrador, Auxiliar, Docente, Tutor |
-| **Público** (`AllowAnonymous`) | solo `POST Auth/login`, `GET Encuesta/verificar/{token}`, `POST Encuesta/responder` |
+| **Público** (`AllowAnonymous`) | `POST Auth/login`, `POST Auth/olvide-contrasena`, `GET Auth/restablecer-contrasena/validar`, `POST Auth/restablecer-contrasena`, `GET Encuesta/verificar/{token}`, `POST Encuesta/responder` |
 
 ### Decisión sobre Auxiliar y gestión de usuarios
 
 Se pidió "crear/editar/borrar usuarios: solo Administrador". La web, sin embargo, deja al Auxiliar registrar **estudiantes** (menú "Usuarios"). Bloquearlo rompería ese flujo. Regla implementada en `UsuarioService`:
 
 - **Administrador**: crea/edita/borra cualquier usuario.
-- **Auxiliar**: solo usuarios cuyo rol (actual **y** nuevo) es **Estudiante**. Crear o promover a Administrador/Auxiliar/Docente/Tutor → **403** `Solo un Administrador puede crear, modificar o eliminar usuarios que no sean Estudiantes`.
+- **Auxiliar** (desde 2026-11-20): **crear y editar** usuarios cuyo rol (actual **y** nuevo) es Estudiante, Docente o Tutor; **eliminar y activar/desactivar** solo Estudiantes (sin cambios). Crear, editar o promover a Administrador/Auxiliar → 403 `Solo un Administrador puede crear o modificar Administradores o Auxiliares`. Crear o promover a Administrador/Auxiliar/Docente/Tutor → **403** `Solo un Administrador puede crear, modificar o eliminar usuarios que no sean Estudiantes`.
 
 Así se elimina la escalada de privilegios (un Auxiliar no puede crearse un Administrador) sin romper la web. Si se prefiere "solo Administrador" estricto, basta con cambiar la política de esas 3 acciones a `SoloAdministrador`.
 
@@ -148,12 +148,12 @@ Crear tutoría (`POST /Tutoria`): Admin/Aux en cualquier horario disponible; Doc
 | `POST /Auth/login` (W)(M) | 🌐 | 🌐 | 🌐 | 🌐 | 🌐 | público + rate limit |
 | `GET /Auth/me` | 401 | ✅ | ✅ | ✅ | ✅ | autenticado |
 | `PUT /Auth/contrasena` (W) **nuevo** | 401 | ✅ propia | ✅ propia | ✅ propia | ✅ propia | Personal + rate limit por usuario |
-| `POST /Usuario` (W) | 401 | ✅ | ✅ solo Estudiante | ❌ | ❌ | GestionWeb + regla |
+| `POST /Usuario` (W) | 401 | ✅ | ✅ Estudiante, Docente, Tutor | ❌ | ❌ | GestionWeb + regla |
 | `GET /Usuario` (W) (con o sin `page`/`pageSize`/`q`/`rol`/`activo`) | 401 | ✅ | ✅ | ❌ | ❌ | GestionWeb |
 | `PATCH /Usuario/{id}/estado` (W) **[nuevo]** | 401 | ✅ (409 sí mismo / último Admin) | ✅ solo Estudiante | ❌ | ❌ | GestionWeb + regla |
 | `GET /Usuario/{id}` (W) | 401 | ✅ | ✅ | ❌ | ❌ | GestionWeb |
 | `GET /Usuario/by-rol/{tipoRol}` (W)(M) | 401 | ✅ | ✅ | ✅ | ✅ | Personal |
-| `PUT /Usuario/{id}` (W) | 401 | ✅ | ✅ solo Estudiante | ❌ | ❌ | GestionWeb + regla |
+| `PUT /Usuario/{id}` (W) | 401 | ✅ | ✅ Estudiante, Docente, Tutor (rol actual y nuevo) | ❌ | ❌ | GestionWeb + regla |
 | `DELETE /Usuario/{id}` (W) **[cambio fase 4: definitiva]** | 401 | ✅ (400 sí mismo; 409 último Admin activo) | ✅ solo Estudiante | ❌ | ❌ | GestionWeb + regla |
 | `POST /Horario` (W) | 401 | ✅ | ✅ | ❌ | ❌ | GestionWeb |
 | `GET /Horario` (W) | 401 | ✅ | ✅ | ❌ | ❌ | GestionWeb |

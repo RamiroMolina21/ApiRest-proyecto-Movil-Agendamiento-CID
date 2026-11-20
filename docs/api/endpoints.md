@@ -198,6 +198,21 @@ Regla general para la web: **un id de usuario `null` significa "usuario eliminad
 | `GET /Auth/me` **[nuevo]** | — | UsuarioResponse | 401 |
 | `PUT /Auth/contrasena` **[nuevo]** | CambiarContrasena | **204** sin cuerpo | 400 (validación, `La contraseña actual no es correcta`, nueva igual a la actual o al correo); 401 sin token / usuario borrado; 403 rol sin acceso; 429 (5 intentos / 15 min **por usuario**, `Retry-After`) |
 
+### Restablecer contraseña ("¿Olvidaste tu contraseña?") **[nuevo]** — todos públicos
+
+| Método y ruta | Request | Éxito | Errores |
+|---|---|---|---|
+| `POST /Auth/olvide-contrasena` | `{ "correo": "..." }` | **200** `{ "message": "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña." }` — SIEMPRE igual, exista o no la cuenta | 400 correo no válido (`message`); **429** + `Retry-After` (5 por IP y 5 por correo cada 15 min) |
+| `GET /Auth/restablecer-contrasena/validar?token=...` | query `token` | **200** `{ "valido": true, "correo": "r***@cecar.edu.co", "expiraEn": "2026-11-20T06:16:02.98Z" }` (UTC) | 400 `{ message: "El enlace no es válido o ha caducado. Solicita uno nuevo." }`; 429 + `Retry-After` |
+| `POST /Auth/restablecer-contrasena` | `{ "token": "...", "contrasenaNueva": "..." }` | **204** sin cuerpo | 400 token inválido/caducado/usado (mismo `message`) o política de contraseña (mensajes de `PUT /Auth/contrasena`); 429 + `Retry-After` (20 por IP / 15 min, compartido con validar) |
+
+- Solo se envía correo a cuentas **activas con acceso** (Administrador, Auxiliar, Docente, Tutor). Estudiantes, inactivos e inexistentes: misma respuesta, nada enviado. El correo se envía en segundo plano (mismo tiempo de respuesta).
+- Enlace: `{Web:UrlBase}/restablecer-contrasena?token=<43 caracteres base64url>`. Caduca a los 60 min (`RestablecimientoContrasena:MinutosValidez`), un solo uso; pedir uno nuevo invalida los anteriores.
+- Política (mismos textos que `PUT /Auth/contrasena`): `La nueva contraseña debe tener entre 8 y 72 caracteres (máximo 72 bytes)`, `...no puede estar formada solo por espacios`, `La nueva contraseña debe ser distinta de la actual`, `La nueva contraseña no puede ser igual a su correo`. Si la política falla, el token sigue valiendo.
+- Tras restablecer: los JWT emitidos antes devuelven **401** `La contraseña de la cuenta se cambió. Inicia sesión de nuevo`; se envía el aviso "Tu contraseña se cambió".
+- Errores: los de negocio llevan solo `message` (y `detail`), **sin** `errors` por campo. Solo un JSON mal formado/tipo incorrecto produce `errors` con claves del binder (`"$.correo"`, `"$"`, `"dto"`), como en el resto de la API.
+- **e2e (solo Development):** `POST /dev/restablecimiento/enlace` con token de **Administrador** y `{ "correo": "..." }` de una cuenta cuyo nombre empieza por `[PRUEBA]` (activa, con acceso) → 200 `{ "enlace", "token" }` válido, sin enviar correo. Otra cuenta → 404. Fuera de Development → 404.
+
 ### CambiarContrasena (PUT /Auth/contrasena)
 | Campo | Tipo | Reglas |
 |---|---|---|
@@ -212,13 +227,13 @@ Detalle en [autenticacion-y-autorizacion.md](autenticacion-y-autorizacion.md).
 
 | Método y ruta | Request | Éxito | Errores propios |
 |---|---|---|---|
-| `POST /Usuario` | UsuarioCreate | **201** UsuarioResponse, `Location: /api/Usuario/{id}` | 400; 403 (Auxiliar con rol ≠ Estudiante); 404 rol inexistente; 409 correo duplicado |
+| `POST /Usuario` | UsuarioCreate | **201** UsuarioResponse, `Location: /api/Usuario/{id}` | 400; 403 (Auxiliar con rol Administrador/Auxiliar: `Solo un Administrador puede crear o modificar Administradores o Auxiliares`) **[cambio: el Auxiliar ya puede crear Docentes y Tutores]**; 404 rol inexistente; 409 correo duplicado |
 | `GET /Usuario` | — | 200 UsuarioResponse[] (todos, sin cabecera) — **idéntico a antes si no se envía ningún parámetro** | — |
 | `GET /Usuario?page=&pageSize=&q=&rol=&activo=` **[nuevo, aditivo]** | todos opcionales (ver abajo) | 200 UsuarioResponse[] **de la página** + cabecera `X-Total-Count` (total que cumple el filtro) | 400 (`page` < 1 o no entero; `pageSize` fuera de 1–100; `rol` desconocido; `q` > 100; `activo` no booleano) |
 | `PATCH /Usuario/{id}/estado` **[nuevo]** | UsuarioEstado | 200 UsuarioResponse | 400 cuerpo; 403 Auxiliar sobre no Estudiante (`Solo un Administrador puede crear, modificar o eliminar usuarios que no sean Estudiantes`), Docente/Tutor; 404; **409** `No se puede desactivar al último Administrador activo` / `No puede desactivar su propia cuenta` |
 | `GET /Usuario/{id}` | — | 200 UsuarioResponse | 404 |
 | `GET /Usuario/by-rol/{tipoRol}?incluirInactivos=` | `tipoRol`: `Estudiante`, `Docente`, `Tutor`, ...; `incluirInactivos` bool opcional (por defecto `false`) | 200 UsuarioResponse[] — **[cambio] solo cuentas activas** salvo `incluirInactivos=true` | — |
-| `PUT /Usuario/{id}` | UsuarioUpdate | 200 UsuarioResponse | 400; 403 (Auxiliar); 404; **409 correo de otro usuario [cambio]** |
+| `PUT /Usuario/{id}` | UsuarioUpdate | 200 UsuarioResponse | 400; 403 (Auxiliar sobre/hacia Administrador o Auxiliar, mismo `message`) **[cambio: el Auxiliar ya puede editar Docentes y Tutores]**; 404; **409 correo de otro usuario [cambio]** |
 | `DELETE /Usuario/{id}` **[cambio, fase 4]** | — | 200 `{ "message": "Usuario eliminado exitosamente", "resumen": ResultadoEliminacion }` — **eliminación definitiva**, ya no se bloquea por tutorías/horarios/retroalimentaciones | 400 `No puede eliminar su propio usuario`; 403 Auxiliar sobre no Estudiante, Docente/Tutor; 404; **409** `No se puede eliminar al último Administrador activo`. Ya **no** hay 409 "tiene registros asociados" |
 
 **Eliminación de usuarios** (una transacción: todo o nada). Qué pasa con cada dependencia:

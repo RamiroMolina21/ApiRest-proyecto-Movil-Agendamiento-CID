@@ -26,6 +26,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 {
     public const string JwtKeyDePrueba = "clave-de-pruebas-solo-para-tests-0123456789abcdef";
     public const string UrlEncuestaDePrueba = "https://web.pruebas.local/encuesta";
+    public const string UrlWebDePrueba = "https://web.pruebas.local";
     public const string Password = "Secreta123";
 
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
@@ -46,6 +47,10 @@ public class ApiFactory : WebApplicationFactory<Program>
         ["RateLimiting:Login:WindowSeconds"] = "60",
         ["Cors:AllowedOrigins:0"] = "http://localhost:5173",
         ["Encuesta:UrlBase"] = UrlEncuestaDePrueba,
+        ["Web:UrlBase"] = UrlWebDePrueba,
+        ["RestablecimientoContrasena:SolicitudesPorIp"] = "1000",
+        ["RestablecimientoContrasena:IntentosRestablecerPorIp"] = "1000",
+        ["RestablecimientoContrasena:SolicitudesPorCorreo"] = "1000",
         ["ConnectionStrings:local"] = "no-se-usa-en-pruebas"
     };
 

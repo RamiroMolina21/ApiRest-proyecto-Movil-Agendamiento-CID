@@ -130,6 +130,31 @@ builder.Services.AddOptions<RateLimiterOptions>().Configure<IOptions<LoginRateLi
             }));
 });
 
+// "¿Olvidaste tu contraseña?": límites por IP (el límite por correo lo aplica RestablecimientoContrasenaService).
+builder.Services.AddOptions<RestablecimientoSettings>().Bind(builder.Configuration.GetSection(RestablecimientoSettings.SectionName));
+builder.Services.AddOptions<WebSettings>().Bind(builder.Configuration.GetSection(WebSettings.SectionName));
+builder.Services.AddOptions<RateLimiterOptions>().Configure<IOptions<RestablecimientoSettings>>((options, cfg) =>
+{
+    var s = cfg.Value;
+    foreach (var (politica, limite) in new[]
+    {
+        (RateLimitRestablecimiento.PoliticaSolicitud, s.SolicitudesPorIp),
+        (RateLimitRestablecimiento.PoliticaRestablecer, s.IntentosRestablecerPorIp)
+    })
+    {
+        options.AddPolicy(politica, httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                httpContext.Connection.RemoteIpAddress?.ToString() ?? "desconocida",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = limite,
+                    Window = TimeSpan.FromSeconds(s.VentanaSegundos),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                }));
+    }
+});
+
 // Proxy inverso: tomar la IP real del cliente de X-Forwarded-For.
 // Por defecto solo se confía en loopback (ngrok / proxy local).
 // En plataformas donde el contenedor solo es accesible a través del balanceador del proveedor
@@ -167,6 +192,7 @@ builder.Services.AddScoped<ITutoriaEstudianteRepository, TutoriaEstudianteReposi
 builder.Services.AddScoped<IEncuestaRepository, EncuestaRepository>();
 builder.Services.AddScoped<IAsuntoAtendidoRepository, AsuntoAtendidoRepository>();
 builder.Services.AddScoped<IMetricasRepository, MetricasRepository>();
+builder.Services.AddScoped<IRestablecimientoContrasenaRepository, RestablecimientoContrasenaRepository>();
 // Transacciones que abarcan varios repositorios (comparten el DbContext scoped).
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
@@ -183,6 +209,13 @@ builder.Services.AddScoped<IHorarioServices, HorarioServices>();
 builder.Services.AddScoped<IMetricasService, MetricasService>();
 builder.Services.AddScoped<IEncuestaService, EncuestaService>();
 builder.Services.AddScoped<IAtencionService, AtencionService>();
+builder.Services.AddScoped<IRestablecimientoContrasenaService, RestablecimientoContrasenaService>();
+builder.Services.AddSingleton<ColaRestablecimientoContrasena>();
+builder.Services.AddHostedService<Agendamiento.Services.ColaRestablecimientoWorker>();
+// El enlace solo puede ir al log en Development y con la opción explícita activada (nunca en producción).
+builder.Services.AddSingleton(new RegistroEnlaceDesarrollo(
+    builder.Environment.IsDevelopment() &&
+    builder.Configuration.GetValue<bool>($"{RestablecimientoSettings.SectionName}:RegistrarEnlaceEnLogDesarrollo")));
 
 // 🔹 Servicios de correo
 builder.Services.AddScoped<ICorreoService, CorreoService>();

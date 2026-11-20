@@ -24,21 +24,23 @@ public sealed class EstadoCuentaCache : IEstadoCuentaCache
 
     private static string Clave(int usuarioId) => $"estado-cuenta:{usuarioId}";
 
-    public async Task<EstadoCuenta> ObtenerAsync(int usuarioId, CancellationToken cancellationToken = default)
+    public async Task<EstadoCuenta> ObtenerAsync(int usuarioId, CancellationToken cancellationToken = default) =>
+        (await ObtenerInfoAsync(usuarioId, cancellationToken)).Estado;
+
+    public async Task<InfoCuenta> ObtenerInfoAsync(int usuarioId, CancellationToken cancellationToken = default)
     {
-        if (_cache.TryGetValue(Clave(usuarioId), out EstadoCuenta estado))
-            return estado;
+        if (_cache.TryGetValue(Clave(usuarioId), out InfoCuenta? info) && info != null)
+            return info;
 
-        var activo = await _usuarioRepository.GetActivoAsync(usuarioId);
-        estado = activo switch
+        var r = await _usuarioRepository.GetEstadoCredencialesAsync(usuarioId);
+        info = r switch
         {
-            null => EstadoCuenta.NoExiste,
-            true => EstadoCuenta.Activa,
-            false => EstadoCuenta.Desactivada
+            null => new InfoCuenta(EstadoCuenta.NoExiste, null),
+            var x when x.Value.Activo => new InfoCuenta(EstadoCuenta.Activa, x.Value.CredencialesCambiadasEn),
+            var x => new InfoCuenta(EstadoCuenta.Desactivada, x.Value.CredencialesCambiadasEn)
         };
-        _cache.Set(Clave(usuarioId), estado, Duracion);
-        return estado;
+        _cache.Set(Clave(usuarioId), info, Duracion);
+        return info;
     }
-
     public void Invalidar(int usuarioId) => _cache.Remove(Clave(usuarioId));
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +16,11 @@ namespace AgendamientoGestion.Entidades.Entities
         public int Rol_idRol { get; set; }
         /// <summary>Cuenta habilitada (columna Usuario.activo BIT NOT NULL DEFAULT 1). Inactivo: no inicia sesión ni se asigna a tutorías.</summary>
         public bool activo { get; set; } = true;
+        /// <summary>
+        /// Última vez (UTC) que se restableció la contraseña por "olvidé mi contraseña" (columna NULL). Los JWT emitidos
+        /// antes dejan de valer (ValidacionCuentaJwt compara con el claim iat).
+        /// </summary>
+        public DateTime? credencialesCambiadasEn { get; set; }
 
         // Propiedades de navegación
         public Rol Rol { get; set; }

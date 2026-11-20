@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
 <title>{{titulo}}</title>
-{{! Layout común de TODOS los correos de TutorPro.
+{{! Layout común de TODOS los correos de CDITutorPro.
     Compatibilidad: estructura en tablas, estilos en línea (Gmail, Outlook, Apple Mail); el <style> solo añade
     mejoras progresivas (móvil y modo oscuro) que los clientes sin soporte ignoran sin romper nada.
     Marca sin imágenes: el isotipo es una celda de color con la inicial (no hay dominio público para alojar el logo;
@@ -46,40 +46,36 @@
     .tp-detalle .tp-suave, .tp-texto .tp-suave { color: #cbd5e1 !important; }
     .tp-detalle p { color: #fdba74 !important; }
     .tp-marca-nombre { color: #f1f5f9 !important; }
-    a { color: #c4b5fd !important; }
+    .tp-marca-nombre span { color: #ff8a8a !important; }
+    a { color: #93c5fd !important; }
     .tp-boton a { color: #ffffff !important; }
-    .tp-boton-sec { border-color: #a78bfa !important; }
-    .tp-boton-sec a { color: #ddd6fe !important; }
+    .tp-boton-sec { border-color: #ff8a8a !important; }
+    .tp-boton-sec a { color: #ffc2c2 !important; }
   }
 </style>
 </head>
-<body class="tp-fondo" style="margin:0; padding:0; background-color:#f3f1f8; word-spacing:normal;">
+<body class="tp-fondo" style="margin:0; padding:0; background-color:#f2f2f0; word-spacing:normal;">
 <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">{{preencabezado}}&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;</div>
-<table role="presentation" class="tp-fondo" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f1f8;">
+<table role="presentation" class="tp-fondo" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2f2f0;">
 <tr>
 <td align="center" style="padding:24px 12px;">
 <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
 <table role="presentation" class="tp-contenedor" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
 
-  <!-- Marca -->
+  <!-- Marca: logotipo de texto (sin imagen). Una imagen remota (p. ej. alojada en pages.dev) se bloquea por defecto en
+       Outlook y en muchos clientes corporativos, cuenta como petición externa tipo rastreador y su dominio no coincide
+       con el del remitente: no mejora la entregabilidad y puede empeorarla. El texto siempre se ve. -->
   <tr>
-    <td class="tp-pad" style="padding:4px 32px 18px 32px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td width="36" height="36" align="center" valign="middle" bgcolor="#7b42f6" style="width:36px; height:36px; background-color:#7b42f6; border-radius:9px; color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:20px; line-height:36px; font-weight:bold; mso-line-height-rule:exactly;">T</td>
-          <td style="padding-left:10px; font-family:Arial, Helvetica, sans-serif;">
-            <span class="tp-marca-nombre" style="font-size:18px; line-height:22px; font-weight:bold; color:#1f2937;">Tutor<span style="color:#6d28d9;">Pro</span></span><br>
-            <span class="tp-suave" style="font-size:12px; line-height:16px; color:#4b5563;">Corporación Universitaria del Caribe · CECAR</span>
-          </td>
-        </tr>
-      </table>
+    <td class="tp-pad" style="padding:4px 32px 18px 32px; font-family:Arial, Helvetica, sans-serif;">
+      <span class="tp-marca-nombre" style="font-size:20px; line-height:24px; font-weight:bold; color:#1f2937;"><span style="color:#b11d25;">CDI</span>TutorPro</span><br>
+      <span class="tp-suave" style="font-size:12px; line-height:16px; color:#474544;">Centro de Idiomas · Corporación Universitaria del Caribe – CECAR</span>
     </td>
   </tr>
 
   <!-- Tarjeta -->
   <tr>
     <td>
-      <table role="presentation" class="tp-tarjeta" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff; border:1px solid #e5e1ef; border-radius:14px;">
+      <table role="presentation" class="tp-tarjeta" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff; border:1px solid #e4e4e1; border-radius:14px;">
         <!-- Franja de acento del tipo de correo -->
         <tr>
           <td height="6" bgcolor="{{colorEncabezado}}" style="height:6px; line-height:6px; font-size:6px; background-color:{{colorEncabezado}}; border-radius:14px 14px 0 0; mso-line-height-rule:exactly;">&nbsp;</td>
@@ -102,10 +98,10 @@
   <tr>
     <td class="tp-pad" style="padding:22px 32px 8px 32px; font-family:Arial, Helvetica, sans-serif; font-size:13px; line-height:20px; color:#4b5563;">
       <p class="tp-suave" style="margin:0 0 8px 0; color:#4b5563;">
-        {{#contactoCorreo}}¿Tienes dudas? Responde a este correo o escríbenos a <a href="mailto:{{contactoCorreo}}" style="color:#6d28d9; text-decoration:underline;">{{contactoCorreo}}</a>.{{/contactoCorreo}}
+        {{#contactoCorreo}}¿Tienes dudas? Responde a este correo o escríbenos a <a href="mailto:{{contactoCorreo}}" style="color:#00529c; text-decoration:underline;">{{contactoCorreo}}</a>.{{/contactoCorreo}}
         {{^contactoCorreo}}Este mensaje se generó automáticamente. Si tienes dudas, comunícate con la coordinación de tutorías de tu programa.{{/contactoCorreo}}
       </p>
-      <p class="tp-suave" style="margin:0 0 8px 0; color:#4b5563;">Recibes este correo porque participas en tutorías gestionadas con TutorPro.</p>
+      <p class="tp-suave" style="margin:0 0 8px 0; color:#4b5563;">Recibes este correo porque participas en tutorías gestionadas con CDITutorPro.</p>
       <p class="tp-suave" style="margin:0; color:#6b7280;">{{nombreSistema}} · © {{anio}}</p>
     </td>
   </tr>

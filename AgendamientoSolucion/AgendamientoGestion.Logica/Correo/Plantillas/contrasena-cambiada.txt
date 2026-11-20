@@ -1,0 +1,5 @@
+Hola, {{destinatarioNombre}}:
+
+La contraseña de tu cuenta {{correo}} se cambió el {{fecha}} (hora de Colombia). Las sesiones abiertas antes de ese momento se cerraron.
+
+Si no fuiste tú, contacta de inmediato con la coordinación{{#contactoCorreo}} escribiendo a {{contactoCorreo}}{{/contactoCorreo}}.

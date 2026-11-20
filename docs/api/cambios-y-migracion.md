@@ -64,8 +64,19 @@
 |---|---|---|---|
 | B17 | `DELETE /Usuario/{id}` ya **no** devuelve 409 por registros asociados: elimina definitivamente (datos propios borrados, compartidos desvinculados). Respuesta 200 añade `resumen`. Nuevo 409 `No se puede eliminar al último Administrador activo` | **BREAKING** de comportamiento | Web: pedir confirmación clara antes de eliminar; mostrar el `resumen`. Ya no hace falta el mensaje "tiene registros asociados" |
 | B18 | Campos de usuario **nullables** en respuestas: TutoriaResponse `usuarioId`/`usuarioNombre`/`usuarioApellidos`/`usuarioCorreo`/`horarioUsuarioId`/`horarioUsuarioNombre`/`horarioUsuarioApellidos`; HorarioResponse `usuarioId`/`usuarioNombre`/`usuarioApellidos`/`usuarioCorreo`; RetroalimentacionResponse `usuarioId`/`usuarioNombre`/`usuarioApellidos`; AsuntoAtendido `usuarioId`/`usuarioNombre` (antes `""`) | **BREAKING** de tipos (solo aparecen `null` tras eliminar a alguien) | Web y MAUI: tratar `null` como "Usuario eliminado"/"Sin asignar" (ver endpoints.md, "Datos desvinculados"). `horarioUsuarioId` sin horario pasa de `0` a `null` |
-| C30 | Correos: MailKit, multipart/alternative (texto + HTML) UTF-8, From `TutorPro – CECAR <cuenta autenticada>`, Reply-To configurable (`SmtpSettings:ResponderA`), Message-ID y Date correctos, `Auto-Submitted`, reintentos y timeout. Asunto del recordatorio unificado a `Recordatorio de Tutoría - dd/MM/yyyy HH:mm` | interno | Ver `docs/correo/` |
+| C30 | Correos: MailKit, multipart/alternative (texto + HTML) UTF-8, From `CDITutorPro – CECAR <cuenta autenticada>`, Reply-To configurable (`SmtpSettings:ResponderA`), Message-ID y Date correctos, `Auto-Submitted`, reintentos y timeout. Asunto del recordatorio unificado a `Recordatorio de Tutoría - dd/MM/yyyy HH:mm` | interno | Ver `docs/correo/` |
 | C31 | Plantillas de correo en `AgendamientoGestion.Logica/Correo/Plantillas` (layout + una por tipo, escape automático) y previsualización `GET /dev/correos` (solo Development) | aditivo | Alistar: rediseño en esas plantillas |
+
+### Fase 5 (2026-11-20): "¿Olvidaste tu contraseña?" y Auxiliar gestiona personal académico
+
+**Requiere esquema**: `ScriptBD/2026-11-20_restablecimiento_contrasena.sql` (idempotente, no destructivo, sin `USE`): columna `Usuario.credencialesCambiadasEn DATETIME2 NULL` y tabla `RestablecimientoContrasena`. `BD.sql` consolidado actualizado.
+
+| # | Cambio | Tipo |
+|---|---|---|
+| C32 | Nuevos `POST /Auth/olvide-contrasena`, `GET /Auth/restablecer-contrasena/validar`, `POST /Auth/restablecer-contrasena` (públicos) y correos `restablecer-contrasena` / `contrasena-cambiada` | aditivo |
+| C33 | Tras restablecer la contraseña, los JWT emitidos antes → 401 `La contraseña de la cuenta se cambió. Inicia sesión de nuevo` (el cambio con `PUT /Auth/contrasena` sigue sin cerrar sesiones) | comportamiento |
+| C34 | Auxiliar: `POST`/`PUT /Usuario` también para Docentes y Tutores; 403 con Administrador/Auxiliar (mensaje nuevo `Solo un Administrador puede crear o modificar Administradores o Auxiliares`). Eliminar y activar/desactivar: solo Estudiantes (sin cambios) | permisos (más permisivo) |
+| C35 | Configuración nueva: `Web:UrlBase` (Render: `Web__UrlBase=https://web-cid-proyecto-movil.pages.dev`) y sección `RestablecimientoContrasena` | config |
 
 ### Cambios de comportamiento (no rompen a los clientes actuales)
 

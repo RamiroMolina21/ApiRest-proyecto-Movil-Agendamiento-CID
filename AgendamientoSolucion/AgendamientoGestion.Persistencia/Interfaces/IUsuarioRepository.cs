@@ -1,4 +1,4 @@
-﻿using AgendamientoGestion.Entidades.Entities;
+using AgendamientoGestion.Entidades.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,8 @@ public interface IUsuarioRepository {
     Task<List<Usuario>> GetByRolAsync(string tipoRol);
     /// <summary>Estado de la cuenta sin cargar la entidad: null si el usuario no existe.</summary>
     Task<bool?> GetActivoAsync(int id);
+    /// <summary>activo y credencialesCambiadasEn sin cargar la entidad; null si el usuario no existe.</summary>
+    Task<(bool Activo, DateTime? CredencialesCambiadasEn)?> GetEstadoCredencialesAsync(int id);
     Task<int> ContarAdministradoresActivosAsync();
 
     /// <summary>

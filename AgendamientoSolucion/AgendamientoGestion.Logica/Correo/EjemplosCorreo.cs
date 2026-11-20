@@ -22,7 +22,10 @@ public static class EjemplosCorreo
         new CancelacionTutoriaCorreo("María José Núñez Peña", 123, Fecha, "Francés", "A1", "Pronunciación básica",
             "El docente no estará disponible"),
         new EncuestaSatisfaccionCorreo("María José", "Inglés", "B1", "Conversación: viajes y transporte",
-            "https://tutorias.ejemplo.edu.co/encuesta?token=0123456789abcdef0123456789abcdef")
+            "https://tutorias.ejemplo.edu.co/encuesta?token=0123456789abcdef0123456789abcdef"),
+        new RestablecerContrasenaCorreo("María José Núñez Peña", "maria.nunez@ejemplo.edu.co",
+            "https://tutorias.ejemplo.edu.co/restablecer-contrasena?token=Q2hhbmdlTWVfZXhhbXBsZV90b2tlbl9fXzAxMjM0NTY3", 60),
+        new ContrasenaCambiadaCorreo("María José Núñez Peña", "maria.nunez@ejemplo.edu.co", Fecha)
     };
 
     public static IModeloCorreo? Buscar(string plantilla) =>

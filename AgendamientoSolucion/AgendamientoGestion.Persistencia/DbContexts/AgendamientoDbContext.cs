@@ -20,6 +20,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
         public DbSet<TutoriaEstudiante> TutoriaEstudiantes { get; set; }
         public DbSet<EncuestaSatisfaccion> EncuestasSatisfaccion { get; set; }
         public DbSet<AsuntoAtendido> AsuntosAtendidos { get; set; }
+        public DbSet<RestablecimientoContrasena> RestablecimientosContrasena { get; set; }
 
         public AgendamientoDbContext(DbContextOptions<AgendamientoDbContext> options) : base(options)
         {
@@ -43,6 +44,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 // Sin HasDefaultValue en EF a propósito: con default true y CLR false, EF omitiría el false al insertar.
                 // El valor por defecto de la entidad (true) cubre las inserciones desde la API.
                 entity.Property(e => e.activo).IsRequired();
+                entity.Property(e => e.credencialesCambiadasEn).HasColumnType("datetime2");
 
                 // Relación con Rol
                 entity.HasOne(e => e.Rol)
@@ -211,6 +213,23 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                     .WithMany(t => t.EncuestasSatisfaccion)
                     .HasForeignKey(e => e.Tutoria_idTutoria)
                     .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            // Configuración de RestablecimientoContrasena (ScriptBD 2026-11-20)
+            modelBuilder.Entity<RestablecimientoContrasena>(entity =>
+            {
+                entity.ToTable("RestablecimientoContrasena");
+                entity.HasKey(e => e.idRestablecimiento);
+                entity.Property(e => e.tokenHash).IsRequired().HasMaxLength(64).IsUnicode(false).IsFixedLength();
+                entity.Property(e => e.fechaCreacion).IsRequired().HasColumnType("datetime2");
+                entity.Property(e => e.fechaExpiracion).IsRequired().HasColumnType("datetime2");
+                entity.Property(e => e.fechaUso).HasColumnType("datetime2");
+                entity.HasIndex(e => e.tokenHash).IsUnique().HasDatabaseName("uq_RestablecimientoContrasena_tokenHash");
+                entity.HasIndex(e => e.Usuario_idUsuario).HasDatabaseName("IX_RestablecimientoContrasena_Usuario");
+                entity.HasOne(e => e.Usuario)
+                    .WithMany()
+                    .HasForeignKey(e => e.Usuario_idUsuario)
+                    .OnDelete(DeleteBehavior.Cascade); // dato propio: se borra con el usuario
             });
 
             // Configuración de AsuntoAtendido (dashboard web: casos marcados como atendidos)
