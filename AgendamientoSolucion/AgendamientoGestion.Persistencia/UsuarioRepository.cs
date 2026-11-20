@@ -1,4 +1,4 @@
-﻿using AgendamientoGestion.Entidades.Constants;
+using AgendamientoGestion.Entidades.Constants;
 using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Persistencia.DbContexts;
 using AgendamientoGestion.Persistencia.Interfaces;
@@ -140,6 +140,9 @@ public class UsuarioRepository : IUsuarioRepository
             .Where(x => x.Usuario_idUsuario == id)
             .ExecuteUpdateAsync(s => s.SetProperty(x => x.Usuario_idUsuario, (int?)null));
 
+        // Solicitudes de restablecimiento de contraseña (dato propio; la FK también es CASCADE).
+        await _context.RestablecimientosContrasena.Where(x => x.Usuario_idUsuario == id).ExecuteDeleteAsync();
+
         // 5) El usuario. Si quedara alguna referencia no contemplada, la FK hace fallar esto y la transacción se deshace.
         await _context.Usuarios.Where(u => u.idUsuario == id).ExecuteDeleteAsync();
         return r;
@@ -193,6 +196,15 @@ public class UsuarioRepository : IUsuarioRepository
             .Where(u => u.idUsuario == id)
             .Select(u => (bool?)u.activo)
             .FirstOrDefaultAsync();
+
+    public async Task<(bool Activo, DateTime? CredencialesCambiadasEn)?> GetEstadoCredencialesAsync(int id)
+    {
+        var r = await _context.Usuarios.AsNoTracking()
+            .Where(u => u.idUsuario == id)
+            .Select(u => new { u.activo, u.credencialesCambiadasEn })
+            .FirstOrDefaultAsync();
+        return r == null ? null : (r.activo, r.credencialesCambiadasEn);
+    }
 
     public Task<int> ContarAdministradoresActivosAsync() =>
         _context.Usuarios.CountAsync(u => u.activo && u.Rol.tipoRol == Roles.Administrador);

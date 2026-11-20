@@ -1,4 +1,4 @@
-﻿using AgendamientoGestion.Entidades.Constants;
+using AgendamientoGestion.Entidades.Constants;
 using AgendamientoGestion.Entidades.Entities;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
@@ -45,7 +45,7 @@ public class UsuarioService : IUsuarioService
             throw new NotFoundException("El rol especificado no existe");
         }
 
-        AsegurarPuedeGestionar(rolSolicitante, rol.tipoRol);
+        AsegurarPuedeCrearOEditar(rolSolicitante, rol.tipoRol);
 
         if (await _usuarioRepository.GetByEmailAsync(correo) != null)
         {
@@ -131,8 +131,8 @@ public class UsuarioService : IUsuarioService
         }
 
         // Un no-Administrador solo puede editar Estudiantes y no puede cambiarles el rol a otro distinto.
-        AsegurarPuedeGestionar(rolSolicitante, usuario.Rol?.tipoRol);
-        AsegurarPuedeGestionar(rolSolicitante, rol.tipoRol);
+        AsegurarPuedeCrearOEditar(rolSolicitante, usuario.Rol?.tipoRol);
+        AsegurarPuedeCrearOEditar(rolSolicitante, rol.tipoRol);
 
         var otroConCorreo = await _usuarioRepository.GetByEmailAsync(correo);
         if (otroConCorreo != null && otroConCorreo.idUsuario != usuario.idUsuario)
@@ -249,6 +249,22 @@ public class UsuarioService : IUsuarioService
     /// gestión (Auxiliar) solo puede gestionar Estudiantes. Evita que un Auxiliar se cree o promueva a
     /// Administrador (escalada de privilegios) sin romper el flujo de la web, donde el Auxiliar registra estudiantes.
     /// </summary>
+    public const string MensajeSoloPersonalAcademico =
+        "Solo un Administrador puede crear o modificar Administradores o Auxiliares";
+
+    /// <summary>
+    /// Crear y editar (POST/PUT /Usuario): el Auxiliar puede sobre Estudiantes, Docentes y Tutores (rol actual y nuevo);
+    /// nunca crear, editar ni promover a Administrador o Auxiliar (evita la escalada de privilegios).
+    /// </summary>
+    private static void AsegurarPuedeCrearOEditar(string rolSolicitante, string? rolObjetivo)
+    {
+        if (Roles.Es(rolSolicitante, Roles.Administrador))
+            return;
+
+        if (!Roles.Es(rolObjetivo, Roles.Estudiante) && !Roles.Es(rolObjetivo, Roles.Docente) && !Roles.Es(rolObjetivo, Roles.Tutor))
+            throw new ForbiddenException(MensajeSoloPersonalAcademico);
+    }
+
     private static void AsegurarPuedeGestionar(string rolSolicitante, string? rolObjetivo)
     {
         if (Roles.Es(rolSolicitante, Roles.Administrador))

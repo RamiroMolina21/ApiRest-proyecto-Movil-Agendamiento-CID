@@ -9,7 +9,7 @@ comportamiento de los destinatarios. Lo que sigue reduce el riesgo; no lo elimin
 | Aspecto | Estado |
 |---|---|
 | Proveedor | `smtp.gmail.com:587` (STARTTLS) con una **cuenta personal @gmail.com** y contraseña de aplicación (user-secrets `SmtpSettings:User/Password`) |
-| From | `TutorPro – CECAR <cuenta autenticada>` (desde 2026-11-12; antes la dirección sin nombre) |
+| From | `CDITutorPro – CECAR <cuenta autenticada>` (desde 2026-11-12; antes la dirección sin nombre) |
 | Volumen | bajo (avisos de tutorías, recordatorios, encuestas) |
 | Enlaces del cuerpo | encuesta → `Encuesta:UrlBase` = `http://localhost:5173/encuesta` (desarrollo) |
 
@@ -34,7 +34,7 @@ Al enviar por `smtp.gmail.com` autenticado con una cuenta @gmail.com, Google fir
 |---|---|
 | **MailKit** en lugar de `System.Net.Mail.SmtpClient` (Microsoft no lo recomienda para desarrollo nuevo y remite a MailKit). Dependencia: MailKit 4.18.2 (MimeKit incluido); `dotnet list package --vulnerable` sin hallazgos | `Services/CorreoService.cs` |
 | `multipart/alternative`: **texto plano + HTML**, ambos UTF-8; cabeceras con caracteres no ASCII codificadas (RFC 2047) | `CorreoService.ConstruirMensaje` |
-| From con **nombre visible coherente** `TutorPro – CECAR` (`SmtpSettings:NombreRemitente`) y dirección = **cuenta autenticada** (aviso al arrancar si `Remitente` ≠ `User`) | `Models/SmtpSettings.cs`, `Program.cs` |
+| From con **nombre visible coherente** `CDITutorPro – CECAR` (`SmtpSettings:NombreRemitente`) y dirección = **cuenta autenticada** (aviso al arrancar si `Remitente` ≠ `User`) | `Models/SmtpSettings.cs`, `Program.cs` |
 | **Reply-To** configurable (`SmtpSettings:ResponderA`); los botones `mailto:` usan esa dirección (antes un dominio inventado) | plantillas |
 | **Message-ID** con el dominio del remitente y **Date** siempre presentes; `Auto-Submitted: auto-generated` (RFC 3834) y `X-Auto-Response-Suppress: All` contra respuestas automáticas | `CorreoService.ConstruirMensaje` |
 | Asunto en una sola línea (sin inyección de cabeceras) y sin exclamaciones; "¡No olvides…!" → "No olvides…" | modelos/plantillas |
@@ -49,7 +49,7 @@ molesta, la evolución correcta es una **bandeja de salida (outbox)** en BD + `B
 `Task.Run` sin persistencia (se perderían correos al reiniciar).
 
 Verificación real (2026-11-12): un correo `nueva-tutoria` de ejemplo enviado a la dirección de pruebas autorizada. Datos del
-lado del envío: `From: TutorPro – CECAR <cuenta@gmail.com>`, `Subject: Nueva Tutoría Asignada - Inglés B1`,
+lado del envío: `From: CDITutorPro – CECAR <cuenta@gmail.com>`, `Subject: Nueva Tutoría Asignada - Inglés B1`,
 `Message-ID: <...@gmail.com>`, partes `text/plain; charset=utf-8` + `text/html; charset=utf-8`, respuesta del servidor
 `2.0.0 OK ... - gsmtp` (aceptado) al primer intento. La clasificación en la bandeja del destinatario **no se puede observar desde el
 servidor**: revisarla en Gmail ("Mostrar original" → SPF/DKIM/DMARC = PASS) y, si cae en spam, marcar "No es spam".
@@ -84,7 +84,7 @@ Configuración de la API en producción (user-secrets / variables de entorno, nu
 SmtpSettings__Remitente=notificaciones@cecar.edu.co
 SmtpSettings__User=notificaciones@cecar.edu.co
 SmtpSettings__Password=<contraseña de aplicación o credencial SMTP del proveedor>
-SmtpSettings__NombreRemitente=TutorPro – CECAR
+SmtpSettings__NombreRemitente=CDITutorPro – CECAR
 SmtpSettings__ResponderA=coordinacion.idiomas@cecar.edu.co
 Encuesta__UrlBase=https://<dominio público de la web>/encuesta
 ```
@@ -101,7 +101,7 @@ Encuesta__UrlBase=https://<dominio público de la web>/encuesta
 - Mantener `Encuesta:UrlBase` en https y en el mismo dominio institucional que el remitente.
 - Si se envía a más de 5.000 destinatarios/día a Gmail (no es el caso), Google exige además DMARC alineado y baja con un clic
   (`List-Unsubscribe` + `List-Unsubscribe-Post`) para correo de marketing; los avisos transaccionales no lo requieren.
-- Nombre visible solo identifica al remitente (sin asuntos ni emojis): "TutorPro – CECAR".
+- Nombre visible solo identifica al remitente (sin asuntos ni emojis): "CDITutorPro – CECAR".
 
 Fuentes: Google "Email sender guidelines" (support.google.com/a/answer/81126); Microsoft Learn, `System.Net.Mail.SmtpClient`
 (observaciones: no recomendado para desarrollo nuevo, usar MailKit); Google Workspace "Gmail sending limits".

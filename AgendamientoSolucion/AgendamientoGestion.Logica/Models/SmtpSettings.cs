@@ -12,7 +12,7 @@ namespace AgendamientoGestion.Logica.Models
         public string Remitente { get; set; } = string.Empty;
 
         /// <summary>Nombre visible del remitente (solo identifica al emisor: sin asuntos ni emojis, guía de Google).</summary>
-        public string NombreRemitente { get; set; } = "TutorPro – CECAR";
+        public string NombreRemitente { get; set; } = "CDITutorPro – CECAR";
 
         /// <summary>Reply-To opcional (p. ej. el buzón de coordinación). Vacío: las respuestas van al Remitente.</summary>
         public string ResponderA { get; set; } = string.Empty;

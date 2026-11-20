@@ -36,6 +36,7 @@ namespace Agendamiento.Errors
                 ForbiddenException => (StatusCodes.Status403Forbidden, "Acceso denegado"),
                 NotFoundException => (StatusCodes.Status404NotFound, "Recurso no encontrado"),
                 ConflictException => (StatusCodes.Status409Conflict, "Conflicto"),
+                DemasiadasSolicitudesException => (StatusCodes.Status429TooManyRequests, "Demasiadas solicitudes"),
                 BadHttpRequestException bad => (bad.StatusCode, "Solicitud inválida"),
                 _ => (StatusCodes.Status500InternalServerError, MensajeErrorInterno)
             };
@@ -61,6 +62,11 @@ namespace Agendamiento.Errors
             {
                 _logger.LogInformation("Solicitud rechazada con {Status}: {Mensaje}", status, exception.Message);
                 problem.Detail = exception is BadHttpRequestException ? "La solicitud no es válida." : exception.Message;
+            }
+
+            if (exception is DemasiadasSolicitudesException limite)
+            {
+                httpContext.Response.Headers.RetryAfter = limite.ReintentarEnSegundos.ToString();
             }
 
             httpContext.Response.StatusCode = status;

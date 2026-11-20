@@ -1,9 +1,9 @@
 -- =====================================================================
 -- TutorPro (Agendamiento) - Esquema COMPLETO de la base de datos
--- Actualizado: 2026-11-13
+-- Actualizado: 2026-11-20
 --
 -- Crea desde cero el esquema actual (equivalente a la BD de desarrollo
--- proyectoagendamientov4 tras los scripts 2026-11-11 y 2026-11-12).
+-- proyectoagendamientov4 tras los scripts 2026-11-11, 2026-11-12 y 2026-11-20).
 --
 -- USO:
 --   * Ejecutar CONECTADO A LA BASE DE DATOS DESTINO, ya creada y vacía.
@@ -17,7 +17,7 @@
 -- No crea usuarios: el primer Administrador debe insertarse con un hash
 -- BCrypt válido (o migrar los datos de una base existente).
 --
--- Los scripts 2026-11-11_* y 2026-11-12_* de esta carpeta sirven para
+-- Los scripts 2026-11-11_*, 2026-11-12_* y 2026-11-20_* de esta carpeta sirven para
 -- ACTUALIZAR una base creada con la versión anterior de este archivo;
 -- no hace falta ejecutarlos sobre una base creada con este script.
 -- =====================================================================
@@ -47,6 +47,7 @@ CREATE TABLE Usuario (
     fechaRegistro DATETIME NOT NULL,
     Rol_idRol INT NOT NULL,
     activo BIT NOT NULL CONSTRAINT DF_Usuario_activo DEFAULT (1),
+    credencialesCambiadasEn DATETIME2 NULL,
     CONSTRAINT PK_Usuario PRIMARY KEY (idUsuario),
     CONSTRAINT fk_Usuario_Rol1
         FOREIGN KEY (Rol_idRol) REFERENCES Rol(idRol)
@@ -225,6 +226,28 @@ CREATE INDEX IX_AsuntoAtendido_Usuario
     ON AsuntoAtendido (Usuario_idUsuario);
 GO
 
+-- =========================================
+-- TABLA RestablecimientoContrasena ("¿Olvidaste tu contraseña?")
+-- =========================================
+-- RestablecimientoContrasena ("¿Olvidaste tu contraseña?"): solo el hash SHA-256 del token, un solo uso.
+CREATE TABLE RestablecimientoContrasena (
+        idRestablecimiento INT IDENTITY(1,1) NOT NULL,
+        Usuario_idUsuario  INT          NOT NULL,
+        tokenHash          CHAR(64)     NOT NULL,   -- SHA-256 en hexadecimal; el token en claro nunca se guarda
+        fechaCreacion      DATETIME2    NOT NULL,   -- UTC
+        fechaExpiracion    DATETIME2    NOT NULL,   -- UTC
+        fechaUso           DATETIME2    NULL,       -- UTC; usado o invalidado
+        CONSTRAINT PK_RestablecimientoContrasena PRIMARY KEY (idRestablecimiento),
+        CONSTRAINT FK_RestablecimientoContrasena_Usuario FOREIGN KEY (Usuario_idUsuario)
+            REFERENCES Usuario (idUsuario) ON DELETE CASCADE ON UPDATE NO ACTION
+    );
+GO
+
+CREATE UNIQUE INDEX uq_RestablecimientoContrasena_tokenHash ON RestablecimientoContrasena (tokenHash);
+GO
+
+CREATE INDEX IX_RestablecimientoContrasena_Usuario ON RestablecimientoContrasena (Usuario_idUsuario);
+GO
 -- =========================================
 -- DATOS INICIALES: roles (los ids 1..5 los usa el código)
 -- =========================================

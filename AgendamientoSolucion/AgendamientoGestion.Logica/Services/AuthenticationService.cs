@@ -1,3 +1,4 @@
+using AgendamientoGestion.Logica.Seguridad;
 using AgendamientoGestion.Entidades.Constants;
 using AgendamientoGestion.Logica.Dtos;
 using AgendamientoGestion.Logica.Exceptions;
@@ -87,25 +88,7 @@ namespace AgendamientoGestion.Logica.Services
             }
 
             var nueva = dto.ContrasenaNueva ?? string.Empty;
-            if (nueva.Length < 8 || System.Text.Encoding.UTF8.GetByteCount(nueva) > 72)
-            {
-                throw new ValidationException("La nueva contraseña debe tener entre 8 y 72 caracteres (máximo 72 bytes)");
-            }
-
-            if (string.IsNullOrWhiteSpace(nueva))
-            {
-                throw new ValidationException("La nueva contraseña no puede estar formada solo por espacios");
-            }
-
-            if (nueva == dto.ContrasenaActual)
-            {
-                throw new ValidationException("La nueva contraseña debe ser distinta de la actual");
-            }
-
-            if (string.Equals(nueva.Trim(), usuario.correo?.Trim(), StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ValidationException("La nueva contraseña no puede ser igual a su correo");
-            }
+            PoliticaContrasena.Validar(nueva, usuario.correo, n => n == dto.ContrasenaActual);
 
             usuario.contrasenaHash = BCrypt.Net.BCrypt.HashPassword(nueva);
             await _usuarioRepository.UpdateAsync(usuario);

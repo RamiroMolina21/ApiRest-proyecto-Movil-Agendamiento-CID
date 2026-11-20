@@ -71,6 +71,48 @@ namespace Agendamiento.Controllers
         }
 
         /// <summary>Devuelve el usuario del token, leído de la BD (útil para restaurar sesión). 401 si fue borrado o desactivado.</summary>
+        /// <summary>
+        /// "¿Olvidaste tu contraseña?". Público. SIEMPRE 200 con el mismo mensaje, exista o no la cuenta; el correo
+        /// (si procede) se envía en segundo plano. 400 correo no válido; 429 límite por IP o por correo.
+        /// </summary>
+        [HttpPost("olvide-contrasena")]
+        [AllowAnonymous]
+        [EnableRateLimiting(RateLimitRestablecimiento.PoliticaSolicitud)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
+        public IActionResult OlvideContrasena([FromBody] OlvideContrasenaDto dto,
+            [FromServices] AgendamientoGestion.Logica.Services.IRestablecimientoContrasenaService restablecimiento)
+        {
+            restablecimiento.Solicitar(dto.Correo);
+            return Ok(new { message = AgendamientoGestion.Logica.Services.RestablecimientoContrasenaService.MensajeSolicitud });
+        }
+
+        /// <summary>Comprueba un enlace de restablecimiento (para que la web muestre el formulario o el error).</summary>
+        [HttpGet("restablecer-contrasena/validar")]
+        [AllowAnonymous]
+        [EnableRateLimiting(RateLimitRestablecimiento.PoliticaRestablecer)]
+        public async Task<IActionResult> ValidarRestablecimiento([FromQuery] string? token,
+            [FromServices] AgendamientoGestion.Logica.Services.IRestablecimientoContrasenaService restablecimiento)
+        {
+            var r = await restablecimiento.ValidarAsync(token);
+            return Ok(new { valido = r.Valido, correo = r.Correo, expiraEn = r.ExpiraEn });
+        }
+
+        /// <summary>Cambia la contraseña con el token del enlace (un solo uso). 204; 400 token o política; 429.</summary>
+        [HttpPost("restablecer-contrasena")]
+        [AllowAnonymous]
+        [EnableRateLimiting(RateLimitRestablecimiento.PoliticaRestablecer)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
+        public async Task<IActionResult> RestablecerContrasena([FromBody] RestablecerContrasenaDto dto,
+            [FromServices] AgendamientoGestion.Logica.Services.IRestablecimientoContrasenaService restablecimiento)
+        {
+            await restablecimiento.RestablecerAsync(dto.Token, dto.ContrasenaNueva);
+            return NoContent();
+        }
+
         [HttpGet("me")]
         [ProducesResponseType(typeof(UsuarioResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]

@@ -36,7 +36,7 @@ public sealed record NuevaTutoriaCorreo(
     public string Plantilla => "nueva-tutoria";
     public string Asunto => $"Nueva Tutoría Asignada - {Idioma} {Nivel}";
     public string Titulo => "Tienes una nueva tutoría";
-    public string ColorEncabezado => "#7b42f6";
+    public string ColorEncabezado => "#b11d25";
     public string Preencabezado => $"{Idioma} {Nivel} · {Formato.FechaHora(FechaHora)} · {Tema}";
 
     public IReadOnlyDictionary<string, object?> Valores() => new Dictionary<string, object?>
@@ -133,7 +133,7 @@ public sealed record EncuestaSatisfaccionCorreo(
     public string Plantilla => "encuesta-satisfaccion";
     public string Asunto => "Encuesta de satisfacción - Tutoría";
     public string Titulo => "¿Cómo te fue en tu tutoría?";
-    public string ColorEncabezado => "#0f766e";
+    public string ColorEncabezado => "#00529c";
     public string Preencabezado => $"Tu opinión sobre la tutoría de {Idioma} {Nivel} · responder toma menos de un minuto";
 
     public IReadOnlyDictionary<string, object?> Valores() => new Dictionary<string, object?>
@@ -143,5 +143,41 @@ public sealed record EncuestaSatisfaccionCorreo(
         ["nivel"] = Nivel,
         ["tema"] = Tema,
         ["enlace"] = Enlace
+    };
+}
+
+/// <summary>"¿Olvidaste tu contraseña?": enlace de un solo uso a la web (Web:UrlBase/restablecer-contrasena?token=...).</summary>
+public sealed record RestablecerContrasenaCorreo(
+    string DestinatarioNombre, string Correo, string Enlace, int MinutosValidez) : IModeloCorreo
+{
+    public string Plantilla => "restablecer-contrasena";
+    public string Asunto => "Restablece tu contraseña";
+    public string Titulo => "Restablece tu contraseña";
+    public string ColorEncabezado => "#00529c";
+    public string Preencabezado => $"El enlace caduca en {MinutosValidez} minutos. Si no lo pediste, ignora este correo.";
+
+    public IReadOnlyDictionary<string, object?> Valores() => new Dictionary<string, object?>
+    {
+        ["destinatarioNombre"] = DestinatarioNombre,
+        ["correo"] = Correo,
+        ["enlace"] = Enlace,
+        ["minutosValidez"] = MinutosValidez
+    };
+}
+
+/// <summary>Aviso de seguridad tras restablecer la contraseña.</summary>
+public sealed record ContrasenaCambiadaCorreo(string DestinatarioNombre, string Correo, DateTime FechaLocal) : IModeloCorreo
+{
+    public string Plantilla => "contrasena-cambiada";
+    public string Asunto => "Tu contraseña se cambió";
+    public string Titulo => "Tu contraseña se cambió";
+    public string ColorEncabezado => "#00529c";
+    public string Preencabezado => "Si no fuiste tú, contacta con la coordinación.";
+
+    public IReadOnlyDictionary<string, object?> Valores() => new Dictionary<string, object?>
+    {
+        ["destinatarioNombre"] = DestinatarioNombre,
+        ["correo"] = Correo,
+        ["fecha"] = Formato.FechaHora(FechaLocal)
     };
 }

@@ -1,4 +1,4 @@
-TutorPro · Corporación Universitaria del Caribe (CECAR)
+CDITutorPro · Centro de Idiomas · Corporación Universitaria del Caribe – CECAR
 
 {{titulo}}
 ========================================
@@ -7,5 +7,5 @@ TutorPro · Corporación Universitaria del Caribe (CECAR)
 
 ----------------------------------------
 {{#contactoCorreo}}¿Tienes dudas? Responde a este correo o escríbenos a {{contactoCorreo}}.{{/contactoCorreo}}{{^contactoCorreo}}Este mensaje se generó automáticamente. Si tienes dudas, comunícate con la coordinación de tutorías de tu programa.{{/contactoCorreo}}
-Recibes este correo porque participas en tutorías gestionadas con TutorPro.
+Recibes este correo porque participas en tutorías gestionadas con CDITutorPro.
 {{nombreSistema}} · © {{anio}}

@@ -1,0 +1,10 @@
+Hola, {{destinatarioNombre}}:
+
+Recibimos una solicitud para restablecer la contraseña de tu cuenta {{correo}}.
+
+Para elegir una contraseña nueva, abre este enlace:
+{{enlace}}
+
+El enlace caduca en {{minutosValidez}} minutos y solo se puede usar una vez.
+
+Si no solicitaste este cambio, ignora este correo: tu contraseña actual seguirá funcionando y nadie podrá cambiarla sin este enlace.

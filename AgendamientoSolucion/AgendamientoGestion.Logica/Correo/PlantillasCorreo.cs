@@ -19,7 +19,7 @@ public interface IPlantillasCorreo
 /// </summary>
 public sealed class PlantillasCorreo : IPlantillasCorreo
 {
-    public const string NombreSistemaPorDefecto = "Sistema de Agendamiento de Tutorías - CECAR";
+    public const string NombreSistemaPorDefecto = "CDITutorPro · Centro de Idiomas – CECAR";
 
     private static readonly ConcurrentDictionary<string, string> Cache = new();
     private readonly SmtpSettings _smtp;

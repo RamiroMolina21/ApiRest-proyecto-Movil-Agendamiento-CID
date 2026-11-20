@@ -12,6 +12,7 @@ namespace Agendamiento.Security
     {
         public const string ItemMensaje = "auth.mensaje";
         public const string MensajeUsuarioNoExiste = "El usuario del token ya no existe";
+        public const string MensajeCredencialesCambiadas = "La contraseña de la cuenta se cambió. Inicia sesión de nuevo";
         public const string MensajeCuentaDesactivada = "La cuenta está desactivada. Contacte con un administrador";
 
         public static async Task OnTokenValidated(TokenValidatedContext context)
@@ -24,13 +25,21 @@ namespace Agendamiento.Security
             }
 
             var cache = context.HttpContext.RequestServices.GetRequiredService<IEstadoCuentaCache>();
-            var estado = await cache.ObtenerAsync(usuarioId, context.HttpContext.RequestAborted);
-            var mensaje = estado switch
+            var info = await cache.ObtenerInfoAsync(usuarioId, context.HttpContext.RequestAborted);
+            var mensaje = info.Estado switch
             {
                 EstadoCuenta.NoExiste => MensajeUsuarioNoExiste,
                 EstadoCuenta.Desactivada => MensajeCuentaDesactivada,
                 _ => null
             };
+
+            // Contraseña restablecida después de emitir el token: el token (iat anterior) deja de valer.
+            if (mensaje == null && info.CredencialesCambiadasEn is DateTime cambio
+                && long.TryParse(context.Principal?.FindFirst("iat")?.Value, out var iat)
+                && iat < new DateTimeOffset(DateTime.SpecifyKind(cambio, DateTimeKind.Utc)).ToUnixTimeSeconds())
+            {
+                mensaje = MensajeCredencialesCambiadas;
+            }
 
             if (mensaje != null)
             {

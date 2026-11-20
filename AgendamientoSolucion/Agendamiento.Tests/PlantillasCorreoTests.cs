@@ -15,7 +15,7 @@ public class PlantillasCorreoTests
 {
     private static readonly SmtpSettings Smtp = new()
     {
-        Remitente = "notificaciones@cecar.test", NombreRemitente = "TutorPro – CECAR", ResponderA = "coordinacion@cecar.test",
+        Remitente = "notificaciones@cecar.test", NombreRemitente = "CDITutorPro – CECAR", ResponderA = "coordinacion@cecar.test",
         User = "notificaciones@cecar.test", Password = "x", Host = "smtp.invalid", Port = 587, EnableSsl = true
     };
 
@@ -95,7 +95,7 @@ public class PlantillasCorreoTests
             MensajeCorreo.Desde(contenido with { Asunto = "Asunto\r\nBcc: victima@x.test" }, "est@cecar.test", "María José Núñez"));
 
         var from = Assert.Single(mime.From.Mailboxes);
-        Assert.Equal("TutorPro – CECAR", from.Name);
+        Assert.Equal("CDITutorPro – CECAR", from.Name);
         Assert.Equal("notificaciones@cecar.test", from.Address);
         Assert.Equal("coordinacion@cecar.test", Assert.Single(mime.ReplyTo.Mailboxes).Address);
         Assert.Equal("María José Núñez", Assert.Single(mime.To.Mailboxes).Name);
