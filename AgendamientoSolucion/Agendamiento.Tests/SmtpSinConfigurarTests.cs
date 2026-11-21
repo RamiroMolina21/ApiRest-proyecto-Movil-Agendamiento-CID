@@ -67,7 +67,7 @@ public class SmtpSinConfigurarTests : IClassFixture<ApiFactorySmtpSinConfigurar>
         var dto = new
         {
             idioma = "Inglés", nivel = "B1", tema = "Sin SMTP", modalidad = "Presencial", estado = "Pendiente",
-            fechaTutoria = DateTime.Today.AddHours(8), usuarioId = tutorId, horarioId
+            fechaTutoria = DateTime.Today.AddHours(8), usuarioId = tutorId, horarioId, cupos = 5
         };
 
         using var docente = await _f.ClienteComoAsync(Seed.Docente);

@@ -32,6 +32,11 @@ namespace AgendamientoGestion.Logica.Dtos
         public string HorarioTitulo { get; set; }
         /// <summary>Máximo de estudiantes; null si el valor guardado no es un entero ≥ 1 (sin límite). Aditivo.</summary>
         public int? HorarioCupos { get; set; }
+        /// <summary>
+        /// Capacidad EFECTIVA de la tutoría: Tutoria.cupos; si es null (tutorías antiguas) los del horario;
+        /// null = sin límite. Es el campo que debe usar la UI. Aditivo (2026-11-21).
+        /// </summary>
+        public int? Cupos { get; set; }
         public List<UsuarioResponseDto> Estudiantes { get; set; } = new();
     }
 }

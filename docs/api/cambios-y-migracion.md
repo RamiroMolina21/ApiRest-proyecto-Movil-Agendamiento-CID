@@ -78,6 +78,28 @@
 | C34 | Auxiliar: `POST`/`PUT /Usuario` también para Docentes y Tutores; 403 con Administrador/Auxiliar (mensaje nuevo `Solo un Administrador puede crear o modificar Administradores o Auxiliares`). Eliminar y activar/desactivar: solo Estudiantes (sin cambios) | permisos (más permisivo) |
 | C35 | Configuración nueva: `Web:UrlBase` (Render: `Web__UrlBase=https://web-cid-proyecto-movil.pages.dev`) y sección `RestablecimientoContrasena` | config |
 
+### Aula opcional (2026-11-20)
+
+| # | Cambio | Tipo |
+|---|---|---|
+| C36 | `POST`/`PUT /Horario`: `espacio` opcional (null/ausente/""/espacios = sin aula, se guarda ""). Título generado sin aula: `dd/MM/yyyy HH:mm–HH:mm`. Correos y Excel muestran "Por confirmar". Sin cambio de esquema. No hay validación de solape por aula en el backend | aditivo/compatible |
+
+### Cupos en la tutoría (2026-11-21)
+
+La capacidad (máximo de estudiantes) se define al **agendar la tutoría**, no en el horario.
+
+| # | Cambio | Tipo |
+|---|---|---|
+| B37 | `POST /Tutoria`: `cupos` (int 1–1000) **obligatorio**. Ausente/`null` → 400 `Los cupos son obligatorios`; fuera de rango → 400 `Los cupos deben ser un número entero entre 1 y 1000` | **BREAKING** (web y MAUI deben enviarlo) |
+| C38 | `PUT /Tutoria/{id}`: `cupos` opcional (ausente = conserva); menor que los inscritos → 409 `No se pueden fijar N cupos: la tutoría ya tiene M estudiantes inscritos` | aditivo |
+| C39 | `TutoriaResponse.cupos` (int\|null) = capacidad efectiva: `Tutoria.cupos` → cupos del horario (tutorías antiguas) → `null` sin límite. `horarioCupos` se mantiene | aditivo |
+| C40 | Límite de `POST /Tutoria` con `estudianteIds` y de `POST /Tutoria/{id}/estudiantes` = capacidad efectiva; mismo 409 `Cupo completo: X de Y ocupados…` | comportamiento |
+| C41 | `POST`/`PUT /Horario`: `cupos` **opcional** (ausente/null/""/espacios → se guarda `""`, también en PUT); si viene, sigue validándose 1–1000. `HorarioResponse.cupos` = `""` cuando no hay | aditivo/compatible |
+
+**Esquema:** columna nueva `Tutoria.cupos INT NULL` + `CHECK (cupos IS NULL OR cupos BETWEEN 1 AND 1000)`. Script idempotente y no destructivo `AgendamientoGestion.Persistencia/ScriptBD/2026-11-21_cupos_en_tutoria.sql` (BD.sql actualizado). **Orden de despliegue: ejecutar el script en Azure SQL ANTES de desplegar la API** (la API nueva lee `Tutoria.cupos`; sin la columna, todas las consultas de tutorías fallan con 500). La API anterior sigue funcionando con la columna ya añadida. Correos, Excel y métricas del backend no usan los cupos (sin cambios).
+
+MAUI: hasta que envíe `cupos`, `POST /Tutoria` desde MAUI responde 400. Hay que añadir el campo (p. ej. 5, el tope fijo que ya usa) en su DTO de creación.
+
 ### Cambios de comportamiento (no rompen a los clientes actuales)
 
 | # | Cambio |

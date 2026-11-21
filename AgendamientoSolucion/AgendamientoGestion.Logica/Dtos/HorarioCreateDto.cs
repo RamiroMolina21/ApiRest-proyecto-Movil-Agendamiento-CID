@@ -28,13 +28,16 @@ namespace AgendamientoGestion.Logica.Dtos
         [Required(ErrorMessage = "La hora de fin es obligatoria")]
         public DateTime HoraFin { get; set; }
 
-        [Required(ErrorMessage = "Los cupos son obligatorios")]
+        /// <summary>
+        /// OPCIONAL desde 2026-11-21 (la capacidad se define en la tutoría). null, ausente o vacío → se guarda "";
+        /// si viene, entero 1..1000.
+        /// </summary>
         [StringLength(60, ErrorMessage = "Los cupos no pueden exceder 60 caracteres")]
-        public string Cupos { get; set; }
+        public string? Cupos { get; set; }
 
-        [Required(ErrorMessage = "El espacio es obligatorio")]
+        /// <summary>Aula. Opcional: null, ausente, "" o solo espacios = sin aula (se guarda ""). Máximo 60.</summary>
         [StringLength(60, ErrorMessage = "El espacio no puede exceder 60 caracteres")]
-        public string Espacio { get; set; }
+        public string? Espacio { get; set; }
 
         [Required(ErrorMessage = "El estado es obligatorio")]
         [StringLength(60, ErrorMessage = "El estado no puede exceder 60 caracteres")]

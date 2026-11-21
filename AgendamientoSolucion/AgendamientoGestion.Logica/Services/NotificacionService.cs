@@ -548,7 +548,7 @@ public class NotificacionService : INotificacionService
                 // Comparar aula/espacio
                 if (tutoriaAnterior.HorarioEspacio != horarioActual?.espacio)
                 {
-                    cambios.CambioAula = $"Aula cambió de {tutoriaAnterior.HorarioEspacio} a {horarioActual?.espacio}";
+                    cambios.CambioAula = $"Aula cambió de {Aula.ParaMostrar(tutoriaAnterior.HorarioEspacio)} a {Aula.ParaMostrar(horarioActual?.espacio)}";
                 }
 
                 // Comparar tema

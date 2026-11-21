@@ -48,7 +48,7 @@ public sealed record NuevaTutoriaCorreo(
         ["tema"] = Tema,
         ["modalidad"] = Modalidad,
         ["fechaHora"] = Formato.FechaHora(FechaHora),
-        ["espacio"] = Espacio
+        ["espacio"] = Utils.Aula.ParaMostrar(Espacio)
     };
 }
 
@@ -71,7 +71,7 @@ public sealed record RecordatorioTutoriaCorreo(
         ["nivel"] = Nivel,
         ["tema"] = Tema,
         ["modalidad"] = Modalidad,
-        ["espacio"] = Espacio
+        ["espacio"] = Utils.Aula.ParaMostrar(Espacio)
     };
 }
 
@@ -95,7 +95,7 @@ public sealed record CambioTutoriaCorreo(
         ["nivel"] = Nivel,
         ["tema"] = Tema,
         ["modalidad"] = Modalidad,
-        ["espacio"] = Espacio,
+        ["espacio"] = Utils.Aula.ParaMostrar(Espacio),
         ["profesor"] = string.IsNullOrWhiteSpace(Profesor) ? "Sin asignar" : Profesor,
         ["motivo"] = Motivo,
         ["hayCambios"] = Cambios.Count > 0,

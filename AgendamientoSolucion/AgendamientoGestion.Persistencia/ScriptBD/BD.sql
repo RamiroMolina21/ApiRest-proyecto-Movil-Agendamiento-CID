@@ -1,9 +1,9 @@
 -- =====================================================================
 -- TutorPro (Agendamiento) - Esquema COMPLETO de la base de datos
--- Actualizado: 2026-11-20
+-- Actualizado: 2026-11-21
 --
 -- Crea desde cero el esquema actual (equivalente a la BD de desarrollo
--- proyectoagendamientov4 tras los scripts 2026-11-11, 2026-11-12 y 2026-11-20).
+-- proyectoagendamientov4 tras los scripts 2026-11-11, 2026-11-12, 2026-11-20 y 2026-11-21).
 --
 -- USO:
 --   * Ejecutar CONECTADO A LA BASE DE DATOS DESTINO, ya creada y vacía.
@@ -108,7 +108,10 @@ CREATE TABLE Tutoria (
     fechaHora DATETIME NOT NULL,
     Usuario_idUsuario INT NULL,
     Horario_idHorario INT NOT NULL,
+    -- Máximo de estudiantes (2026-11-21). NULL: tutoría anterior → se usan los cupos del horario.
+    cupos INT NULL,
     CONSTRAINT PK_Tutoria PRIMARY KEY (idTutoria),
+    CONSTRAINT ck_Tutoria_cupos CHECK (cupos IS NULL OR cupos BETWEEN 1 AND 1000),
     CONSTRAINT fk_Tutoria_Usuario1
         FOREIGN KEY (Usuario_idUsuario) REFERENCES Usuario(idUsuario)
         ON DELETE SET NULL ON UPDATE NO ACTION,

@@ -1,3 +1,4 @@
+using AgendamientoGestion.Logica.Utils;
 using AgendamientoGestion.Logica.Interfaces;
 using AgendamientoGestion.Logica.Dtos;
 using OfficeOpenXml;
@@ -63,7 +64,7 @@ namespace AgendamientoGestion.Logica.Services
                     new { Campo = "Modalidad", Valor = tutoria.Modalidad ?? "N/A" },
                     new { Campo = "Estado", Valor = tutoria.Estado ?? "N/A" },
                     new { Campo = "Fecha y Hora", Valor = tutoria.FechaTutoria.ToString("yyyy-MM-dd HH:mm") },
-                    new { Campo = "Espacio", Valor = tutoria.HorarioEspacio ?? "N/A" },
+                    new { Campo = "Espacio", Valor = Aula.ParaMostrar(tutoria.HorarioEspacio) },
                     new { Campo = "Hora Inicio", Valor = tutoria.HorarioHoraInicio.ToString("HH:mm") },
                     new { Campo = "Hora Fin", Valor = tutoria.HorarioHoraFin.ToString("HH:mm") }
                 };

@@ -94,6 +94,7 @@ namespace AgendamientoGestion.Persistencia.DbContexts
                 entity.Property(e => e.modalidad).IsRequired().HasMaxLength(45);
                 entity.Property(e => e.estado).IsRequired().HasMaxLength(45);
                 entity.Property(e => e.fechaHora).IsRequired();
+                entity.Property(e => e.cupos).IsRequired(false);
 
                 // Relación con Usuario
                 entity.HasOne(e => e.Usuario)
