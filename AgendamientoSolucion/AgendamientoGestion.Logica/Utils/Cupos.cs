@@ -17,5 +17,33 @@ public static class Cupos
     /// <summary>Valida el valor recibido en POST/PUT Horario y lo devuelve normalizado ("08" → "8").</summary>
     public static string ValidarYNormalizar(string? valor) =>
         Interpretar(valor)?.ToString()
-        ?? throw new ValidationException($"Los cupos deben ser un número entero entre 1 y {Maximo}");
+        ?? throw new ValidationException(MensajeRango);
+
+    public static readonly string MensajeRango = $"Los cupos deben ser un número entero entre 1 y {Maximo}";
+    public const string MensajeObligatorio = "Los cupos son obligatorios";
+
+    /// <summary>
+    /// Horario.cupos es OPCIONAL desde 2026-11-21 (la capacidad vive en Tutoria.cupos): null/vacío → "";
+    /// si viene, se valida 1..Maximo y se normaliza.
+    /// </summary>
+    public static string ValidarOpcionalHorario(string? valor) =>
+        string.IsNullOrWhiteSpace(valor) ? string.Empty : ValidarYNormalizar(valor);
+
+    /// <summary>Valida Tutoria.cupos (entero 1..Maximo). null → 400 si es obligatorio.</summary>
+    public static int? ValidarTutoria(int? valor, bool obligatorio)
+    {
+        if (valor == null)
+        {
+            return obligatorio ? throw new ValidationException(MensajeObligatorio) : null;
+        }
+
+        return valor is >= 1 and <= Maximo ? valor : throw new ValidationException(MensajeRango);
+    }
+
+    /// <summary>
+    /// Capacidad efectiva: Tutoria.cupos; si es null (tutorías anteriores al cambio) los del horario;
+    /// si tampoco hay número, null = sin límite.
+    /// </summary>
+    public static int? Efectivos(int? cuposTutoria, string? cuposHorario) =>
+        cuposTutoria ?? Interpretar(cuposHorario);
 }

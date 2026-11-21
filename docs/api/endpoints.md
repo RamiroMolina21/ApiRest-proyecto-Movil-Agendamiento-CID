@@ -67,12 +67,12 @@ Solo tutorías con `sinResponder > 0`; orden `fechaHora` descendente. `fechaHora
 |---|---|---|
 | `titulo` | string \| null | **[cambio] opcional**, ≤ 100. Omitido, `null`, `""` o solo espacios → el servidor genera uno (ver abajo). Si viene con texto se guarda tal cual (recortando espacios de los extremos) |
 | `fechaInicio`, `fechaFin`, `horaInicio`, `horaFin` | DateTime | obligatorios |
-| `cupos` | string | obligatorio. **[cambio]** debe ser un entero de 1 a 1000 (`"10"`, `" 05 "` → se guarda `"5"`); si no → 400 `Los cupos deben ser un número entero entre 1 y 1000`. Sigue siendo string en el JSON. Significado: **máximo de estudiantes** de la tutoría de ese horario |
-| `espacio` | string | obligatorio, ≤ 60 |
+| `cupos` | string \| null | **[cambio 2026-11-21] OPCIONAL**: ausente, `null`, `""` o solo espacios → se guarda `""` (en POST y en PUT: un PUT sin `cupos` deja `""`). Si viene, debe ser un entero de 1 a 1000 (`" 05 "` → `"5"`); si no → 400 `Los cupos deben ser un número entero entre 1 y 1000`. Ya **no** define la capacidad de las tutorías nuevas (ver `TutoriaCreate.cupos`); solo sirve de respaldo para tutorías antiguas con `cupos` null. `HorarioResponse.cupos` sigue siendo string (`""` cuando no hay) |
+| `espacio` | string \| null | **[cambio 2026-11-20] opcional** (aula), ≤ 60. `null`, ausente, `""` o solo espacios = **sin aula**: se guarda y se devuelve `""` (también `horarioEspacio: ""` en TutoriaResponse). Cada cliente decide el texto a mostrar; los correos y el Excel muestran "Por confirmar". En PUT, `null`/`""` quita el aula |
 | `estado` | string | obligatorio, ≤ 60 (`Disponible`, `Libre`, `Ocupado`, `Cancelado` — texto libre, ver decisiones pendientes) |
 | `usuarioId` | int | obligatorio, debe existir |
 
-**Título generado** (determinista, ≤ 100 caracteres): `{espacio} · {dd/MM/yyyy} {HH:mm}–{HH:mm}`; si `fechaFin` es otro día: `{espacio} · {dd/MM/yyyy}–{dd/MM/yyyy} {HH:mm}–{HH:mm}`. Ej.: `Sala 3 · 15/03/2030 08:00–09:30`. Si el espacio es muy largo se recorta para no pasar de 100.
+**Título generado** (determinista, ≤ 100 caracteres): `{espacio} · {dd/MM/yyyy} {HH:mm}–{HH:mm}`; si `fechaFin` es otro día: `{espacio} · {dd/MM/yyyy}–{dd/MM/yyyy} {HH:mm}–{HH:mm}`. Ej.: `Sala 3 · 15/03/2030 08:00–09:30`. **Sin aula**: sin el prefijo, p. ej. `15/03/2030 08:00–09:30`. Si el espacio es muy largo se recorta para no pasar de 100.
 **PUT sin título**: si el título guardado es el que el servidor habría generado con los datos anteriores, se **regenera** con los nuevos (no queda desfasado al cambiar espacio/fecha/hora); si es un título escrito por alguien (web antigua, MAUI, E2E), se **conserva**. `HorarioResponse.titulo` siempre trae un string no vacío.
 
 ### HorarioResponse
@@ -94,6 +94,7 @@ Solo tutorías con `sinResponder > 0`; orden `fechaHora` descendente. `fechaHora
 | `usuarioId` | int | obligatorio: asignado. **[cambio, solo POST]** debe tener rol Docente o Tutor → si no, 400 `El usuario asignado debe ser Docente o Tutor` |
 | `horarioId` | int | obligatorio. **[cambio, solo POST]** debe estar `Disponible`/`Libre` → si no, **409** `El horario ya no está disponible`. Al crear pasa a `Ocupado` (reserva atómica) |
 | `estudianteIds` | int[] \| null | **[nuevo, opcional, solo POST]** estudiantes a asignar en la misma operación: todos o ninguno, respetando cupos (409). Ids repetidos se ignoran. En PUT se ignora |
+| `cupos` | int \| null | **[nuevo 2026-11-21, BREAKING en POST]** máximo de estudiantes de la tutoría, entero 1–1000. **POST: obligatorio** → ausente/`null` → 400 `Los cupos son obligatorios`; fuera de rango → 400 `Los cupos deben ser un número entero entre 1 y 1000` (un valor no numérico como `"abc"` → 400 de validación del JSON). **PUT: opcional** (ausente/`null` = conserva); fuera de rango → 400; menor que los estudiantes ya inscritos → **409** `No se pueden fijar N cupos: la tutoría ya tiene M estudiantes inscritos` |
 
 Campos extra (p. ej. `tutorId` que envía MAUI) se ignoran. Las validaciones marcadas "solo POST" no se aplican a `PUT /Tutoria/{id}` (gestión web, sin cambios).
 
@@ -114,11 +115,11 @@ Sin cuerpo (o `{}`) = comportamiento anterior (solo finaliza).
   "usuarioNombre": "Carlos", "usuarioApellidos": "Pérez", "usuarioCorreo": "carlos@...",
   "horarioEspacio": "Sala A", "horarioHoraInicio": "2026-11-12T08:00:00", "horarioHoraFin": "2026-11-12T09:00:00",
   "horarioUsuarioId": 8, "horarioUsuarioNombre": "Ana", "horarioUsuarioApellidos": "Martínez",
-  "horarioTitulo": "Tutoría Inglés", "horarioCupos": 5,
+  "horarioTitulo": "Tutoría Inglés", "horarioCupos": 5, "cupos": 3,
   "estudiantes": [ /* UsuarioResponse */ ]
 }
 ```
-`usuarioId`, `horarioId` **[+]**. **[+] (fase 2)** `horarioUsuarioId` (dueño del horario = Docente que agendó; **[cambio, fase 4]** `null` si el dueño fue eliminado o no hay horario — antes `0`), `horarioUsuarioNombre`/`horarioUsuarioApellidos`, `horarioTitulo`, `horarioCupos` (`int` o `null` si el valor guardado no es un entero ≥ 1 = sin límite). Cupos ocupados = `estudiantes.length`. `estudiantes` es siempre un array (en POST/PUT viene `[]`; antes `null`) **[cambio menor]**. Datos relacionados ausentes: `"N/A"` y `0001-01-01T00:00:00`. **[cambio, fase 4]** Asignado eliminado: `usuarioId`, `usuarioNombre`, `usuarioApellidos`, `usuarioCorreo` = `null` (tutoría **sin asignar**); dueño del horario eliminado: `horarioUsuarioId`, `horarioUsuarioNombre`, `horarioUsuarioApellidos` = `null`.
+`usuarioId`, `horarioId` **[+]**. **[+] (fase 2)** `horarioUsuarioId` (dueño del horario = Docente que agendó; **[cambio, fase 4]** `null` si el dueño fue eliminado o no hay horario — antes `0`), `horarioUsuarioNombre`/`horarioUsuarioApellidos`, `horarioTitulo`, `horarioCupos` (`int` o `null` si el valor guardado no es un entero ≥ 1 = sin límite; se mantiene por compatibilidad). **[+] 2026-11-21** `cupos` (`int` o `null`): **capacidad efectiva** = `Tutoria.cupos`; si es null (tutorías antiguas) los cupos del horario; `null` = sin límite. **La UI debe usar `cupos`**. Cupos ocupados = `estudiantes.length`. `estudiantes` es siempre un array (en POST/PUT viene `[]`; antes `null`) **[cambio menor]**. Datos relacionados ausentes: `"N/A"` y `0001-01-01T00:00:00`. **[cambio, fase 4]** Asignado eliminado: `usuarioId`, `usuarioNombre`, `usuarioApellidos`, `usuarioCorreo` = `null` (tutoría **sin asignar**); dueño del horario eliminado: `horarioUsuarioId`, `horarioUsuarioNombre`, `horarioUsuarioApellidos` = `null`.
 
 ### RetroalimentacionCreate (POST/PUT /Retroalimentacion)
 | Campo | Tipo | Reglas |
@@ -275,24 +276,24 @@ La UI puede mostrar el resumen ("3 tutorías quedaron sin asignar…") y deberí
 
 | Método y ruta | Request | Éxito | Errores propios |
 |---|---|---|---|
-| `POST /Horario` | HorarioCreate (`titulo` opcional **[cambio]**) | **201** HorarioResponse (con `titulo` generado si no se envió) | 400 (incl. cupos no entero **[cambio]**), 404 usuario |
+| `POST /Horario` | HorarioCreate (`titulo` opcional **[cambio]**) | **201** HorarioResponse (con `titulo` generado si no se envió) | 400 (`cupos` presente pero no entero 1–1000 **[cambio]**; opcional desde 2026-11-21), 404 usuario |
 | `GET /Horario` | — | 200 HorarioResponse[] | — |
 | `GET /Horario/{id}` | — | 200 HorarioResponse | 404 |
 | `GET /Horario/disponibles` | — | 200 HorarioResponse[] con estado `Disponible` o `Libre` **[cambio: + Libre]** | — |
 | `GET /Horario/usuario/{usuarioId}` | — | 200 HorarioResponse[] | **403 si Docente/Tutor pide otro usuarioId [cambio]** |
-| `PUT /Horario/{id}` | HorarioCreate | 200 HorarioResponse | 400 (incl. cupos no entero **[cambio]**), 404 |
+| `PUT /Horario/{id}` | HorarioCreate | 200 HorarioResponse | 400 (`cupos` presente pero no entero 1–1000; opcional desde 2026-11-21), 404 |
 | `DELETE /Horario/{id}` | — | 200 `{ "message": "Horario eliminado exitosamente" }` | 404; **409 tiene tutorías [cambio, antes 500]** |
 
 ## Tutoria
 
 | Método y ruta | Request | Éxito | Errores propios |
 |---|---|---|---|
-| `POST /Tutoria` | TutoriaCreate | **201** TutoriaResponse (`estudiantes` = los asignados en la misma operación, o `[]`) | 400 (validación, fecha/hora fuera del horario, asignado no Docente/Tutor, estudiante no Estudiante, **asignado o estudiante con la cuenta desactivada [nuevo]**); **403** Tutor, o Docente en horario ajeno; 404 usuario/horario/estudiante; **409** horario no disponible o cupo superado **[cambio]** |
+| `POST /Tutoria` | TutoriaCreate | **201** TutoriaResponse (`estudiantes` = los asignados en la misma operación, o `[]`) | 400 (validación, **`cupos` ausente o fuera de 1–1000 [nuevo 2026-11-21]**, fecha/hora fuera del horario, asignado no Docente/Tutor, estudiante no Estudiante, **asignado o estudiante con la cuenta desactivada [nuevo]**); **403** Tutor, o Docente en horario ajeno; 404 usuario/horario/estudiante; **409** horario no disponible o cupo superado (límite = `cupos` de la tutoría) **[cambio]** |
 | `GET /Tutoria` | — | 200 TutoriaResponse[] | — |
 | `GET /Tutoria/{id}` | — | 200 TutoriaResponse | 404; **403 sin acceso (regla de propiedad) [cambio]** |
-| `PUT /Tutoria/{id}` | TutoriaCreate | 200 TutoriaResponse (`estudiantes: []`) | 400 (incl. **reasignar a una cuenta desactivada [nuevo]**; editar otros datos de una tutoría cuyo asignado ya está desactivado sí se permite), 404 |
+| `PUT /Tutoria/{id}` | TutoriaCreate | 200 TutoriaResponse (`estudiantes: []`) | 400 (incl. **reasignar a una cuenta desactivada [nuevo]**; editar otros datos de una tutoría cuyo asignado ya está desactivado sí se permite; `cupos` fuera de 1–1000 [nuevo]), 404; **409** `cupos` menor que los inscritos **[nuevo 2026-11-21]** |
 | `DELETE /Tutoria/{id}` | — | 200 `{ "message": "Tutoría eliminada exitosamente" }` | 404. **Borra también encuestas** (antes 500) **[cambio]** |
-| `POST /Tutoria/{id}/estudiantes` | `{ "estudianteIds": [5, 6] }` (≥ 1) | 200 `{ "message": "Estudiantes agregados exitosamente" }` | 400 (usuario no Estudiante, **estudiante desactivado [nuevo]**, o todos ya asignados); 404 tutoría/estudiante; **403** sin acceso o Tutor (`El Tutor no puede agregar ni quitar estudiantes de una tutoría`); **409** `Cupo completo: X de Y ocupados (se intentaron agregar N)` **[cambio]**. Todo o nada |
+| `POST /Tutoria/{id}/estudiantes` | `{ "estudianteIds": [5, 6] }` (≥ 1) | 200 `{ "message": "Estudiantes agregados exitosamente" }` | 400 (usuario no Estudiante, **estudiante desactivado [nuevo]**, o todos ya asignados); 404 tutoría/estudiante; **403** sin acceso o Tutor (`El Tutor no puede agregar ni quitar estudiantes de una tutoría`); **409** `Cupo completo: X de Y ocupados (se intentaron agregar N)` **[cambio]**; Y = `cupos` de la tutoría, o los del horario si la tutoría es antigua (`cupos` null); sin límite si ninguno es numérico. Todo o nada |
 | `GET /Tutoria/{id}/estudiantes` | — | 200 UsuarioResponse[] | 404; **403 sin acceso [cambio]** |
 | `DELETE /Tutoria/{tutoriaId}/estudiantes/{estudianteId}` | — | 200 `{ "message": "Estudiante eliminado de la tutoría exitosamente" }` | 404; **403** sin acceso o Tutor. **[cambio aditivo]** antes solo Admin/Aux; ahora también el Docente participante |
 | `GET /Tutoria/calendario/docente?nombre=&apellidos=&correo=` | query obligatorias | 200 TutoriaResponse[] | 400 faltan datos / no es docente-tutor; 404 |

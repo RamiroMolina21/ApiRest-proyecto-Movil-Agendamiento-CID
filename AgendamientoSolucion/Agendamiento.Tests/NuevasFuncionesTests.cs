@@ -98,13 +98,13 @@ public class NuevasFuncionesTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public void Titulo_generado_nunca_supera_100_caracteres_y_sin_espacio_usa_Horario()
+    public void Titulo_generado_nunca_supera_100_caracteres_y_sin_aula_no_lleva_prefijo()
     {
         var largo = TituloHorario.Generar(new string('x', 300), Dia, Dia.AddDays(1), Dia.AddHours(8), Dia.AddHours(9));
         Assert.True(largo.Length <= TituloHorario.LongitudMaxima);
         Assert.EndsWith(" · 15/03/2030–16/03/2030 08:00–09:00", largo);
 
-        Assert.Equal("Horario · 15/03/2030 08:00–09:00", TituloHorario.Generar(null, Dia, Dia, Dia.AddHours(8), Dia.AddHours(9)));
+        Assert.Equal("15/03/2030 08:00–09:00", TituloHorario.Generar(null, Dia, Dia, Dia.AddHours(8), Dia.AddHours(9)));
     }
 
     // ------------------------------------------------------------------ 2) Paginación de usuarios
@@ -252,7 +252,7 @@ public class NuevasFuncionesTests : IClassFixture<ApiFactory>
         var crear = await admin.PostAsJsonAsync("/api/Tutoria", new
         {
             idioma = "Inglés", nivel = "B1", tema = "Inactivo", modalidad = "Virtual", estado = "Pendiente",
-            fechaTutoria = DateTime.Today.AddHours(8), usuarioId = tutorId, horarioId
+            fechaTutoria = DateTime.Today.AddHours(8), usuarioId = tutorId, horarioId, cupos = 5
         });
         Assert.Equal(HttpStatusCode.BadRequest, crear.StatusCode);
 

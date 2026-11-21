@@ -91,10 +91,11 @@ public class TutoriaService : ITutoriaService
         }
 
         var fechaHora = NormalizarFechaTutoria(tutoriaDto.FechaTutoria, horario);
+        var cupos = Cupos.ValidarTutoria(tutoriaDto.Cupos, obligatorio: true);
 
         // Validar estudiantes y cupo ANTES de escribir nada.
         var estudiantes = await ValidarEstudiantesNuevosAsync(tutoriaDto.EstudianteIds ?? new List<int>(), tutoriaId: null);
-        VerificarCupo(horario, actuales: 0, nuevos: estudiantes.Count);
+        VerificarCupo(cupos, horario, actuales: 0, nuevos: estudiantes.Count);
 
         Tutoria tutoriaCreada;
         await using (var transaccion = await _unidadDeTrabajo.IniciarTransaccionAsync())
@@ -114,7 +115,8 @@ public class TutoriaService : ITutoriaService
                 estado = tutoriaDto.Estado,
                 fechaHora = fechaHora,
                 Usuario_idUsuario = asignado.idUsuario,
-                Horario_idHorario = horario.idHorario
+                Horario_idHorario = horario.idHorario,
+                cupos = cupos
             });
 
             if (estudiantes.Count > 0)
@@ -251,6 +253,20 @@ public class TutoriaService : ITutoriaService
             HorarioEspacio = tutoria.Horario?.espacio ?? ""
         };
 
+        // Cupos opcional en PUT: ausente = conserva. No puede quedar por debajo de los ya inscritos.
+        var nuevosCupos = Cupos.ValidarTutoria(tutoriaDto.Cupos, obligatorio: false);
+        if (nuevosCupos != null)
+        {
+            var inscritos = await _tutoriaEstudianteRepository.CountByTutoriaAsync(tutoria.idTutoria);
+            if (nuevosCupos.Value < inscritos)
+            {
+                throw new ConflictException(
+                    $"No se pueden fijar {nuevosCupos.Value} cupos: la tutoría ya tiene {inscritos} estudiantes inscritos");
+            }
+
+            tutoria.cupos = nuevosCupos;
+        }
+
         tutoria.idioma = tutoriaDto.Idioma;
         tutoria.nivel = tutoriaDto.Nivel;
         tutoria.tema = tutoriaDto.Tema;
@@ -313,7 +329,7 @@ public class TutoriaService : ITutoriaService
 
             // 2) Cupo del horario = máximo de estudiantes de la tutoría.
             var actuales = await _tutoriaEstudianteRepository.CountByTutoriaAsync(tutoriaId);
-            VerificarCupo(tutoria.Horario, actuales, nuevos.Count);
+            VerificarCupo(tutoria.cupos, tutoria.Horario, actuales, nuevos.Count);
 
             // 3) Insertar todas las asignaciones en un único SaveChanges.
             await _tutoriaEstudianteRepository.CreateRangeAsync(nuevos.Select(e => new TutoriaEstudiante
@@ -378,16 +394,18 @@ public class TutoriaService : ITutoriaService
         return resultado;
     }
 
-    /// <summary>Cupos = máximo de estudiantes de la tutoría del horario. Cupos no numéricos (datos antiguos) = sin límite.</summary>
-    private void VerificarCupo(Horario? horario, int actuales, int nuevos)
+    /// <summary>
+    /// Límite = Tutoria.cupos; si es null (tutorías antiguas) los cupos del horario; si tampoco son numéricos, sin límite.
+    /// </summary>
+    private void VerificarCupo(int? cuposTutoria, Horario? horario, int actuales, int nuevos)
     {
-        if (nuevos == 0 || horario == null) return;
+        if (nuevos == 0) return;
 
-        var cupo = Cupos.Interpretar(horario.cupos);
+        var cupo = Cupos.Efectivos(cuposTutoria, horario?.cupos);
         if (cupo == null)
         {
-            _logger.LogWarning("El horario {HorarioId} tiene cupos no numéricos ('{Cupos}'): se asignan estudiantes sin límite",
-                horario.idHorario, horario.cupos);
+            _logger.LogWarning("La tutoría (horario {HorarioId}) no tiene cupos numéricos ('{Cupos}'): se asignan estudiantes sin límite",
+                horario?.idHorario, horario?.cupos);
             return;
         }
 
@@ -629,6 +647,7 @@ public class TutoriaService : ITutoriaService
         HorarioUsuarioApellidos = horario is { Usuario_idUsuario: null } ? null : horario?.Usuario?.apellidos ?? sinDatos,
         HorarioTitulo = horario?.titulo ?? sinDatos,
         HorarioCupos = Cupos.Interpretar(horario?.cupos),
+        Cupos = Cupos.Efectivos(tutoria.cupos, horario?.cupos),
         Estudiantes = estudiantes
     };
 }

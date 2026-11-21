@@ -150,7 +150,7 @@ public class CorreosFlujoTests : IClassFixture<Agendamiento.Tests.Infrastructure
         var resp = await System.Net.Http.Json.HttpClientJsonExtensions.PostAsJsonAsync(admin, "/api/Tutoria", new
         {
             idioma = "Inglés", nivel = "B1", tema = "<i>Viajes</i>", modalidad = "Virtual", estado = "Pendiente",
-            fechaTutoria = DateTime.Today.AddHours(8), usuarioId = tutorId, horarioId, estudianteIds = new[] { estId }
+            fechaTutoria = DateTime.Today.AddHours(8), usuarioId = tutorId, horarioId, estudianteIds = new[] { estId }, cupos = 5
         });
         Assert.Equal(System.Net.HttpStatusCode.Created, resp.StatusCode);
 

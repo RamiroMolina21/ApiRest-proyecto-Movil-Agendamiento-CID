@@ -25,10 +25,10 @@ public class MigracionWebTests : IClassFixture<ApiFactory>
 
     private int Id(string correo) => _f.ConDb(db => Seed.IdDe(db, correo));
 
-    private static object NuevaTutoria(int usuarioId, int horarioId, DateTime? fecha = null, int[]? estudianteIds = null) => new
+    private static object NuevaTutoria(int usuarioId, int horarioId, DateTime? fecha = null, int[]? estudianteIds = null, int? cupos = 10) => new
     {
         idioma = "Inglés", nivel = "B1", tema = "Web", modalidad = "Virtual", estado = "Pendiente",
-        fechaTutoria = fecha ?? DateTime.Today.AddHours(8), usuarioId, horarioId, estudianteIds
+        fechaTutoria = fecha ?? DateTime.Today.AddHours(8), usuarioId, horarioId, estudianteIds, cupos
     };
 
     private static async Task<HttpStatusCode> Status(Task<HttpResponseMessage> peticion) => (await peticion).StatusCode;
@@ -336,14 +336,14 @@ public class MigracionWebTests : IClassFixture<ApiFactory>
         var tutoriasAntes = _f.ConDb(db => db.Tutorias.Count());
 
         // Supera el cupo → 409, no se crea nada y el horario sigue disponible.
-        var excede = await docente.PostAsJsonAsync("/api/Tutoria", NuevaTutoria(tutorId, horario, estudianteIds: new[] { e1, e2 }));
+        var excede = await docente.PostAsJsonAsync("/api/Tutoria", NuevaTutoria(tutorId, horario, estudianteIds: new[] { e1, e2 }, cupos: 1));
         Assert.Equal(HttpStatusCode.Conflict, excede.StatusCode);
         // Estudiante inexistente → 404, tampoco se crea nada.
         Assert.Equal(HttpStatusCode.NotFound, await Status(docente.PostAsJsonAsync("/api/Tutoria", NuevaTutoria(tutorId, horario, estudianteIds: new[] { 999999 }))));
         Assert.Equal(tutoriasAntes, _f.ConDb(db => db.Tutorias.Count()));
         Assert.Equal("Disponible", _f.ConDb(db => db.Horarios.Single(h => h.idHorario == horario).estado));
 
-        var ok = await docente.PostAsJsonAsync("/api/Tutoria", NuevaTutoria(tutorId, horario, estudianteIds: new[] { e1, e1 }));
+        var ok = await docente.PostAsJsonAsync("/api/Tutoria", NuevaTutoria(tutorId, horario, estudianteIds: new[] { e1, e1 }, cupos: 1));
         Assert.Equal(HttpStatusCode.Created, ok.StatusCode);
         var json = await ok.JsonAsync();
         Assert.Equal(e1, json["estudiantes"]!.AsArray().Single()!["idUsuario"]!.GetValue<int>());

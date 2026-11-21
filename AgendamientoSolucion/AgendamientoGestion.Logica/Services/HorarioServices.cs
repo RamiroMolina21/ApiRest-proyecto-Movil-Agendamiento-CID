@@ -34,8 +34,8 @@ public class HorarioServices : IHorarioServices
             fechaFin = horarioDto.FechaFin,
             horaInicio = horarioDto.HoraInicio,
             horaFin = horarioDto.HoraFin,
-            cupos = Cupos.ValidarYNormalizar(horarioDto.Cupos),
-            espacio = horarioDto.Espacio,
+            cupos = Cupos.ValidarOpcionalHorario(horarioDto.Cupos),
+            espacio = Aula.Normalizar(horarioDto.Espacio),
             estado = horarioDto.Estado,
             Usuario_idUsuario = usuario.idUsuario
         };
@@ -81,8 +81,8 @@ public class HorarioServices : IHorarioServices
         horario.fechaFin = horarioDto.FechaFin;
         horario.horaInicio = horarioDto.HoraInicio;
         horario.horaFin = horarioDto.HoraFin;
-        horario.cupos = Cupos.ValidarYNormalizar(horarioDto.Cupos);
-        horario.espacio = horarioDto.Espacio;
+        horario.cupos = Cupos.ValidarOpcionalHorario(horarioDto.Cupos);
+        horario.espacio = Aula.Normalizar(horarioDto.Espacio);
         horario.estado = horarioDto.Estado;
         horario.Usuario_idUsuario = usuario.idUsuario;
         horario.Usuario = usuario;

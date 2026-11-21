@@ -17,6 +17,8 @@ namespace AgendamientoGestion.Entidades.Entities
         /// <summary>Asignado (Docente/Tutor). null: el usuario fue eliminado; la tutoría queda sin asignar.</summary>
         public int? Usuario_idUsuario { get; set; }
         public int Horario_idHorario { get; set; }
+        /// <summary>Máximo de estudiantes (1..1000). null: tutoría anterior al cambio → se usan los cupos del horario.</summary>
+        public int? cupos { get; set; }
 
         // Propiedades de navegación
         public Usuario? Usuario { get; set; }

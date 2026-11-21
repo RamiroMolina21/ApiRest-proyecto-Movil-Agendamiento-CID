@@ -40,8 +40,14 @@ namespace AgendamientoGestion.Logica.Dtos
 
         /// <summary>
         /// Opcional (solo POST): estudiantes a asignar en la misma operación. Se crea la tutoría y se asignan
-        /// todos o ninguno (respeta los cupos del horario). Se ignora en PUT.
+        /// todos o ninguno (respeta los cupos de la tutoría). Se ignora en PUT.
         /// </summary>
         public List<int>? EstudianteIds { get; set; }
+
+        /// <summary>
+        /// Máximo de estudiantes de la tutoría, entero 1..1000. OBLIGATORIO en POST; opcional en PUT
+        /// (ausente/null = conserva). Se valida en el servicio (el DTO es compartido por POST y PUT).
+        /// </summary>
+        public int? Cupos { get; set; }
     }
 }
