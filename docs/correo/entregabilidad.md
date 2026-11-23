@@ -105,3 +105,9 @@ Encuesta__UrlBase=https://<dominio público de la web>/encuesta
 
 Fuentes: Google "Email sender guidelines" (support.google.com/a/answer/81126); Microsoft Learn, `System.Net.Mail.SmtpClient`
 (observaciones: no recomendado para desarrollo nuevo, usar MailKit); Google Workspace "Gmail sending limits".
+
+
+## Render gratuito: SMTP bloqueado
+
+En Render (plan gratuito) los puertos SMTP están bloqueados: usar `Correo:Proveedor = GmailApi`. Ver [gmail-api.md](gmail-api.md).
+
