@@ -68,6 +68,7 @@ namespace Agendamiento.Controllers
             return Ok(new
             {
                 messageId,
+                proveedor = correo is AgendamientoGestion.Logica.Services.GmailApiCorreoService ? "GmailApi" : "Smtp",
                 from = $"{s.NombreRemitente} <{s.DireccionRemitente}>",
                 replyTo = string.IsNullOrWhiteSpace(s.ResponderA) ? null : s.ResponderA,
                 subject = c.Asunto,

@@ -218,7 +218,17 @@ builder.Services.AddSingleton(new RegistroEnlaceDesarrollo(
     builder.Configuration.GetValue<bool>($"{RestablecimientoSettings.SectionName}:RegistrarEnlaceEnLogDesarrollo")));
 
 // 🔹 Servicios de correo
-builder.Services.AddScoped<ICorreoService, CorreoService>();
+// Correo:Proveedor = "Smtp" (por defecto) | "GmailApi" (HTTPS 443; Render gratuito bloquea los puertos SMTP).
+// Se resuelve con IOptions (no leyendo la configuración antes de Build) para respetar todas las fuentes de configuración.
+builder.Services.Configure<CorreoSettings>(builder.Configuration.GetSection(CorreoSettings.SectionName));
+builder.Services.Configure<GmailApiSettings>(builder.Configuration.GetSection(GmailApiSettings.SectionName));
+builder.Services.AddSingleton<GmailAccessTokenCache>();
+builder.Services.AddHttpClient<GmailApiCorreoService>();
+builder.Services.AddScoped<CorreoService>();
+builder.Services.AddScoped<ICorreoService>(sp =>
+    sp.GetRequiredService<IOptions<CorreoSettings>>().Value.ProveedorValidado() == CorreoSettings.ProveedorGmailApi
+        ? sp.GetRequiredService<GmailApiCorreoService>()
+        : sp.GetRequiredService<CorreoService>());
 builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddSingleton<AgendamientoGestion.Logica.Correo.IPlantillasCorreo, AgendamientoGestion.Logica.Correo.PlantillasCorreo>();
 builder.Services.AddScoped<IExcelService, ExcelService>();
@@ -252,6 +262,16 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Proveedor de correo: valor inválido o GmailApi sin credenciales → la API NO arranca, con un mensaje claro en el log
+// de despliegue (mejor que descubrirlo cuando no llega ningún correo).
+var proveedorCorreo = app.Services.GetRequiredService<IOptions<CorreoSettings>>().Value.ProveedorValidado();
+if (proveedorCorreo == CorreoSettings.ProveedorGmailApi)
+{
+    GmailApiCorreoService.ValidarConfiguracion(
+        app.Services.GetRequiredService<IOptions<GmailApiSettings>>().Value,
+        app.Services.GetRequiredService<IOptions<SmtpSettings>>().Value);
+}
+
 // ----------------------
 // 🔹 AVISOS DE ENTREGABILIDAD DE CORREO (ver docs/correo/entregabilidad.md)
 // ----------------------
@@ -264,7 +284,8 @@ var app = builder.Build();
             "Encuesta:UrlBase ({Url}) no es una URL pública https: los enlaces de los correos de encuesta no funcionarán fuera de este equipo.", urlEncuesta);
     }
 
-    var smtp = app.Services.GetRequiredService<IOptions<SmtpSettings>>().Value;
+    app.Logger.LogInformation("Proveedor de correo: {Proveedor}", proveedorCorreo);
+var smtp = app.Services.GetRequiredService<IOptions<SmtpSettings>>().Value;
     if (!string.IsNullOrWhiteSpace(smtp.User) && !string.Equals(smtp.DireccionRemitente, smtp.User.Trim(), StringComparison.OrdinalIgnoreCase))
     {
         app.Logger.LogWarning("SmtpSettings:Remitente distinto de la cuenta autenticada: el proveedor puede reescribir el From o el correo fallar DMARC.");
